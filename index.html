@@ -4,1015 +4,441 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🛡️ SISTEMA DE GESTION INDICADORES HSEQ & SOCIAL</title>
-    <!-- Tailwind CSS para diseño corporativo moderno -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- ApexCharts CDN para gráficos premium -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <!-- Lucide Icons CDN para íconos elegantes -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase JS Client library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- MSAL.js Browser Client library para SharePoint/Graph API -->
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-    <!-- html2pdf.js para exportación de PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        :root {
+            --bg-main: #0f172a;
+            --bg-panel: rgba(30, 41, 59, 0.7);
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+        }
+
+        body.light-theme {
+            --bg-main: #f1f5f9;
+            --bg-panel: #ffffff;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
         .glassmorphism {
-            background: rgba(30, 41, 59, 0.7);
+            background: var(--bg-panel);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
         }
-        .glassmorphism-light {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        
+        .card-bg {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            transition: all 0.3s;
         }
-        /* Custom scrollbar */
+
+        .text-dynamic { color: var(--text-main); }
+        .text-muted-dynamic { color: var(--text-muted); }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-track { background: var(--border-color); }
         ::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
     </style>
 </head>
-<body class="p-4 bg-slate-950 text-slate-100 antialiased select-none min-h-screen">
+<body class="p-4 antialiased select-none min-h-screen">
 
-    <!-- CABECERA PRINCIPAL (SISTEMA DE GESTION INDICADORES HSEQ & SOCIAL) -->
-    <header class="glassmorphism p-4 rounded-2xl mb-4 border border-slate-800 shadow-xl flex flex-wrap items-center justify-between gap-4">
+    <header class="glassmorphism p-4 rounded-2xl mb-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
             <div class="p-2.5 bg-gradient-to-tr from-cyan-600 to-indigo-600 rounded-xl shadow-lg">
                 <i data-lucide="shield-check" class="w-6 h-6 text-white animate-pulse"></i>
             </div>
             <div>
-                <span class="text-[9px] uppercase font-extrabold tracking-widest text-cyan-400 block">Integrow S.A. - Plataforma de Fiscalización</span>
-                <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-2 mt-0.5">
-                    SISTEMA DE GESTION INDICADORES HSEQ & SOCIAL
+                <span class="text-[9px] uppercase font-extrabold tracking-widest text-cyan-500 block">Integrow S.A. - Plataforma de Fiscalización</span>
+                <h1 class="text-lg font-black tracking-tight text-dynamic flex items-center gap-2 mt-0.5">
+                    SISTEMA DE GESTIÓN INDICADORES HSEQ & SOCIAL
                 </h1>
             </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-            <div class="flex flex-col text-xs">
-                <span class="text-[9px] text-slate-400 uppercase font-bold mb-1">Centro de Trabajo</span>
-                <select id="tenantSelector" onchange="cambiarTenant()" class="bg-slate-900 border border-slate-700 text-white rounded-lg px-3 py-1.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all">
-                    <option value="MILLENIUM">ETINAR: HOSPITAL MILLENIUM MED (FOR-SGI-03)</option>
-                    <option value="CASA_RONALD">FUNDACIÓN CASA RONALD MCDONALD</option>
-                </select>
-            </div>
-            
-            <!-- Estado Conexión Supabase -->
-            <button onclick="toggleConfigModal('db')" class="flex flex-col items-start px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/50 transition-all">
-                <span class="text-[8px] text-slate-400 uppercase block font-bold">Base de Datos</span>
-                <span id="badgeDbStatus" class="text-xs font-black text-amber-500 flex items-center gap-1">
-                    <span class="h-2 w-2 rounded-full bg-amber-500 animate-ping"></span> Modo Local
-                </span>
+            <button onclick="toggleTheme()" class="p-2 bg-slate-800 text-yellow-400 hover:bg-slate-700 rounded-lg transition-all shadow-md border border-slate-700" title="Cambiar Tema">
+                <i data-lucide="sun" id="themeIcon" class="w-5 h-5"></i>
             </button>
 
-            <!-- Estado Conexión SharePoint -->
-            <button onclick="toggleConfigModal('sp')" class="flex flex-col items-start px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-cyan-500/50 transition-all">
-                <span class="text-[8px] text-slate-400 uppercase block font-bold">SharePoint Linker</span>
-                <span id="badgeSpStatus" class="text-xs font-black text-rose-500 flex items-center gap-1">
-                    <span class="h-2 w-2 rounded-full bg-rose-500"></span> Desconectado
-                </span>
-            </button>
+            <div class="flex items-center gap-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 shadow-md">
+                <div class="flex flex-col text-xs">
+                    <span class="text-[8px] text-slate-400 uppercase font-bold mb-0.5 flex items-center gap-1">
+                        Centro de Trabajo <i data-lucide="lock" class="w-2.5 h-2.5 text-amber-500" title="Próximamente: Acceso por contraseña"></i>
+                    </span>
+                    <select id="tenantSelector" class="bg-transparent text-white text-xs font-bold focus:outline-none w-48">
+                        <option value="MELIOME">PROYECTO HOSPITAL MELIOME</option>
+                        <option value="CREAR">CREAR S.A.</option>
+                    </select>
+                </div>
+                <button onclick="agregarCliente()" class="bg-cyan-600 hover:bg-cyan-500 text-white rounded p-1 transition-all" title="Nuevo Cliente">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+            </div>
 
             <div class="flex gap-2">
-                <button onclick="generarInformeWord()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-1.5">
-                    <i data-lucide="file-text" class="w-4 h-4"></i> EXPORTAR WORD
-                </button>
                 <button onclick="generarInformePDF()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-1.5">
-                    <i data-lucide="download" class="w-4 h-4"></i> EXPORTAR PDF
+                    <i data-lucide="download" class="w-4 h-4"></i> INFORME PDF
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MATRIZ SUPERIOR DE LOS 10 INDICADORES CLAVE (LÍNEA BASE FOR-SGI-040 CON AGREGACIÓN DE INCIDENTES) -->
-    <section class="grid grid-cols-2 md:grid-cols-5 xl:grid-cols-10 gap-2.5 mb-4" id="grid9IndicadoresMaster">
-        <!-- Inyectado dinámicamente -->
-    </section>
+    <section class="grid grid-cols-2 md:grid-cols-5 xl:grid-cols-10 gap-2.5 mb-4" id="grid10IndicadoresMaster"></section>
 
-    <!-- ENLACE DINÁMICO: DESPLEGABLE PARA ABRIR SUB-INDICADORES PROACTIVOS -->
-    <section class="mb-4 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-lg transition-all">
-        <details class="group" open>
-            <summary class="list-none flex justify-between items-center cursor-pointer font-black text-xs text-slate-300 uppercase tracking-wider">
-                <span class="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors">
-                    <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i> SUB-INDICADORES DE GESTIÓN PROACTIVA (ART, OPAS, DPS, DS, ENTS, OSEA, CAI)
-                </span>
-                <span class="transition-transform group-open:rotate-180 text-slate-500">
-                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                </span>
-            </summary>
-            
-            <div class="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-7 gap-3 mt-4 pt-4 border-t border-slate-800/80" id="contenedorSubProactivos">
-                <!-- Inyectado dinámicamente -->
-            </div>
-        </details>
-    </section>
-
-    <!-- CUADRO CONTEXTUAL DE PARÁMETROS: TASA DE RIESGO / INCIDENTES SEGURIDAD Y AMBIENTALES -->
-    <div id="panelCalculoHseq" class="hidden glassmorphism p-4 rounded-2xl border border-cyan-500/30 shadow-lg mb-4 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-        <!-- Inyectado dinámicamente por JS según el KPI activo -->
-    </div>
-
-    <!-- CONTROL CENTRAL DE PANELES (RELOJES Y CAPTURA MOBILE) -->
-    <div class="grid grid-cols-1 xl:grid-cols-4 gap-4 mb-4">
-        
-        <!-- PANELES DE GRÁFICOS APEXCHARTS -->
-        <div class="xl:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            <!-- Apex Gauge 1: Global Preventivo SST -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-between shadow-md">
-                <div class="w-full flex items-center justify-between mb-2">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">PREVENTIVO GLOBAL SST</span>
-                    <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
-                </div>
-                <div id="chartGaugeSisoma" class="w-full h-36 flex items-center justify-center"></div>
-                <span class="text-[9px] font-bold text-slate-400 text-center tracking-tight">Meta: ≥ 95%</span>
-            </div>
-
-            <!-- Apex Gauge 2: Tasa de Riesgo -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-between shadow-md">
-                <div class="w-full flex items-center justify-between mb-2">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">TASA DE RIESGO (TR)</span>
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i>
-                </div>
-                <div id="chartGaugeTR" class="w-full h-36 flex items-center justify-center"></div>
-                <div class="flex justify-between w-full text-[8px] text-slate-400 px-2 font-mono">
-                    <span id="lblGaugeTFSub">TF: 0.00</span>
-                    <span id="lblGaugeTGSub">TG: 0.00</span>
-                </div>
-            </div>
-
-            <!-- Apex Gauge 3: Índice de Eficacia -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-between shadow-md">
-                <div class="w-full flex items-center justify-between mb-2">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider">INDICE DE EFICACIA (IEF)</span>
-                    <i data-lucide="target" class="w-4 h-4 text-cyan-400"></i>
-                </div>
-                <div id="chartGaugeIef" class="w-full h-36 flex items-center justify-center"></div>
-                <span class="text-[9px] font-bold text-slate-400 text-center tracking-tight">Meta: ≥ 85%</span>
-            </div>
-
-            <!-- Gráfico 4: Tendencia de Incidentes & HSEQ -->
-            <div class="md:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-md">
-                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400"></i> Tendencia Histórica de Desempeño (Últimos 6 Meses)
-                </h4>
-                <div id="chartTrendHSEQ" class="h-48"></div>
-            </div>
-
-            <!-- Gráfico 5: Barras Plan vs Ejecución Subindicadores -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-md">
-                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-400"></i> Plan vs Ejecución Proactivos
-                </h4>
-                <div id="chartBarSubProactivos" class="h-48"></div>
-            </div>
-
+    <div id="panelCalculoHseq" class="hidden glassmorphism p-4 rounded-2xl shadow-lg mb-4 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
         </div>
 
-        <!-- TELEMETRIA MOVIL DE LEVANTAMIENTO EN CAMPO E INSPECCIONES (EMULACIÓN DISPOSITIVO) -->
-        <aside class="bg-slate-900 border border-slate-800 rounded-3xl p-4 shadow-2xl flex flex-col justify-between text-xs relative h-[480px]">
-            <!-- Botón del altavoz / Bezel de Celular -->
-            <div class="absolute top-1.5 left-1/2 -translate-x-1/2 h-1 w-12 bg-slate-700 rounded-full"></div>
-            
-            <div class="flex flex-col h-full mt-2 overflow-hidden">
-                <!-- Selector de Módulo Móvil -->
-                <div class="grid grid-cols-2 gap-1 bg-slate-950 p-1 rounded-xl mb-3 border border-slate-800/80">
-                    <button id="btnTabHallazgos" onclick="setMobileTab('hallazgos')" class="bg-cyan-600 text-white font-extrabold text-[9px] py-1.5 rounded-lg uppercase tracking-wider transition-all">
-                        🔎 Inspección
-                    </button>
-                    <button id="btnTabPermisos" onclick="setMobileTab('permisos')" class="text-slate-400 font-extrabold text-[9px] py-1.5 rounded-lg uppercase tracking-wider transition-all">
-                        📄 Permisos
-                    </button>
-                </div>
-
-                <div id="containerMobileForms" class="flex-1 overflow-y-auto pr-1">
-                    <!-- CONTENEDOR 1: INSPECCION DE HALLAZGOS -->
-                    <div id="mobFormHallazgos" class="space-y-2">
-                        <div>
-                            <label class="block text-slate-400 font-bold text-[8px] uppercase">1. Tipo de Novedad</label>
-                            <select id="mobTipo" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[11px]">
-                                <option value="NEAR_MISS">Near Miss (Casi Accidente)</option>
-                                <option value="ACTO_SUB">Acto Subestándar</option>
-                                <option value="COND_SUB">Condición Subestándar</option>
-                            </select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">2. Criticidad</label>
-                                <select id="mobCriticidad" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[11px]">
-                                    <option value="ALTA">🔴 Alta</option>
-                                    <option value="MEDIA">🟡 Media</option>
-                                    <option value="BAJA">🟢 Baja</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">3. Plazo</label>
-                                <input type="date" id="mobPlazo" value="2026-07-31" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1 font-bold text-white text-[11px] font-mono">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">4. Clasif. Riesgo</label>
-                                <select id="mobRiesgo" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[11px]">
-                                    <option value="Mecánico">Mecánico</option>
-                                    <option value="Locativo">Locativo</option>
-                                    <option value="Físico">Físico</option>
-                                    <option value="Químico">Químico</option>
-                                    <option value="Eléctrico">Eléctrico</option>
-                                    <option value="Ergonómico">Ergonómico</option>
-                                    <option value="Psicosocial">Psicosocial</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">5. Vincular KPI</label>
-                                <select id="mobKpiVinculo" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[11px]">
-                                    <option value="ART">b1) ART</option>
-                                    <option value="OPAS">b2) OPAS</option>
-                                    <option value="DPS">b3) DPS</option>
-                                    <option value="DS">b4) DS</option>
-                                    <option value="ENTS">b5) ENTS</option>
-                                    <option value="OSEA">b6) OSEA</option>
-                                    <option value="CAI">b7) CAI</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 font-bold text-[8px] uppercase">6. Resp. / Acción Correctiva</label>
-                            <div class="flex gap-1.5">
-                                <input type="text" id="mobResp" placeholder="Responsable" class="w-1/3 bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[11px]">
-                                <input type="text" id="mobAccion" placeholder="Acción correctiva" class="w-2/3 bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-medium text-white text-[11px]">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-slate-400 font-bold text-[8px] uppercase">7. Descripción Hallazgo</label>
-                            <input type="text" id="mobDescripcion" placeholder="Detalle de anomalía..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-[11px] text-white focus:outline-none focus:border-cyan-500">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center relative flex flex-col justify-center items-center h-16 cursor-pointer hover:border-cyan-500/50 transition-all">
-                                <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
-                                <span class="block text-[7px] font-bold text-slate-400 mt-1">FOTO INICIAL</span>
-                                <input type="file" accept="image/*" id="fileFotoInicial" onchange="capturarImagenLocal(this, 'previewIni')" class="absolute inset-0 opacity-0 cursor-pointer">
-                                <img id="previewIni" class="absolute inset-0 h-full w-full object-cover hidden rounded-xl">
-                            </div>
-                            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 text-center relative flex flex-col justify-center items-center h-16 cursor-pointer hover:border-cyan-500/50 transition-all">
-                                <i data-lucide="image" class="w-4 h-4 text-slate-400"></i>
-                                <span class="block text-[7px] font-bold text-slate-400 mt-1">FOTO CIERRE</span>
-                                <input type="file" accept="image/*" id="fileFotoCierre" onchange="capturarImagenLocal(this, 'previewCie')" class="absolute inset-0 opacity-0 cursor-pointer">
-                                <img id="previewCie" class="absolute inset-0 h-full w-full object-cover hidden rounded-xl">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CONTENEDOR 2: VERIFICACION DE PERMISOS DE TRABAJO -->
-                    <div id="mobFormPermisos" class="space-y-2 hidden">
-                        <div class="flex gap-1.5">
-                            <div class="flex-1">
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">ID de Permiso</label>
-                                <input type="text" id="permitId" value="PT-2026-0042" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[11px] font-mono">
-                            </div>
-                            <div class="w-1/2">
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">Supervisor</label>
-                                <input type="text" id="permitSupervisor" value="Ing. R. Salazar" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[11px]">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">Clase de Permiso</label>
-                                <select id="permitClase" onchange="cambiarChecklistPermisos()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[10px]">
-                                    <option value="ALTURAS">Trabajo en Alturas 🧗</option>
-                                    <option value="CALIENTE">Trabajo en Caliente 🔥</option>
-                                    <option value="CONFINADO">Espacio Confinado 🕳️</option>
-                                    <option value="ELECTRICO">Riesgo Eléctrico ⚡</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-slate-400 font-bold text-[8px] uppercase">Estado</label>
-                                <select id="permitStatus" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-bold text-white text-[10px]">
-                                    <option value="ACTIVO">🟢 Activo</option>
-                                    <option value="SUSPENDIDO">🟡 Suspendido</option>
-                                    <option value="CERRADO">🔴 Cerrado</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Checklists de Seguridad Críticos -->
-                        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800/80">
-                            <span class="block text-[8px] font-black text-cyan-400 uppercase tracking-wider mb-1.5">Controles de Seguridad Críticos</span>
-                            <div id="boxPermitChecklists" class="space-y-1 text-[9px] text-slate-300">
-                                <!-- Inyectado dinámicamente -->
-                            </div>
-                        </div>
-
-                        <!-- Firma Digital -->
-                        <div>
-                            <label class="block text-slate-400 font-bold text-[8px] uppercase mb-1">Firma Digital del Inspector (Nombre completo)</label>
-                            <input type="text" id="permitInspectorFirma" value="Firma Inspector SST" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 font-semibold text-white text-[11px]">
-                        </div>
-                        
-                        <!-- Visualizador de Código QR -->
-                        <div class="flex items-center gap-3 p-2 bg-slate-950 rounded-xl border border-slate-800/80">
-                            <div id="boxPermitQR" class="shrink-0 bg-white p-1 rounded-lg">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=PT-2026-0042-VERIFICADO" class="h-10 w-10">
-                            </div>
-                            <div class="flex-1 leading-tight">
-                                <span class="text-[8px] font-bold text-slate-400 block">Trazabilidad Criptográfica</span>
-                                <span class="text-[9px] font-bold text-emerald-400 block mt-0.5">Código QR de Verificación</span>
-                                <span class="text-[7px] text-slate-500 block font-mono">MD5: ad90ff...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="guardarRegistroMobile()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-extrabold py-2.5 rounded-xl shadow-lg transition-all uppercase tracking-wider text-[10px] mt-3 shrink-0 flex items-center justify-center gap-1.5">
-                    <i data-lucide="radio" class="w-4 h-4 animate-ping"></i> Transmitir al Servidor HSEQ
-                </button>
-            </div>
-        </aside>
-    </div>
-
-    <!-- REGISTROS ADICIONALES (LOG DE NOVEDADES Y PLAN DE ACCION ACTIVO) -->
-    <div class="grid grid-cols-1 xl:grid-cols-4 gap-4 mb-4">
-        
-        <!-- LOG TRANSACCIONAL DE LEVANTAMIENTOS EN CAMPO -->
-        <div class="xl:col-span-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-md">
-            <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-wider mb-3 border-b border-slate-800 pb-2 flex items-center justify-between">
-                <span class="flex items-center gap-1.5"><i data-lucide="database" class="w-4 h-4 text-cyan-400"></i> Registro de Hallazgos y Permisos Transmitidos en Campo</span>
-                <span class="text-[8px] bg-slate-950 text-cyan-400 px-2 py-0.5 rounded-full font-mono font-bold" id="lblLogCount">Total: 1</span>
-            </h4>
-            <div class="overflow-y-auto max-h-[160px] divide-y divide-slate-800/80 pr-1 text-xs" id="boxHistorialMobileLogs">
-                <!-- Inyectado dinámicamente -->
-            </div>
-        </div>
-
-        <!-- PLAN DE ACCIÓN REFORMULATORIO (REACTIVO) -->
-        <div id="boxPlanAccionDinamico" class="rounded-2xl border flex flex-col justify-between text-xs p-4 shadow-md font-medium">
-            <!-- Reactivo por JS -->
-        </div>
-    </div>
-
-    <!-- CAPÍTULO DE CIERRE ABSOLUTO: PLANIFICACIÓN OPERATIVA DETALLADA POR KPI -->
-    <section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <div class="border-b border-slate-800 pb-3 mb-4 flex justify-between items-center flex-wrap gap-4">
+    <section class="glassmorphism p-4 rounded-2xl shadow-xl mb-4">
+        <div class="border-b border-gray-500/30 pb-3 mb-4 flex justify-between items-center flex-wrap gap-4">
             <div>
-                <h3 class="text-xs font-black text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="calendar-range" class="w-4 h-4 text-cyan-400"></i> CONTROL OPERATIVO Y PLANIFICACIÓN DE INDICADORES
+                <h3 class="text-sm font-black text-dynamic uppercase tracking-wider flex items-center gap-2">
+                    <i data-lucide="calendar-check" class="w-5 h-5 text-cyan-500"></i> CONTROL OPERATIVO Y TRAZABILIDAD MENSUAL
                 </h3>
-                <p class="text-[10px] text-slate-400 font-bold mt-1 uppercase" id="lblKpiPlanContexto">Planificación Activa: 2. INDICE GLOBAL PREVENTIVO SST</p>
+                <p class="text-[10px] text-muted-dynamic font-bold mt-1">Cargue la información mensual para la generación del informe de Gestión Ambiental y Seguridad.</p>
             </div>
-            <span class="text-[9px] bg-slate-950 text-cyan-400 font-mono px-3 py-1 rounded-full font-bold border border-slate-800" id="lblFormulaPlan">Fórmula de Control</span>
+            <select id="mesControl" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-1 text-xs font-bold">
+                <option value="01">Enero</option>
+                <option value="02">Febrero</option>
+                <option value="03" selected>Marzo</option>
+                <option value="04">Abril</option>
+                <option value="05">Mayo</option>
+                <option value="06">Junio</option>
+                <option value="07">Julio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+            </select>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
-                    <tr class="border-b border-slate-800 text-slate-400 font-black uppercase text-[9px] tracking-wider">
-                        <th class="p-3 w-[22%]">Horizonte Temporal</th>
-                        <th class="p-3 w-[15%]">Act. Planificadas</th>
-                        <th class="p-3 w-[15%]">Act. Ejecutadas</th>
-                        <th class="p-3 w-[15%]">Efectividad %</th>
-                        <th class="p-3 w-[33%] text-right">Evidencia de Respaldo Criptográfica (SHA-256)</th>
+                    <tr class="border-b border-gray-500/30 text-muted-dynamic font-black uppercase text-[9px] tracking-wider">
+                        <th class="p-3 w-[25%]">Indicador HSEQ & Social</th>
+                        <th class="p-3 w-[15%] text-center">Planificado / Meta</th>
+                        <th class="p-3 w-[15%] text-center">Ejecutado / Real</th>
+                        <th class="p-3 w-[15%] text-center">Cumplimiento %</th>
+                        <th class="p-3 w-[30%] text-right">Cronograma / Evidencia</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800/50 bg-transparent text-slate-300">
-                    <!-- Fila Anual -->
-                    <tr class="hover:bg-slate-900/40 transition-colors">
-                        <td class="p-3 font-semibold text-white">M1) Planificación Anual (Macro Metas)</td>
-                        <td class="p-3"><input type="number" id="inputPlan_anual_p" oninput="cambiarValorPlanInput('anual')" class="w-24 bg-slate-950 border border-slate-800 rounded px-2.5 py-1 font-bold text-center text-white focus:outline-none focus:border-cyan-500 font-mono"></td>
-                        <td class="p-3"><input type="number" id="inputPlan_anual_e" oninput="cambiarValorPlanInput('anual')" class="w-24 bg-slate-950 border border-slate-800 rounded px-2.5 py-1 font-bold text-center text-cyan-400 focus:outline-none focus:border-cyan-500 font-mono"></td>
-                        <td class="p-3 font-mono font-black text-xs text-cyan-400" id="lblPlan_anual_pct">100.00%</td>
-                        <td class="p-3 text-right">
-                            <button onclick="dispararCargaArchivoPlan('anual')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-[9px] px-3 py-1.5 rounded-lg transition-all uppercase tracking-wider inline-flex items-center gap-1">
-                                <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Cargar Cronograma
-                            </button>
-                            <span id="lblPlanFileName_anual" class="block text-[8px] text-slate-500 font-mono mt-1 truncate max-w-xs text-right">FOR-SGC-011_Anual.pdf</span>
-                        </td>
-                    </tr>
-                    <!-- Fila Mensual -->
-                    <tr class="hover:bg-slate-900/40 transition-colors">
-                        <td class="p-3 font-semibold text-white">M2) Planificación Mensual (Frentes/Fases)</td>
-                        <td class="p-3"><input type="number" id="inputPlan_mensual_p" oninput="cambiarValorPlanInput('mensual')" class="w-24 bg-slate-950 border border-slate-800 rounded px-2.5 py-1 font-bold text-center text-white focus:outline-none focus:border-cyan-500 font-mono"></td>
-                        <td class="p-3"><input type="number" id="inputPlan_mensual_e" oninput="cambiarValorPlanInput('mensual')" class="w-24 bg-slate-950 border border-slate-800 rounded px-2.5 py-1 font-bold text-center text-cyan-400 focus:outline-none focus:border-cyan-500 font-mono"></td>
-                        <td class="p-3 font-mono font-black text-xs text-cyan-400" id="lblPlan_mensual_pct">100.00%</td>
-                        <td class="p-3 text-right">
-                            <button onclick="dispararCargaArchivoPlan('mensual')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-[9px] px-3 py-1.5 rounded-lg transition-all uppercase tracking-wider inline-flex items-center gap-1">
-                                <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Cargar Actas / Firmas
-                            </button>
-                            <span id="lblPlanFileName_mensual" class="block text-[8px] text-slate-500 font-mono mt-1 truncate max-w-xs text-right">Acta_Comite_Marzo.pdf</span>
-                        </td>
-                    </tr>
-                    <!-- Fila Semanal -->
-                    <tr class="hover:bg-slate-900/40 transition-colors">
-                        <td class="p-3 font-semibold text-white">M3) Planificación Semanal (Charlas/Inspecc.)</td>
-                        <td class="p-3"><input type="number" id="inputPlan_semanal_p" oninput="cambiarValorPlanInput('semanal')" class="w-24 bg-slate-950 border border-slate-800 rounded px-2.5 py-1 font-bold text-center text-white focus:outline-none focus:border-cyan-500 font-mono"></td>
-                        <td class="p-3"><input type="number" id="inputPlan_semanal_e" oninput="cambiarValorPlanInput('semanal')" class="w-24 bg-slate-950 border border-slate-800 rounded px-2.5 py-1 font-bold text-center text-cyan-400 focus:outline-none focus:border-cyan-500 font-mono"></td>
-                        <td class="p-3 font-mono font-black text-xs text-cyan-400" id="lblPlan_semanal_pct">100.00%</td>
-                        <td class="p-3 text-right">
-                            <button onclick="dispararCargaArchivoPlan('semanal')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold text-[9px] px-3 py-1.5 rounded-lg transition-all uppercase tracking-wider inline-flex items-center gap-1">
-                                <i data-lucide="paperclip" class="w-3.5 h-3.5"></i> Cargar Registros Asistencia
-                            </button>
-                            <span id="lblPlanFileName_semanal" class="block text-[8px] text-slate-500 font-mono mt-1 truncate max-w-xs text-right">Firmas_Charlas_S5.pdf</span>
-                        </td>
-                    </tr>
-                </tbody>
+                <tbody id="tablaControlOperativo" class="divide-y divide-gray-500/20 text-dynamic">
+                    </tbody>
             </table>
         </div>
         <input type="file" id="corePlanFileEngine" class="hidden" onchange="asentarArchivoPlanCripto(this.files[0])">
     </section>
 
-    <!-- CONFIGURATION MODALS -->
-    <!-- Supabase DB Configuration Modal -->
-    <div id="modalDbConfig" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-sm font-black text-white uppercase flex items-center gap-2">
-                    <i data-lucide="database" class="w-4 h-4 text-cyan-400"></i> Parámetros Base de Datos
-                </h3>
-                <button onclick="toggleConfigModal('db')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="space-y-3">
-                <p class="text-[11px] text-slate-400">Conecta tu base de datos centralizada de Supabase para habilitar la compartición de datos HSEQ en tiempo real con otros inspectores.</p>
-                <div>
-                    <label class="block text-slate-400 font-bold text-[9px] uppercase mb-1">SUPABASE URL</label>
-                    <input type="text" id="dbUrl" placeholder="https://xxxx.supabase.co" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
-                </div>
-                <div>
-                    <label class="block text-slate-400 font-bold text-[9px] uppercase mb-1">SUPABASE ANON KEY</label>
-                    <input type="password" id="dbKey" placeholder="eyJhbGciOiJIUzI1NiIsIn..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="desconectarDb()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg text-xs font-bold transition-all">Desconectar</button>
-                <button onclick="guardarConfigDb()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold transition-all shadow-lg">Conectar y Sincronizar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SharePoint Configuration Modal -->
-    <div id="modalSpConfig" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-sm font-black text-white uppercase flex items-center gap-2">
-                    <i data-lucide="cloud" class="w-4 h-4 text-cyan-400"></i> SharePoint Integrator
-                </h3>
-                <button onclick="toggleConfigModal('sp')" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="space-y-3">
-                <p class="text-[11px] text-slate-400">Configura el inicio de sesión corporativo de Microsoft Entra ID para buscar y vincular actas directamente desde tus repositorios de SharePoint.</p>
-                <div>
-                    <label class="block text-slate-400 font-bold text-[9px] uppercase mb-1">Azure Tenant ID</label>
-                    <input type="text" id="spTenantId" placeholder="common o ID de Tenant" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
-                </div>
-                <div>
-                    <label class="block text-slate-400 font-bold text-[9px] uppercase mb-1">Azure Application (Client) ID</label>
-                    <input type="text" id="spClientId" placeholder="ID de la App Registrada" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono">
-                </div>
-                <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center mt-2">
-                    <span class="text-xs font-bold text-slate-300">Cuenta de Microsoft</span>
-                    <button id="btnSpAuth" onclick="loginMicrosoft()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md">
-<script>
-        /**
-         * =========================================================================
-         * SISTEMA DE GESTIÓN DE INDICADORES HSEQ & SOCIAL
-         * CORE DE CONTROL DE ACTIVIDADES Y CRONOGRAMAS (CONFORMIDAD ISO 19011)
-         * =========================================================================
-         * 
-         * Este script centraliza la lógica analítica de los indicadores clave
-         * y las gestiones preventivas en campo. Se ha reestructurado con
-         * principios de Clean Code para facilitar su migración a Supabase (PostgreSQL)
-         * e integraciones directas con repositorios documentales en SharePoint.
-         */
-
-        // 1. ESQUEMA DE DATOS CENTRALIZADO ("ESPEJO" DE SUPABASE Y APPS MÓVILES)
-        let indicadoresSupabaseMock = [
-            {
-                id: "TR",
-                codigo: "1",
-                nombre: "TASA DE RIESGO",
-                meta: 5.27,
-                es_inverso: true,
-                formula: "TR = (TF * TG) / 10",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/TasaRiesgo",
-                valor_actual: 0.00,
-                alerta: false,
-                metadatos: { tf: 0.00, tg: 0.00 },
-                planificacion: {
-                    anual: { p: 12, e: 12, file: "FOR-SGC-011_TR_Anual.pdf", hash: "4fa8bc667efbc980", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/TasaRiesgo/Anual" },
-                    mensual: { p: 1, e: 1, file: "FOR-SGC-011_TR_Mensual.pdf", hash: "a09bcdef223cdaef", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/TasaRiesgo/Mensual" },
-                    semanal: { p: 0, e: 0, file: "Sin novedades", hash: "N/A", url_sharepoint: "" }
-                }
-            },
-            {
-                id: "SISOMA",
-                codigo: "2",
-                nombre: "INDICE GLOBAL PREVENTIVO SST",
-                meta: 95.00,
-                es_inverso: false,
-                formula: "Ponderado de 7 Sub-Indicadores Proactivos",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/SISOMA",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: {},
-                planificacion: {
-                    anual: { p: 24, e: 24, file: "FOR-SGC-011_Anual.pdf", hash: "7c9bb5f2a12ffde0", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/SISOMA/Anual" },
-                    mensual: { p: 12, e: 12, file: "Acta_Comite_Marzo.pdf", hash: "bf9820fdb44a8cb2", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/SISOMA/Mensual" },
-                    semanal: { p: 4, e: 4, file: "Firmas_Charlas_S5.pdf", hash: "ae09ff2123cdaef1", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/SISOMA/Semanal" }
-                }
-            },
-            {
-                id: "ACCIDENTES",
-                codigo: "3",
-                nombre: "NO. ACCIDENTES GRAVES",
-                meta: 0,
-                es_inverso: true,
-                formula: "Conteo Absoluto",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Accidentes",
-                valor_actual: 0.00,
-                alerta: false,
-                metadatos: {},
-                planificacion: {
-                    anual: { p: 1, e: 1, file: "Cero_Siniestralidad.pdf", hash: "80ffade9100ffabc", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Accidentes/Anual" },
-                    mensual: { p: 1, e: 1, file: "Validacion_SUT.pdf", hash: "9910ac222ffda01a", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Accidentes/Mensual" },
-                    semanal: { p: 0, e: 0, file: "N/A", hash: "N/A", url_sharepoint: "" }
-                }
-            },
-            {
-                id: "RESIDUOS",
-                codigo: "4",
-                nombre: "GESTIÓN DE RESIDUOS (% RSG)",
-                meta: 20.00,
-                es_inverso: false,
-                formula: "% RSG = (R.Vertidos / R.Gen) * 100",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Residuos",
-                valor_actual: 4.30,
-                alerta: true,
-                metadatos: {},
-                planificacion: {
-                    anual: { p: 4, e: 4, file: "PMA_Residuos_Anual.pdf", hash: "b0c9f1388def223a", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Residuos/Anual" },
-                    mensual: { p: 1, e: 1, file: "Manifiesto_Marzo_MAAE.pdf", hash: "123ade091ffa8c2b", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Residuos/Mensual" },
-                    semanal: { p: 4, e: 4, file: "Bitacora_Pesaje_S5.pdf", hash: "ff22cd33a88ba812", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Residuos/Semanal" }
-                }
-            },
-            {
-                id: "PMA",
-                codigo: "5",
-                nombre: "CUMPLIMIENTO PMA",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "(Act. Ejec / Act. Plan) * 100",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/PMA",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: {},
-                planificacion: {
-                    anual: { p: 1, e: 1, file: "PMA_Aprobado_2026.pdf", hash: "e2c3d4f5e6a8cb23", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/PMA/Anual" },
-                    mensual: { p: 1, e: 1, file: "Informe_Ambiental_Mensual.pdf", hash: "7a8b9c0d1e2f3a4b", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/PMA/Mensual" },
-                    semanal: { p: 2, e: 2, file: "Inspecciones_Frentes.pdf", hash: "3f4g5h6i7j8k9l0m", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/PMA/Semanal" }
-                }
-            },
-            {
-                id: "CAPACITACION",
-                codigo: "6",
-                nombre: "PLAN CAPACITACIÓN SST",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "(Act. Realizadas / Prog) * 100",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Capacitacion",
-                valor_actual: 113.00,
-                alerta: false,
-                metadatos: {},
-                planificacion: {
-                    anual: { p: 1, e: 1, file: "Plan_Capacitacion_Anual.pdf", hash: "9k0l1m2n3o4p5q6r", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Capacitacion/Anual" },
-                    mensual: { p: 2, e: 2, file: "Asistencias_Mes.pdf", hash: "5p6q7r8s9t0u1v2w", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Capacitacion/Mensual" },
-                    semanal: { p: 1, e: 1, file: "Registro_Induccion.pdf", hash: "u1v2w3x4y5z6a7b8", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Capacitacion/Semanal" }
-                }
-            },
-            {
-                id: "COMUNIDAD",
-                codigo: "7",
-                nombre: "PLAN RELIC. COMUNITARIO",
-                meta: 80.00,
-                es_inverso: false,
-                formula: "(Act. Realizadas / Prog) * 100",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Comunidad",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: {},
-                planificacion: {
-                    anual: { p: 2, e: 2, file: "Cronograma_Social_Anual.pdf", hash: "1a2b3c4d5e6f7g8h", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Comunidad/Anual" },
-                    mensual: { p: 1, e: 1, file: "Minuta_Reunion_Vecinal.pdf", hash: "7f8g9h0i1j2k3l4m", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Comunidad/Mensual" },
-                    semanal: { p: 0, e: 0, file: "N/A", hash: "N/A", url_sharepoint: "" }
-                }
-            },
-            {
-                id: "QUEJAS_INT",
-                codigo: "8",
-                nombre: "QUEJAS INTERNAS ATENDIDAS",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "(Atendidas / Recibidas) * 100",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/QuejasInternas",
-                valor_actual: 0.00,
-                alerta: false,
-                metadatos: { recibidas: 0, atendidas: 0 },
-                planificacion: {
-                    anual: { p: 1, e: 1, file: "Procedimiento_Quejas.pdf", hash: "3k4l5m6n7o8p9q0r", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/QuejasInternas/Anual" },
-                    mensual: { p: 1, e: 1, file: "Log_Interno.pdf", hash: "9p0q1r2s3t4u5v6w", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/QuejasInternas/Mensual" },
-                    semanal: { p: 0, e: 0, file: "N/A", hash: "N/A", url_sharepoint: "" }
-                }
-            },
-            {
-                id: "QUEJAS_EXT",
-                codigo: "9",
-                nombre: "QUEJAS EXTERNAS ATENDIDAS",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "(Atendidas / Recibidas) * 100",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/QuejasExternas",
-                valor_actual: 0.00,
-                alerta: false,
-                metadatos: { recibidas: 0, atendidas: 0 },
-                planificacion: {
-                    anual: { p: 1, e: 1, file: "Procedimiento_Quejas.pdf", hash: "5u6v7w8x9y0z1a2b", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/QuejasExternas/Anual" },
-                    mensual: { p: 1, e: 1, file: "Log_Externo.pdf", hash: "1z2a3b4c5d6e7f8g", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/QuejasExternas/Mensual" },
-                    semanal: { p: 0, e: 0, file: "N/A", hash: "N/A", url_sharepoint: "" }
-                }
-            },
-            {
-                id: "INCIDENTES",
-                codigo: "10",
-                nombre: "INCIDENTES SEGURIDAD Y AMB.",
-                meta: 0,
-                es_inverso: true,
-                formula: "ISA = Incid. Seg + Incid. Amb",
-                categoria: "principal",
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Incidentes",
-                valor_actual: 0.00,
-                alerta: false,
-                metadatos: { iseg: 0, iamb: 0 },
-                planificacion: {
-                    anual: { p: 1, e: 1, file: "Procedimiento_Reporte_Incidentes.pdf", hash: "4aefbc901ef0d421", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Incidentes/Anual" },
-                    mensual: { p: 1, e: 1, file: "Log_Incidentes_Marzo.pdf", hash: "b09cd42ff1a7781a", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/Incidentes/Mensual" },
-                    semanal: { p: 0, e: 0, file: "N/A", hash: "N/A", url_sharepoint: "" }
-                }
-            },
-            {
-                id: "ART",
-                codigo: "b1",
-                nombre: "Análisis Riesgo Tarea (ART)",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "IART = (Nart / Narp) * 100",
-                categoria: "proactivo",
-                peso: 5,
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ART",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: { prog: 10, ejec: 10 },
-                planificacion: {
-                    anual: { p: 52, e: 52, file: "Cronograma_ART_Anual.pdf", hash: "7e8f9a0b1c2d3e4f", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ART/Anual" },
-                    mensual: { p: 4, e: 4, file: "ART_Mes_Marzo.pdf", hash: "3d4e5f6a7b8c9d0e", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ART/Mensual" },
-                    semanal: { p: 1, e: 1, file: "ART_Semana_12.pdf", hash: "9c0d1e2f3a4b5c6d", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ART/Semanal" }
-                }
-            },
-            {
-                id: "OPAS",
-                codigo: "b2",
-                nombre: "Observación Planeada (OPAS)",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "Opas = (opasr * Pc) / (opasp * Pobp) * 100",
-                categoria: "proactivo",
-                peso: 3,
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/OPAS",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: { prog: 12, ejec: 12 },
-                planificacion: {
-                    anual: { p: 12, e: 12, file: "Plan_OPAS_2026.pdf", hash: "5b6c7d8e9f0a1b2c", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/OPAS/Anual" },
-                    mensual: { p: 1, e: 1, file: "OPAS_Marzo.pdf", hash: "1a2b3c4d5e6f7g8h", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/OPAS/Mensual" },
-                    semanal: { p: 1, e: 1, file: "Muestreo_Conductas.pdf", hash: "7f8g9h0i1j2k3l4m", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/OPAS/Semanal" }
-                }
-            },
-            {
-                id: "DPS",
-                codigo: "b3",
-                nombre: "Diálogo Periódico (DPS)",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "IDps = (dpsr * Nas) / (dpsp * pp) * 100",
-                categoria: "proactivo",
-                peso: 2,
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DPS",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: { prog: 8, ejec: 8 },
-                planificacion: {
-                    anual: { p: 365, e: 365, file: "Plan_Charlas_5Min.pdf", hash: "3k4l5m6n7o8p9q0r", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DPS/Anual" },
-                    mensual: { p: 30, e: 30, file: "Charlas_Marzo.pdf", hash: "9p0q1r2s3t4u5v6w", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DPS/Mensual" },
-                    semanal: { p: 5, e: 5, file: "Asistencia_S5.pdf", hash: "5u6v7w8x9y0z1a2b", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DPS/Semanal" }
-                }
-            },
-            {
-                id: "DS",
-                codigo: "b4",
-                nombre: "Demanda Seguridad (DS)",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "IDs = (Ncse / Ncsd) * 100",
-                categoria: "proactivo",
-                peso: 3,
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DS",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: { prog: 15, ejec: 15 },
-                planificacion: {
-                    anual: { p: 12, e: 12, file: "Plan_Remediacion_Anual.pdf", hash: "1z2a3b4c5d6e7f8g", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DS/Anual" },
-                    mensual: { p: 1, e: 1, file: "Condiciones_Sub_Marzo.pdf", hash: "7e8f9a0b1c2d3e4f", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DS/Mensual" },
-                    semanal: { p: 2, e: 2, file: "Cierre_Hallazgos_S5.pdf", hash: "3d4e5f6a7b8c9d0e", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/DS/Semanal" }
-                }
-            },
-            {
-                id: "ENTS",
-                codigo: "b5",
-                nombre: "Entrenamiento Seg. (ENTS)",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "Ents = (Nee / Nteep) * 100",
-                categoria: "proactivo",
-                peso: 1,
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ENTS",
-                valor_actual: 113.00,
-                alerta: false,
-                metadatos: { prog: 100, ejec: 113 },
-                planificacion: {
-                    anual: { p: 4, e: 4, file: "Plan_Entrenamiento_SGI.pdf", hash: "9c0d1e2f3a4b5c6d", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ENTS/Anual" },
-                    mensual: { p: 1, e: 1, file: "Evaluaciones_SGI_Marzo.pdf", hash: "5b6c7d8e9f0a1b2c", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ENTS/Mensual" },
-                    semanal: { p: 1, e: 1, file: "Firmas_Entrenamiento.pdf", hash: "1a2b3c4d5e6f7g8h", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/ENTS/Semanal" }
-                }
-            },
-            {
-                id: "OSEA",
-                codigo: "b6",
-                nombre: "Órdenes Serv. Auditadas",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "Osea = (oseac * 100) / oseaa",
-                categoria: "proactivo",
-                peso: 4,
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/OSEA",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: { prog: 6, ejec: 6 },
-                planificacion: {
-                    anual: { p: 12, e: 12, file: "Plan_Auditorias_OSEA.pdf", hash: "7f8g9h0i1j2k3l4m", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/OSEA/Anual" },
-                    mensual: { p: 1, e: 1, file: "Informe_OSEA_Marzo.pdf", hash: "3k4l5m6n7o8p9q0r", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/OSEA/Mensual" },
-                    semanal: { p: 0, e: 0, file: "N/A", hash: "N/A", url_sharepoint: "" }
-                }
-            },
-            {
-                id: "CAI",
-                codigo: "b7",
-                nombre: "Control Incidentes (CAI)",
-                meta: 100.00,
-                es_inverso: false,
-                formula: "ICai = (Nmi * 100) / nmp",
-                categoria: "proactivo",
-                peso: 4,
-                url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/CAI",
-                valor_actual: 100.00,
-                alerta: false,
-                metadatos: { prog: 5, ejec: 5 },
-                planificacion: {
-                    anual: { p: 1, e: 1, file: "Plan_Investigacion_Anual.pdf", hash: "9p0q1r2s3t4u5v6w", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/CAI/Anual" },
-                    mensual: { p: 1, e: 1, file: "Medidas_Correctivas_Marzo.pdf", hash: "5u6v7w8x9y0z1a2b", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/CAI/Mensual" },
-                    semanal: { p: 1, e: 1, file: "Evidencia_Cierre_Accidente.pdf", hash: "1z2a3b4c5d6e7f8g", url_sharepoint: "https://integrow.sharepoint.com/sites/HSEQ/Verificacion/CAI/Semanal" }
-                }
-            }
+    <script>
+        // 1. ESTRUCTURA DE DATOS MAESTRA (LISTA PARA BASE DE DATOS)
+        const CONTEXTO_INDICADORES = [
+            { id: "TR", code: "1", name: "TASA DE RIESGO", val: 1.2, target: "≤ 5.27", formula: "TR = TF * TG / 10", spLink: "https://ejemplo.sharepoint.com/tasa_riesgo", history: [2.5, 1.8, 1.2, 0.9, 1.2], extra: { tf: [25, 20, 15, 10, 12], tg: [10, 9, 8, 9, 10] }, isInverse: true },
+            { id: "IGP_SST", code: "2", name: "INDICE GLOBAL PREVENTIVO SST", val: 95.5, target: "≥ 85%", formula: "Ponderado 22 Criterios", spLink: "https://ejemplo.sharepoint.com/preventivo", history: [80, 85, 90, 93, 95.5], isInverse: false },
+            { id: "INCIDENTES", code: "3", name: "INCIDENTES SEG. Y AMB.", val: 0, target: "0", formula: "Conteo de eventos", spLink: "https://ejemplo.sharepoint.com/incidentes", history: [3, 1, 2, 0, 0], isInverse: true },
+            { id: "ACCIDENTES", code: "4", name: "ACCIDENTES GRAVES", val: 0, target: "0", formula: "Conteo de eventos", spLink: "https://ejemplo.sharepoint.com/accidentes", history: [0, 0, 0, 0, 0], isInverse: true },
+            { id: "RESIDUOS", code: "5", name: "GESTIÓN DE RESIDUOS", val: 24.5, target: "≥ 20%", formula: "(R.Vertidos/R.Gen)*100", spLink: "https://ejemplo.sharepoint.com/residuos", history: [15, 18, 20, 22, 24.5], isInverse: false },
+            { id: "PMA", code: "6", name: "CUMPLIMIENTO PMA", val: 100, target: "100%", formula: "(Act. Ejec / Plan)*100", spLink: "https://ejemplo.sharepoint.com/pma", history: [80, 90, 100, 100, 100], isInverse: false },
+            { id: "CAPACITACION", code: "7", name: "PLAN CAPACITACIÓN", val: 100, target: "85%", formula: "(Ejec / Prog)*100", spLink: "https://ejemplo.sharepoint.com/capacitacion", history: [50, 75, 100, 100, 100], isInverse: false },
+            { id: "COMUNIDAD", code: "8", name: "RELACIONAMIENTO COMUNITARIO", val: 85, target: "≥ 85%", formula: "(Ejec / Prog)*100", spLink: "https://ejemplo.sharepoint.com/comunidad", history: [60, 70, 80, 85, 85], isInverse: false },
+            { id: "QUEJAS_INT", code: "9", name: "QUEJAS INTERNAS ATENDIDAS", val: 100, target: "100%", formula: "(Atendidas / Recibidas)*100", spLink: "https://ejemplo.sharepoint.com/quejas_int", history: [90, 95, 100, 100, 100], isInverse: false },
+            { id: "QUEJAS_EXT", code: "10", name: "QUEJAS EXTERNAS ATENDIDAS", val: 100, target: "100%", formula: "(Atendidas / Recibidas)*100", spLink: "https://ejemplo.sharepoint.com/quejas_ext", history: [80, 100, 100, 100, 100], isInverse: false }
         ];
 
-        // 2. BACKWARD-COMPATIBLE WRAPPERS
-        const CONTEXTO_INDICADORES = {};
-        const MATRIZ_SUB_PROACTIVOS = {};
-        const BASE_DATOS_PLANIFICACION_POR_KPI = {};
+        let activeKpiId = "IGP_SST";
+        let panelChartInstance = null;
+        let isLightMode = false;
+        let activeUploadKpi = null;
 
-        function sincronizarEstructurasLegacy() {
-            indicadoresSupabaseMock.filter(k => k.categoria === "principal").forEach(k => {
-                Object.defineProperty(CONTEXTO_INDICADORES, k.id, {
-                    configurable: true, enumerable: true,
-                    value: {
-                        id: k.id, code: k.codigo, name: k.nombre,
-                        get val() { return k.valor_actual; }, set val(v) { k.valor_actual = v; },
-                        target: k.id === 'TR' ? `< ${k.meta}` : (k.id === 'ACCIDENTES' || k.id === 'INCIDENTES' ? `${k.meta}` : `≥ ${k.meta}%`),
-                        get alert() { return k.alerta; }, set alert(v) { k.alerta = v; },
-                        formula: k.formula,
-                        get tf() { return k.metadatos?.tf || 0; }, set tf(v) { if (k.metadatos) k.metadatos.tf = v; },
-                        get tg() { return k.metadatos?.tg || 0; }, set tg(v) { if (k.metadatos) k.metadatos.tg = v; },
-                        get iseg() { return k.metadatos?.iseg || 0; }, set iseg(v) { if (k.metadatos) k.metadatos.iseg = v; },
-                        get iamb() { return k.metadatos?.iamb || 0; }, set iamb(v) { if (k.metadatos) k.metadatos.iamb = v; }
-                    }
-                });
-            });
-
-            indicadoresSupabaseMock.filter(k => k.categoria === "proactivo").forEach(sub => {
-                Object.defineProperty(MATRIZ_SUB_PROACTIVOS, sub.id, {
-                    configurable: true, enumerable: true,
-                    value: {
-                        id: sub.id, name: `${sub.codigo}) ${sub.nombre}`,
-                        get prog() { return sub.metadatos?.prog || 0; }, set prog(v) { if (sub.metadatos) sub.metadatos.prog = v; },
-                        get ejec() { return sub.metadatos?.ejec || 0; }, set ejec(v) { if (sub.metadatos) sub.metadatos.ejec = v; },
-                        get val() { return sub.valor_actual; }, set val(v) { sub.valor_actual = v; },
-                        formula: sub.formula, weight: sub.peso
-                    }
-                });
-            });
-
-            indicadoresSupabaseMock.forEach(k => {
-                Object.defineProperty(BASE_DATOS_PLANIFICACION_POR_KPI, k.id, {
-                    configurable: true, enumerable: true,
-                    value: { formula: k.formula, anual: k.planificacion.anual, mensual: k.planificacion.mensual, semanal: k.planificacion.semanal }
-                });
-            });
-        }
-
-        sincronizarEstructurasLegacy();
-
-        let hht_value = 100000;
-        let na_value = 0;
-        let dp_value = 0;
-        let iseg_value = 0;
-        let iamb_value = 0;
-
-        let LOG_CAMP_MOBILE = [
-            { id: 201, type: "HALLAZGO", data: { tipo: "NEAR_MISS", criticidad: "MEDIA", riesgo: "Locativo", resp: "Ing. Residente", plazo: "2026-03-15", accion: "Alineación de estantería", imgIni: null, imgCie: null, desc: "Near Miss: Desviación menor en estiba de materiales de mampostería.", kpi: "DS" } }
-        ];
-
-        const PERMIT_CHECKLIST_CONTROLS = {
-            ALTURAS: ["🧗 Arnés de cuerpo entero inspeccionado", "🧗 Línea de vida y puntos de anclaje certificados", "🧗 EPP específico", "🧗 ATS firmado", "🧗 Condiciones climáticas favorables"],
-            CALIENTE: ["🔥 Extintor PQS de 10lbs cargado", "🔥 Área libre de combustibles", "🔥 Biombos ignífugos", "🔥 Medición de gases", "🔥 Vigía de fuego"],
-            CONFINADO: ["🕳️ Monitoreo continuo de gases", "🕳️ Ventilación forzada", "🕳️ Vigía en entrada", "🕳️ Sistema de rescate", "🕳️ Bloqueo LOTO"],
-            ELECTRICO: ["⚡ Cinco Reglas de Oro", "⚡ Candados y tarjetas (LOTO)", "⚡ Guantes dieléctricos", "⚡ Revelador de tensión", "⚡ Delimitación de área"]
-        };
-
-        let activeKpiKey = "SISOMA";
-        let mobileActiveTab = "hallazgos";
-        let stringFotoInicialTmp = null;
-        let stringFotoCierreTmp = null;
-        let activeHorizonTarget = "anual";
-        let chartInstances = {};
-
-        function getKpi(id) { return indicadoresSupabaseMock.find(k => k.id === id); }
-
-        function recalcularFila(p, e, esInverso, m) {
-            const plan = Number.isNaN(parseFloat(p)) ? 0 : parseFloat(p);
-            const ejec = Number.isNaN(parseFloat(e)) ? 0 : parseFloat(e);
-            const meta = Number.isNaN(parseFloat(m)) ? 0 : parseFloat(m);
-            let pct = 0, alert = false;
-            if (esInverso) {
-                if (meta === 0) { pct = (ejec === 0) ? 100 : 0; alert = (ejec > 0); }
-                else { if (ejec <= meta) { pct = 100; alert = false; } else { pct = (meta / ejec) * 100; alert = true; } }
-            } else {
-                if (plan === 0) { pct = 100; alert = (ejec < meta && meta > 0); }
-                else { pct = (ejec / plan) * 100; alert = (pct < meta); }
-            }
-            return { porcentaje: parseFloat(Math.max(0, Number.isFinite(pct) ? pct : 100).toFixed(2)), alerta: alert };
-        }
-
-        function actualizarAlertasYValores() {
-            indicadoresSupabaseMock.filter(k => k.categoria === "proactivo").forEach(sub => {
-                const calc = recalcularFila(sub.metadatos?.prog || 0, sub.metadatos?.ejec || 0, false, 100);
-                sub.valor_actual = calc.porcentaje;
-                sub.alerta = calc.alerta;
-            });
-            let sVal = 0, sWeight = 0;
-            indicadoresSupabaseMock.filter(k => k.categoria === "proactivo").forEach(sub => { sVal += (sub.peso || 0) * sub.valor_actual; sWeight += (sub.peso || 0); });
-            const sis = getKpi("SISOMA");
-            if (sis) { sis.valor_actual = parseFloat((sWeight > 0 ? sVal / sWeight : 100).toFixed(2)); sis.alerta = recalcularFila(100, sis.valor_actual, false, sis.meta).alerta; }
-            const hht = (hht_value <= 0) ? 100000 : hht_value;
-            const tf = (na_value * 200000) / hht, tg = (dp_value * 200000) / hht;
-            const trKpi = getKpi("TR");
-            if (trKpi) { trKpi.valor_actual = parseFloat(((tf * tg) / 10).toFixed(2)); trKpi.metadatos.tf = tf; trKpi.metadatos.tg = tg; trKpi.alerta = recalcularFila(trKpi.meta, trKpi.valor_actual, true, trKpi.meta).alerta; }
-            const accKpi = getKpi("ACCIDENTES");
-            if (accKpi) { accKpi.valor_actual = na_value; accKpi.alerta = recalcularFila(0, na_value, true, accKpi.meta).alerta; }
-            const incKpi = getKpi("INCIDENTES");
-            if (incKpi) { incKpi.valor_actual = iseg_value + iamb_value; incKpi.metadatos.iseg = iseg_value; incKpi.metadatos.iamb = iamb_value; incKpi.alerta = recalcularFila(0, incKpi.valor_actual, true, incKpi.meta).alerta; }
-            indicadoresSupabaseMock.filter(k => k.categoria === "principal" && !["SISOMA", "TR", "ACCIDENTES", "INCIDENTES"].includes(k.id)).forEach(k => {
-                const calc = recalcularFila(100, k.valor_actual, k.es_inverso, k.meta);
-                k.alerta = calc.alerta;
-            });
-        }
-
+        // INICIALIZACIÓN
         window.onload = function() {
             lucide.createIcons();
-            cargarConfiguracionesLocales();
-            conectarSupabase(true);
-            inicializarGráficosApex();
-            recalcularTodo();
-            cambiarChecklistPermisos();
+            renderTopIndicators();
+            renderControlOperativo();
+            selectKpi("IGP_SST");
         };
 
-        function recalcularTodo() {
-            actualizarAlertasYValores();
-            renderizar9Indicadores();
-            renderSubProactivos();
-            updateHseqPanel();
-            renderPlanificacionTabla();
-            renderHistorialLogs();
-            renderPlanAccionReactivo();
-            actualizarGraficosData();
+        // 2. MODO CLARO / OSCURO
+        function toggleTheme() {
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('light-theme', isLightMode);
+            const icon = document.getElementById("themeIcon");
+            icon.setAttribute("data-lucide", isLightMode ? "moon" : "sun");
+            icon.classList.toggle("text-indigo-600", isLightMode);
+            icon.classList.toggle("text-yellow-400", !isLightMode);
+            lucide.createIcons();
+            selectKpi(activeKpiId); 
         }
 
-        function renderPlanificacionTabla() { renderControlOperativo(); }
+        // 3. GESTIÓN DE NUEVOS CLIENTES
+        function agregarCliente() {
+            const nuevo = prompt("Ingrese el nombre del nuevo Centro de Trabajo (Cliente):");
+            if(nuevo && nuevo.trim() !== "") {
+                const select = document.getElementById("tenantSelector");
+                const option = document.createElement("option");
+                option.value = nuevo.replace(/\s+/g, '_').toUpperCase();
+                option.text = nuevo.toUpperCase();
+                select.appendChild(option);
+                select.value = option.value;
+                alert(`Cliente "${nuevo.toUpperCase()}" ha sido registrado exitosamente.`);
+            }
+        }
 
-        function renderizar9Indicadores() {
-            const grid = document.getElementById("grid9IndicadoresMaster");
-            if (!grid) return; grid.innerHTML = "";
-            indicadoresSupabaseMock.filter(k => k.categoria === "principal").forEach(k => {
-                const active = k.id === activeKpiKey ? 'ring-2 ring-cyan-500 bg-slate-900 border-cyan-500/50' : 'bg-slate-900/60';
-                grid.innerHTML += `<div onclick="selectKpi('${k.id}', '${k.nombre}')" class="${active} border border-slate-800 rounded-xl p-2.5 text-center cursor-pointer">
-                    <span class="text-[7.5px] font-black text-slate-400 block uppercase truncate">${k.codigo}. ${k.nombre}</span>
-                    <div class="text-sm font-black ${k.alerta ? 'text-rose-400' : 'text-cyan-400'}">${k.id === 'TR' ? k.valor_actual.toFixed(2) : (['ACCIDENTES', 'INCIDENTES'].includes(k.id) ? k.valor_actual.toFixed(0) : k.valor_actual.toFixed(2) + '%')}</div>
-                </div>`;
+        // 4. RENDERIZAR LAS 10 TARJETAS SUPERIORES
+        function renderTopIndicators() {
+            const grid = document.getElementById("grid10IndicadoresMaster");
+            grid.innerHTML = "";
+
+            CONTEXTO_INDICADORES.forEach(k => {
+                const activeStyle = k.id === activeKpiId ? 'ring-2 ring-cyan-500 bg-cyan-900/20 border-cyan-500/50' : 'card-bg border-gray-500/30';
+                let valText = (k.isInverse) ? k.val.toFixed(2) : `${k.val.toFixed(1)}%`;
+                
+                grid.innerHTML += `
+                    <div onclick="selectKpi('${k.id}')" class="${activeStyle} border rounded-xl p-2.5 text-center shadow-md cursor-pointer hover:-translate-y-1 transition-all duration-200">
+                        <span class="text-[7.5px] font-black text-muted-dynamic block uppercase tracking-wider truncate mb-1" title="${k.name}">${k.code}. ${k.name}</span>
+                        <div class="text-sm font-black text-cyan-500">${valText}</div>
+                        <span class="text-[7px] text-muted-dynamic block mt-1">Meta: ${k.target}</span>
+                    </div>
+                `;
             });
         }
 
-        function selectKpi(id, name) { activeKpiKey = id; document.getElementById("lblKpiPlanContexto").innerText = `Planificación Activa: ${name}`; recalcularTodo(); }
-
-        function renderSubProactivos() {
-            const container = document.getElementById("contenedorSubProactivos");
-            if (!container) return; container.innerHTML = "";
-            indicadoresSupabaseMock.filter(k => k.categoria === "proactivo").forEach(sub => {
-                container.innerHTML += `<div onclick="selectKpi('${sub.id}', '${sub.nombre}')" class="bg-slate-900/60 border border-slate-800 rounded-xl p-2.5 cursor-pointer hover:border-cyan-500">
-                    <span class="text-[8px] font-extrabold text-slate-400 block">${sub.nombre}</span>
-                    <div class="text-sm font-black text-cyan-400 font-mono">${sub.valor_actual.toFixed(1)}%</div>
-                </div>`;
-            });
+        // 5. PANEL CON EL BOTÓN AZUL DE SHAREPOINT Y LA GRÁFICA
+        function selectKpi(id) {
+            activeKpiId = id;
+            renderTopIndicators(); 
+            const kpi = CONTEXTO_INDICADORES.find(k => k.id === id);
+            const panel = document.getElementById("panelCalculoHseq");
+            panel.classList.remove("hidden");
+            
+            panel.innerHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <span class="bg-cyan-600 text-white font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">Trazabilidad Activa</span>
+                        <h3 class="text-sm font-black text-dynamic uppercase mt-2">${kpi.code}. ${kpi.name}</h3>
+                        <p class="text-[10px] text-muted-dynamic font-mono mt-1">Fórmula: ${kpi.formula}</p>
+                    </div>
+                    <a href="${kpi.spLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#0078D4] hover:bg-[#005a9e] text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-md mt-2">
+                        <i data-lucide="cloud" class="w-4 h-4"></i>
+                        Ver Base de Datos en SharePoint
+                    </a>
+                    <p class="text-[9px] text-muted-dynamic">Enlace directo al repositorio documental (Excel/Listas).</p>
+                </div>
+                <div class="lg:col-span-2">
+                    <h4 class="text-[10px] font-black text-muted-dynamic uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-500"></i> Gráfica de Corrida / Desempeño
+                    </h4>
+                    <div id="chartContextual" class="h-48 w-full bg-slate-900/20 rounded-lg border border-gray-500/20 p-2"></div>
+                </div>
+            `;
+            lucide.createIcons();
+            renderChart(kpi);
         }
 
+        // 6. MOTOR DE GRÁFICAS DE APEXCHARTS
+        function renderChart(kpi) {
+            if(panelChartInstance) { panelChartInstance.destroy(); }
+            const textColor = isLightMode ? '#64748b' : '#94a3b8';
+            const gridColor = isLightMode ? '#e2e8f0' : '#1e293b';
+            let options = {};
+
+            if(kpi.id === "TR") {
+                options = {
+                    chart: { type: 'line', height: 170, toolbar: { show: false }, background: 'transparent' },
+                    colors: ['#f43f5e', '#10b981'],
+                    stroke: { curve: 'smooth', width: 3 },
+                    series: [
+                        { name: 'Indice Frecuencia (IF)', data: kpi.extra.tf },
+                        { name: 'Indice Gravedad (IG)', data: kpi.extra.tg }
+                    ],
+                    xaxis: { categories: ['Mes-4', 'Mes-3', 'Mes-2', 'Mes-1', 'Actual'], labels: { style: { colors: textColor, fontSize: '9px' } } },
+                    yaxis: { labels: { style: { colors: textColor, fontSize: '9px' } } },
+                    legend: { labels: { colors: textColor }, fontSize: '10px' },
+                    grid: { borderColor: gridColor }
+                };
+            } else {
+                options = {
+                    chart: { type: 'bar', height: 170, toolbar: { show: false }, background: 'transparent' },
+                    colors: ['#0ea5e9'],
+                    plotOptions: { bar: { borderRadius: 4, dataLabels: { position: 'top' } } },
+                    dataLabels: { enabled: true, formatter: val => val + (kpi.isInverse ? '' : '%'), style: { fontSize: '9px', colors: [textColor] }, offsetY: -15 },
+                    series: [{ name: 'Desempeño', data: kpi.history }],
+                    xaxis: { categories: ['Mes-4', 'Mes-3', 'Mes-2', 'Mes-1', 'Actual'], labels: { style: { colors: textColor, fontSize: '9px' } } },
+                    yaxis: { labels: { style: { colors: textColor, fontSize: '9px' } } },
+                    grid: { borderColor: gridColor }
+                };
+            }
+            panelChartInstance = new ApexCharts(document.querySelector("#chartContextual"), options);
+            panelChartInstance.render();
+        }
+
+        // 7. TABLA DE CONTROL OPERATIVO INFERIOR
         function renderControlOperativo() {
-            const kpi = getKpi(activeKpiKey);
-            if (!kpi) return;
-            ['anual', 'mensual', 'semanal'].forEach(h => {
-                const pD = kpi.planificacion[h];
-                document.getElementById(`inputPlan_${h}_p`).value = pD.p;
-                document.getElementById(`inputPlan_${h}_e`).value = pD.e;
-                const calc = recalcularFila(pD.p, pD.e, false, 100);
-                const label = document.getElementById(`lblPlan_${h}_pct`);
-                label.innerText = calc.porcentaje + "%";
-                label.className = `font-mono font-black text-xs ${calc.alerta ? 'text-rose-500' : 'text-emerald-400'}`;
+            const tbody = document.getElementById("tablaControlOperativo");
+            tbody.innerHTML = "";
+
+            CONTEXTO_INDICADORES.forEach(kpi => {
+                let planDefault = 100;
+                let ejecDefault = (kpi.isInverse) ? 0 : kpi.val;
+                
+                if(kpi.id === "TR") planDefault = 5.27;
+                if(kpi.id === "INCIDENTES" || kpi.id === "ACCIDENTES") planDefault = 0;
+                if(kpi.id === "CAPACITACION") planDefault = 85;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-500/10 transition-colors">
+                        <td class="p-3 font-semibold text-xs text-dynamic">
+                            ${kpi.code}. ${kpi.name}
+                        </td>
+                        <td class="p-3">
+                            <input type="number" id="plan_${kpi.id}" value="${planDefault}" step="any" oninput="recalcularFila('${kpi.id}', ${kpi.isInverse})" class="w-full card-bg border border-gray-500/30 rounded px-2 py-1.5 font-bold text-center text-dynamic focus:outline-none focus:border-cyan-500 font-mono">
+                        </td>
+                        <td class="p-3">
+                            <input type="number" id="ejec_${kpi.id}" value="${ejecDefault}" step="any" oninput="recalcularFila('${kpi.id}', ${kpi.isInverse})" class="w-full card-bg border border-gray-500/30 rounded px-2 py-1.5 font-bold text-center text-cyan-500 focus:outline-none focus:border-cyan-500 font-mono">
+                        </td>
+                        <td class="p-3 font-mono font-black text-xs text-center">
+                            <span id="pct_${kpi.id}">-</span>
+                        </td>
+                        <td class="p-3 text-right">
+                            <button onclick="document.getElementById('corePlanFileEngine').click(); activeUploadKpi='${kpi.id}'" class="bg-slate-700 hover:bg-slate-600 text-white font-bold text-[9px] px-3 py-1.5 rounded-lg transition-all uppercase tracking-wider inline-flex items-center gap-1 shadow-md">
+                                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Adjuntar Evidencia
+                            </button>
+                            <span id="evidencia_${kpi.id}" class="block text-[8px] text-muted-dynamic font-mono mt-1 truncate max-w-xs text-right float-right">Sin archivo...</span>
+                        </td>
+                    </tr>
+                `;
+                recalcularFila(kpi.id, kpi.isInverse);
             });
+            lucide.createIcons();
         }
 
-        function renderHistorialLogs() {
-            const container = document.getElementById("boxHistorialMobileLogs");
-            if (!container) return; container.innerHTML = "";
-            LOG_CAMP_MOBILE.forEach(item => {
-                container.innerHTML += `<div class="py-2.5 border-b border-slate-800">
-                    <span class="text-[8px] font-black uppercase text-cyan-400">${item.type}</span>
-                    <p class="text-[11px] text-slate-300">${item.data.desc || item.data.permit}</p>
-                </div>`;
+        // 8. CÁLCULO MATEMÁTICO (DIRECTO E INVERSO) PARA LAS FILAS
+        function recalcularFila(id, isInverse) {
+            const pInput = parseFloat(document.getElementById(`plan_${id}`).value) || 0;
+            const eInput = parseFloat(document.getElementById(`ejec_${id}`).value) || 0;
+            const pctSpan = document.getElementById(`pct_${id}`);
+            
+            let pct = 0;
+            let esExitoso = true;
+
+            if (isInverse) {
+                // Indicadores Inversos (Menor es mejor)
+                if (eInput <= pInput) {
+                    pct = 100;
+                    esExitoso = true;
+                } else {
+                    pct = pInput === 0 ? 0 : (pInput / eInput) * 100;
+                    esExitoso = false;
+                }
+            } else {
+                // Indicadores Directos (Mayor es mejor)
+                if (pInput === 0 && eInput === 0) {
+                    pct = 100;
+                } else if (pInput === 0) {
+                    pct = 100;
+                } else {
+                    pct = (eInput / pInput) * 100;
+                }
+                esExitoso = pct >= 99.9; // Margen para flotantes
+            }
+
+            if (pct > 100) pct = 100;
+
+            pctSpan.innerText = pct.toFixed(1) + "%";
+            pctSpan.className = esExitoso ? "text-emerald-500" : "text-rose-500";
+        }
+
+        // 9. LOGICA DE EVIDENCIAS (ARCHIVOS LOCACLES)
+        function asentarArchivoPlanCripto(file) {
+            if(!file || !activeUploadKpi) return;
+            const label = document.getElementById(`evidencia_${activeUploadKpi}`);
+            label.innerText = `📁 ${file.name}`;
+            label.classList.add("text-cyan-500");
+            document.getElementById("corePlanFileEngine").value = ""; 
+        }
+
+        // 10. EXPORTACIÓN A PDF DEL REPORTE
+        function generarInformePDF() {
+            const element = document.createElement("div");
+            element.style.padding = "30px";
+            element.style.color = "#000";
+            element.style.backgroundColor = "#fff";
+            element.style.fontFamily = "Arial, sans-serif";
+            
+            const tenantSelect = document.getElementById("tenantSelector");
+            const tenantNombre = tenantSelect.options[tenantSelect.selectedIndex].text;
+            const mesSelect = document.getElementById("mesControl");
+            const mesNombre = mesSelect.options[mesSelect.selectedIndex].text;
+
+            let filasHTML = "";
+            CONTEXTO_INDICADORES.forEach(kpi => {
+                const p = document.getElementById(`plan_${kpi.id}`).value;
+                const e = document.getElementById(`ejec_${kpi.id}`).value;
+                const pct = document.getElementById(`pct_${kpi.id}`).innerText;
+                
+                filasHTML += `
+                    <tr>
+                        <td style="border: 1px solid #333; padding: 8px; font-size: 11px;">${kpi.code}. ${kpi.name}</td>
+                        <td style="border: 1px solid #333; padding: 8px; text-align: center; font-size: 11px;">${p}</td>
+                        <td style="border: 1px solid #333; padding: 8px; text-align: center; font-size: 11px;">${e}</td>
+                        <td style="border: 1px solid #333; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;">${pct}</td>
+                    </tr>
+                `;
             });
-        }
 
-        function renderPlanAccionReactivo() {
-            const box = document.getElementById("boxPlanAccionDinamico");
-            if (!box) return;
-            const alert = indicadoresSupabaseMock.some(k => k.alerta);
-            box.className = `rounded-2xl border p-4 ${alert ? 'border-rose-500 bg-rose-950/20' : 'border-emerald-500 bg-emerald-950/20'}`;
-            box.innerHTML = `<h4 class="font-black ${alert ? 'text-rose-200' : 'text-emerald-200'}">${alert ? 'ALERTA ACTIVA' : 'SISTEMA CONFORME'}</h4>`;
-        }
+            element.innerHTML = `
+                <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
+                    <h2 style="margin: 0; font-size: 18px;">INFORME MENSUAL DE TRAZABILIDAD HSEQ & SOCIAL</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; font-weight: bold;">Plataforma: Integrow Smart Safety 4.0</p>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <p style="margin: 2px 0; font-size: 12px;"><strong>Centro de Trabajo / Cliente:</strong> ${tenantNombre}</p>
+                    <p style="margin: 2px 0; font-size: 12px;"><strong>Periodo Evaluado:</strong> ${mesNombre} 2026</p>
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #f1f5f9;">
+                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; text-align: left;">Indicador de Gestión Operativa</th>
+                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; width: 15%;">Planificado</th>
+                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; width: 15%;">Ejecutado</th>
+                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; width: 15%;">% Cumplimiento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filasHTML}
+                    </tbody>
+                </table>
+                <div style="margin-top: 50px; text-align: center;">
+                    <p style="font-size: 10px; color: #666; margin: 0;">__________________________________________________</p>
+                    <p style="font-size: 10px; color: #666; margin-top: 5px;">Firma Digital Autorizada</p>
+                    <p style="font-size: 9px; color: #999;">Generado automáticamente por el algoritmo de trazabilidad.</p>
+                </div>
+            `;
 
-        function actualizarGraficosData() {
-            if (chartInstances.sisoma) chartInstances.sisoma.updateSeries([getKpi("SISOMA").valor_actual]);
-            if (chartInstances.tr) chartInstances.tr.updateSeries([Math.min(getKpi("TR").valor_actual * 10, 100)]);
-        }
+            const opt = {
+                margin: 0.5,
+                filename: `Reporte_HSEQ_${tenantNombre.replace(/\s+/g, '_')}_${mesNombre}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
 
-        function inicializarGráficosApex() {
-            const opt = { chart: { type: 'radialBar', height: 160, sparkline: { enabled: true } }, series: [100] };
-            chartInstances.sisoma = new ApexCharts(document.getElementById("chartGaugeSisoma"), opt); chartInstances.sisoma.render();
-            chartInstances.tr = new ApexCharts(document.getElementById("chartGaugeTR"), opt); chartInstances.tr.render();
+            html2pdf().set(opt).from(element).save();
         }
-
-        function cargarConfiguracionesLocales() { /* Implementación de persistencia local */ }
-        function conectarSupabase(silencio) { /* Conexión a DB */ }
-        function toggleConfigModal(t) { const m = document.getElementById(t === 'db' ? 'modalDbConfig' : 'modalSpConfig'); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
-        function cambiarChecklistPermisos() { /* lógica UI */ }
-        function guardarRegistroMobile() { recalcularTodo(); }
-        function cambiarTenant() { recalcularTodo(); }
     </script>
 </body>
 </html>
