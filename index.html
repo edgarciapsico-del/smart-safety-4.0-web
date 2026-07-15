@@ -3,442 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🛡️ SISTEMA DE GESTION INDICADORES HSEQ & SOCIAL</title>
+    <title>SMART SAFETY 4.0 - SISTEMA INTEGRAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
     <style>
-        :root {
-            --bg-main: #0f172a;
-            --bg-panel: rgba(30, 41, 59, 0.7);
-            --bg-card: rgba(15, 23, 42, 0.6);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #1e293b;
-        }
-
-        body.light-theme {
-            --bg-main: #f1f5f9;
-            --bg-panel: #ffffff;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #cbd5e1;
-        }
-
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); transition: background-color 0.3s; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        
-        .glassmorphism {
-            background: var(--bg-panel);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s;
-        }
-        
-        .card-bg {
-            background: var(--bg-card);
-            border-color: var(--border-color);
-            transition: all 0.3s;
-        }
-
-        .text-dynamic { color: var(--text-main); }
-        .text-muted-dynamic { color: var(--text-muted); }
-
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--border-color); }
-        ::-webkit-scrollbar-thumb { background: #0ea5e9; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body.light { --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; }
+        body { background-color: var(--bg); color: var(--text); font-family: sans-serif; transition: background-color 0.3s; }
+        .card { background-color: var(--card); border: 1px solid #334155; }
     </style>
 </head>
-<body class="p-4 antialiased select-none min-h-screen">
-
-    <header class="glassmorphism p-4 rounded-2xl mb-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-gradient-to-tr from-cyan-600 to-indigo-600 rounded-xl shadow-lg">
-                <i data-lucide="shield-check" class="w-6 h-6 text-white animate-pulse"></i>
-            </div>
-            <div>
-                <span class="text-[9px] uppercase font-extrabold tracking-widest text-cyan-500 block">Integrow S.A. - Plataforma de Fiscalización</span>
-                <h1 class="text-lg font-black tracking-tight text-dynamic flex items-center gap-2 mt-0.5">
-                    SISTEMA DE GESTIÓN INDICADORES HSEQ & SOCIAL
-                </h1>
-            </div>
+<body class="p-4">
+    <nav class="flex justify-between items-center mb-6 p-4 card rounded-xl shadow-lg">
+        <h1 class="font-black text-cyan-400 text-lg">INTEGROW | SMART SAFETY 4.0</h1>
+        <div class="flex gap-2">
+            <button onclick="document.body.classList.toggle('light')" class="p-2 bg-slate-700 rounded"><i data-lucide="sun"></i></button>
+            <button onclick="show('dash')" class="px-4 py-2 bg-cyan-600 rounded text-xs font-bold hover:bg-cyan-500">DASHBOARD</button>
+            <button onclick="show('insp')" class="px-4 py-2 bg-emerald-600 rounded text-xs font-bold hover:bg-emerald-500">INSPECCIONES</button>
         </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-            <button onclick="toggleTheme()" class="p-2 bg-slate-800 text-yellow-400 hover:bg-slate-700 rounded-lg transition-all shadow-md border border-slate-700" title="Cambiar Tema">
-                <i data-lucide="sun" id="themeIcon" class="w-5 h-5"></i>
-            </button>
-
-            <div class="flex items-center gap-1 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 shadow-md">
-                <div class="flex flex-col text-xs">
-                    <span class="text-[8px] text-slate-400 uppercase font-bold mb-0.5 flex items-center gap-1">
-                        Centro de Trabajo <i data-lucide="lock" class="w-2.5 h-2.5 text-amber-500" title="Próximamente: Acceso por contraseña"></i>
-                    </span>
-                    <select id="tenantSelector" class="bg-transparent text-white text-xs font-bold focus:outline-none w-48">
-                        <option value="MELIOME">PROYECTO HOSPITAL MELIOME</option>
-                        <option value="CREAR">CREAR S.A.</option>
-                    </select>
-                </div>
-                <button onclick="agregarCliente()" class="bg-cyan-600 hover:bg-cyan-500 text-white rounded p-1 transition-all" title="Nuevo Cliente">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                </button>
-            </div>
-
-            <div class="flex gap-2">
-                <button onclick="generarInformePDF()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-extrabold text-xs px-3.5 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-1.5">
-                    <i data-lucide="download" class="w-4 h-4"></i> INFORME PDF
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <section class="grid grid-cols-2 md:grid-cols-5 xl:grid-cols-10 gap-2.5 mb-4" id="grid10IndicadoresMaster"></section>
-
-    <div id="panelCalculoHseq" class="hidden glassmorphism p-4 rounded-2xl shadow-lg mb-4 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-        </div>
-
-    <section class="glassmorphism p-4 rounded-2xl shadow-xl mb-4">
-        <div class="border-b border-gray-500/30 pb-3 mb-4 flex justify-between items-center flex-wrap gap-4">
-            <div>
-                <h3 class="text-sm font-black text-dynamic uppercase tracking-wider flex items-center gap-2">
-                    <i data-lucide="calendar-check" class="w-5 h-5 text-cyan-500"></i> CONTROL OPERATIVO Y TRAZABILIDAD MENSUAL
-                </h3>
-                <p class="text-[10px] text-muted-dynamic font-bold mt-1">Cargue la información mensual para la generación del informe de Gestión Ambiental y Seguridad.</p>
-            </div>
-            <select id="mesControl" class="bg-slate-800 text-white border border-slate-600 rounded px-3 py-1 text-xs font-bold">
-                <option value="01">Enero</option>
-                <option value="02">Febrero</option>
-                <option value="03" selected>Marzo</option>
-                <option value="04">Abril</option>
-                <option value="05">Mayo</option>
-                <option value="06">Junio</option>
-                <option value="07">Julio</option>
-                <option value="08">Agosto</option>
-                <option value="09">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-            </select>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                    <tr class="border-b border-gray-500/30 text-muted-dynamic font-black uppercase text-[9px] tracking-wider">
-                        <th class="p-3 w-[25%]">Indicador HSEQ & Social</th>
-                        <th class="p-3 w-[15%] text-center">Planificado / Meta</th>
-                        <th class="p-3 w-[15%] text-center">Ejecutado / Real</th>
-                        <th class="p-3 w-[15%] text-center">Cumplimiento %</th>
-                        <th class="p-3 w-[30%] text-right">Cronograma / Evidencia</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaControlOperativo" class="divide-y divide-gray-500/20 text-dynamic">
-                    </tbody>
+    </nav>
+    <div id="dash-view">
+        <div id="grid-kpis" class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6"></div>
+        <div id="panel-kpi" class="card p-6 rounded-xl mb-6 hidden"></div>
+        <div class="card p-6 rounded-xl shadow-lg">
+            <table class="w-full text-xs text-left">
+                <thead><tr class="text-gray-400 uppercase border-b border-gray-700"><th class="p-3">Indicador</th><th class="p-3">Plan</th><th class="p-3">Ejec</th><th class="p-3">%</th><th class="p-3">Vínculo</th></tr></thead>
+                <tbody id="tabla-control"></tbody>
             </table>
         </div>
-        <input type="file" id="corePlanFileEngine" class="hidden" onchange="asentarArchivoPlanCripto(this.files[0])">
-    </section>
-
+    </div>
+    <div id="insp-view" class="hidden card p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-black mb-4">Registro de Novedades de Campo</h2>
+        <div class="grid grid-cols-1 gap-4">
+            <select id="insp-tipo" class="bg-slate-800 p-3 rounded text-sm border border-gray-600"><option>Seguridad</option><option>Salud</option><option>Ambiente</option></select>
+            <input type="text" id="insp-loc" placeholder="Ubicación / Área" class="bg-slate-800 p-3 rounded text-sm border border-gray-600">
+            <textarea id="insp-obs" placeholder="Detalle de la novedad..." class="bg-slate-800 p-3 rounded text-sm h-32 border border-gray-600"></textarea>
+            <button onclick="guardarInsp()" class="bg-emerald-600 p-3 rounded font-bold hover:bg-emerald-500">GUARDAR Y TRANSMITIR</button>
+        </div>
+        <div id="insp-list" class="mt-6 space-y-2"></div>
+    </div>
     <script>
-        // 1. ESTRUCTURA DE DATOS MAESTRA (LISTA PARA BASE DE DATOS)
-        const CONTEXTO_INDICADORES = [
-            { id: "TR", code: "1", name: "TASA DE RIESGO", val: 1.2, target: "≤ 5.27", formula: "TR = TF * TG / 10", spLink: "https://ejemplo.sharepoint.com/tasa_riesgo", history: [2.5, 1.8, 1.2, 0.9, 1.2], extra: { tf: [25, 20, 15, 10, 12], tg: [10, 9, 8, 9, 10] }, isInverse: true },
-            { id: "IGP_SST", code: "2", name: "INDICE GLOBAL PREVENTIVO SST", val: 95.5, target: "≥ 85%", formula: "Ponderado 22 Criterios", spLink: "https://ejemplo.sharepoint.com/preventivo", history: [80, 85, 90, 93, 95.5], isInverse: false },
-            { id: "INCIDENTES", code: "3", name: "INCIDENTES SEG. Y AMB.", val: 0, target: "0", formula: "Conteo de eventos", spLink: "https://ejemplo.sharepoint.com/incidentes", history: [3, 1, 2, 0, 0], isInverse: true },
-            { id: "ACCIDENTES", code: "4", name: "ACCIDENTES GRAVES", val: 0, target: "0", formula: "Conteo de eventos", spLink: "https://ejemplo.sharepoint.com/accidentes", history: [0, 0, 0, 0, 0], isInverse: true },
-            { id: "RESIDUOS", code: "5", name: "GESTIÓN DE RESIDUOS", val: 24.5, target: "≥ 20%", formula: "(R.Vertidos/R.Gen)*100", spLink: "https://ejemplo.sharepoint.com/residuos", history: [15, 18, 20, 22, 24.5], isInverse: false },
-            { id: "PMA", code: "6", name: "CUMPLIMIENTO PMA", val: 100, target: "100%", formula: "(Act. Ejec / Plan)*100", spLink: "https://ejemplo.sharepoint.com/pma", history: [80, 90, 100, 100, 100], isInverse: false },
-            { id: "CAPACITACION", code: "7", name: "PLAN CAPACITACIÓN", val: 100, target: "85%", formula: "(Ejec / Prog)*100", spLink: "https://ejemplo.sharepoint.com/capacitacion", history: [50, 75, 100, 100, 100], isInverse: false },
-            { id: "COMUNIDAD", code: "8", name: "RELACIONAMIENTO COMUNITARIO", val: 85, target: "≥ 85%", formula: "(Ejec / Prog)*100", spLink: "https://ejemplo.sharepoint.com/comunidad", history: [60, 70, 80, 85, 85], isInverse: false },
-            { id: "QUEJAS_INT", code: "9", name: "QUEJAS INTERNAS ATENDIDAS", val: 100, target: "100%", formula: "(Atendidas / Recibidas)*100", spLink: "https://ejemplo.sharepoint.com/quejas_int", history: [90, 95, 100, 100, 100], isInverse: false },
-            { id: "QUEJAS_EXT", code: "10", name: "QUEJAS EXTERNAS ATENDIDAS", val: 100, target: "100%", formula: "(Atendidas / Recibidas)*100", spLink: "https://ejemplo.sharepoint.com/quejas_ext", history: [80, 100, 100, 100, 100], isInverse: false }
+        const KPIs = [
+            { id: "TR", name: "TASA RIESGO", val: 1.2, inv: true, link: "" },
+            { id: "IGP", name: "IGP SST", val: 95.5, inv: false, link: "" },
+            { id: "INC", name: "INCIDENTES", val: 0, inv: true, link: "" },
+            { id: "ACC", name: "ACCIDENTES", val: 0, inv: true, link: "" },
+            { id: "RES", name: "RESIDUOS", val: 24.5, inv: false, link: "" },
+            { id: "PMA", name: "PMA", val: 100, inv: false, link: "" },
+            { id: "CAP", name: "CAPACITACIÓN", val: 100, inv: false, link: "" },
+            { id: "COM", name: "COMUNITARIO", val: 85, inv: false, link: "" },
+            { id: "QIN", name: "QUEJAS INT", val: 100, inv: false, link: "" },
+            { id: "QEX", name: "QUEJAS EXT", val: 100, inv: false, link: "" }
         ];
-
-        let activeKpiId = "IGP_SST";
-        let panelChartInstance = null;
-        let isLightMode = false;
-        let activeUploadKpi = null;
-
-        // INICIALIZACIÓN
-        window.onload = function() {
-            lucide.createIcons();
-            renderTopIndicators();
-            renderControlOperativo();
-            selectKpi("IGP_SST");
-        };
-
-        // 2. MODO CLARO / OSCURO
-        function toggleTheme() {
-            isLightMode = !isLightMode;
-            document.body.classList.toggle('light-theme', isLightMode);
-            const icon = document.getElementById("themeIcon");
-            icon.setAttribute("data-lucide", isLightMode ? "moon" : "sun");
-            icon.classList.toggle("text-indigo-600", isLightMode);
-            icon.classList.toggle("text-yellow-400", !isLightMode);
-            lucide.createIcons();
-            selectKpi(activeKpiId); 
+        function show(v) {
+            document.getElementById('dash-view').classList.toggle('hidden', v !== 'dash');
+            document.getElementById('insp-view').classList.toggle('hidden', v !== 'insp');
         }
-
-        // 3. GESTIÓN DE NUEVOS CLIENTES
-        function agregarCliente() {
-            const nuevo = prompt("Ingrese el nombre del nuevo Centro de Trabajo (Cliente):");
-            if(nuevo && nuevo.trim() !== "") {
-                const select = document.getElementById("tenantSelector");
-                const option = document.createElement("option");
-                option.value = nuevo.replace(/\s+/g, '_').toUpperCase();
-                option.text = nuevo.toUpperCase();
-                select.appendChild(option);
-                select.value = option.value;
-                alert(`Cliente "${nuevo.toUpperCase()}" ha sido registrado exitosamente.`);
+        function guardarInsp() {
+            const list = document.getElementById('insp-list');
+            list.innerHTML += `<div class="card p-3 border-l-4 border-emerald-500 text-xs"><b>${document.getElementById('insp-tipo').value}</b>: ${document.getElementById('insp-obs').value}</div>`;
+        }
+        function setLink(id) {
+            const url = prompt("Vínculo de SharePoint:");
+            if(url) {
+                KPIs.find(k => k.id === id).link = url;
+                document.getElementById(`link-${id}`).innerHTML = `<a href="${url}" target="_blank" class="text-cyan-400 underline">Ir al archivo</a>`;
             }
         }
-
-        // 4. RENDERIZAR LAS 10 TARJETAS SUPERIORES
-        function renderTopIndicators() {
-            const grid = document.getElementById("grid10IndicadoresMaster");
-            grid.innerHTML = "";
-
-            CONTEXTO_INDICADORES.forEach(k => {
-                const activeStyle = k.id === activeKpiId ? 'ring-2 ring-cyan-500 bg-cyan-900/20 border-cyan-500/50' : 'card-bg border-gray-500/30';
-                let valText = (k.isInverse) ? k.val.toFixed(2) : `${k.val.toFixed(1)}%`;
-                
-                grid.innerHTML += `
-                    <div onclick="selectKpi('${k.id}')" class="${activeStyle} border rounded-xl p-2.5 text-center shadow-md cursor-pointer hover:-translate-y-1 transition-all duration-200">
-                        <span class="text-[7.5px] font-black text-muted-dynamic block uppercase tracking-wider truncate mb-1" title="${k.name}">${k.code}. ${k.name}</span>
-                        <div class="text-sm font-black text-cyan-500">${valText}</div>
-                        <span class="text-[7px] text-muted-dynamic block mt-1">Meta: ${k.target}</span>
-                    </div>
-                `;
-            });
+        function render() {
+            document.getElementById('grid-kpis').innerHTML = KPIs.map(k => `
+                <div onclick="select('${k.id}')" class="card p-3 rounded cursor-pointer text-center hover:border-cyan-500">
+                    <div class="text-[8px] uppercase text-gray-400 truncate">${k.name}</div>
+                    <div class="font-black text-cyan-400">${k.val}${k.inv?'':'%'}</div>
+                </div>`).join('');
+            document.getElementById('tabla-control').innerHTML = KPIs.map(k => `
+                <tr class="border-b border-gray-700">
+                    <td class="p-3 font-bold">${k.name}</td>
+                    <td class="p-3"><input type="number" id="p-${k.id}" value="100" oninput="calc('${k.id}', ${k.inv})" class="w-12 bg-transparent text-center font-mono"></td>
+                    <td class="p-3"><input type="number" id="e-${k.id}" value="${k.val}" oninput="calc('${k.id}', ${k.inv})" class="w-12 bg-transparent text-center font-mono text-cyan-400"></td>
+                    <td class="p-3 font-black" id="pct-${k.id}">0%</td>
+                    <td class="p-3"><button onclick="setLink('${k.id}')" class="bg-gray-700 px-2 py-1 rounded text-[9px]">VINCULAR</button><div id="link-${k.id}"></div></td>
+                </tr>`).join('');
+            KPIs.forEach(k => calc(k.id, k.inv));
         }
-
-        // 5. PANEL CON EL BOTÓN AZUL DE SHAREPOINT Y LA GRÁFICA
-        function selectKpi(id) {
-            activeKpiId = id;
-            renderTopIndicators(); 
-            const kpi = CONTEXTO_INDICADORES.find(k => k.id === id);
-            const panel = document.getElementById("panelCalculoHseq");
-            panel.classList.remove("hidden");
-            
-            panel.innerHTML = `
-                <div class="space-y-3">
-                    <div>
-                        <span class="bg-cyan-600 text-white font-extrabold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider">Trazabilidad Activa</span>
-                        <h3 class="text-sm font-black text-dynamic uppercase mt-2">${kpi.code}. ${kpi.name}</h3>
-                        <p class="text-[10px] text-muted-dynamic font-mono mt-1">Fórmula: ${kpi.formula}</p>
-                    </div>
-                    <a href="${kpi.spLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-[#0078D4] hover:bg-[#005a9e] text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-md mt-2">
-                        <i data-lucide="cloud" class="w-4 h-4"></i>
-                        Ver Base de Datos en SharePoint
-                    </a>
-                    <p class="text-[9px] text-muted-dynamic">Enlace directo al repositorio documental (Excel/Listas).</p>
-                </div>
-                <div class="lg:col-span-2">
-                    <h4 class="text-[10px] font-black text-muted-dynamic uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-500"></i> Gráfica de Corrida / Desempeño
-                    </h4>
-                    <div id="chartContextual" class="h-48 w-full bg-slate-900/20 rounded-lg border border-gray-500/20 p-2"></div>
-                </div>
-            `;
-            lucide.createIcons();
-            renderChart(kpi);
+        function calc(id, inv) {
+            const p = parseFloat(document.getElementById(`p-${id}`).value) || 0;
+            const e = parseFloat(document.getElementById(`e-${id}`).value) || 0;
+            const pct = inv ? (e <= p ? 100 : (p/e)*100) : (p > 0 ? (e/p)*100 : 0);
+            const el = document.getElementById(`pct-${id}`);
+            el.innerText = pct.toFixed(1) + "%";
+            el.className = pct >= 99 ? "p-3 font-black text-emerald-500" : "p-3 font-black text-rose-500";
         }
-
-        // 6. MOTOR DE GRÁFICAS DE APEXCHARTS
-        function renderChart(kpi) {
-            if(panelChartInstance) { panelChartInstance.destroy(); }
-            const textColor = isLightMode ? '#64748b' : '#94a3b8';
-            const gridColor = isLightMode ? '#e2e8f0' : '#1e293b';
-            let options = {};
-
-            if(kpi.id === "TR") {
-                options = {
-                    chart: { type: 'line', height: 170, toolbar: { show: false }, background: 'transparent' },
-                    colors: ['#f43f5e', '#10b981'],
-                    stroke: { curve: 'smooth', width: 3 },
-                    series: [
-                        { name: 'Indice Frecuencia (IF)', data: kpi.extra.tf },
-                        { name: 'Indice Gravedad (IG)', data: kpi.extra.tg }
-                    ],
-                    xaxis: { categories: ['Mes-4', 'Mes-3', 'Mes-2', 'Mes-1', 'Actual'], labels: { style: { colors: textColor, fontSize: '9px' } } },
-                    yaxis: { labels: { style: { colors: textColor, fontSize: '9px' } } },
-                    legend: { labels: { colors: textColor }, fontSize: '10px' },
-                    grid: { borderColor: gridColor }
-                };
-            } else {
-                options = {
-                    chart: { type: 'bar', height: 170, toolbar: { show: false }, background: 'transparent' },
-                    colors: ['#0ea5e9'],
-                    plotOptions: { bar: { borderRadius: 4, dataLabels: { position: 'top' } } },
-                    dataLabels: { enabled: true, formatter: val => val + (kpi.isInverse ? '' : '%'), style: { fontSize: '9px', colors: [textColor] }, offsetY: -15 },
-                    series: [{ name: 'Desempeño', data: kpi.history }],
-                    xaxis: { categories: ['Mes-4', 'Mes-3', 'Mes-2', 'Mes-1', 'Actual'], labels: { style: { colors: textColor, fontSize: '9px' } } },
-                    yaxis: { labels: { style: { colors: textColor, fontSize: '9px' } } },
-                    grid: { borderColor: gridColor }
-                };
-            }
-            panelChartInstance = new ApexCharts(document.querySelector("#chartContextual"), options);
-            panelChartInstance.render();
+        function select(id) {
+            const k = KPIs.find(x => x.id === id);
+            document.getElementById('panel-kpi').classList.remove('hidden');
+            document.getElementById('panel-kpi').innerHTML = `<h3 class="font-black text-cyan-400">${k.name}</h3>`;
         }
-
-        // 7. TABLA DE CONTROL OPERATIVO INFERIOR
-        function renderControlOperativo() {
-            const tbody = document.getElementById("tablaControlOperativo");
-            tbody.innerHTML = "";
-
-            CONTEXTO_INDICADORES.forEach(kpi => {
-                let planDefault = 100;
-                let ejecDefault = (kpi.isInverse) ? 0 : kpi.val;
-                
-                if(kpi.id === "TR") planDefault = 5.27;
-                if(kpi.id === "INCIDENTES" || kpi.id === "ACCIDENTES") planDefault = 0;
-                if(kpi.id === "CAPACITACION") planDefault = 85;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-500/10 transition-colors">
-                        <td class="p-3 font-semibold text-xs text-dynamic">
-                            ${kpi.code}. ${kpi.name}
-                        </td>
-                        <td class="p-3">
-                            <input type="number" id="plan_${kpi.id}" value="${planDefault}" step="any" oninput="recalcularFila('${kpi.id}', ${kpi.isInverse})" class="w-full card-bg border border-gray-500/30 rounded px-2 py-1.5 font-bold text-center text-dynamic focus:outline-none focus:border-cyan-500 font-mono">
-                        </td>
-                        <td class="p-3">
-                            <input type="number" id="ejec_${kpi.id}" value="${ejecDefault}" step="any" oninput="recalcularFila('${kpi.id}', ${kpi.isInverse})" class="w-full card-bg border border-gray-500/30 rounded px-2 py-1.5 font-bold text-center text-cyan-500 focus:outline-none focus:border-cyan-500 font-mono">
-                        </td>
-                        <td class="p-3 font-mono font-black text-xs text-center">
-                            <span id="pct_${kpi.id}">-</span>
-                        </td>
-                        <td class="p-3 text-right">
-                            <button onclick="document.getElementById('corePlanFileEngine').click(); activeUploadKpi='${kpi.id}'" class="bg-slate-700 hover:bg-slate-600 text-white font-bold text-[9px] px-3 py-1.5 rounded-lg transition-all uppercase tracking-wider inline-flex items-center gap-1 shadow-md">
-                                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i> Adjuntar Evidencia
-                            </button>
-                            <span id="evidencia_${kpi.id}" class="block text-[8px] text-muted-dynamic font-mono mt-1 truncate max-w-xs text-right float-right">Sin archivo...</span>
-                        </td>
-                    </tr>
-                `;
-                recalcularFila(kpi.id, kpi.isInverse);
-            });
-            lucide.createIcons();
-        }
-
-        // 8. CÁLCULO MATEMÁTICO (DIRECTO E INVERSO) PARA LAS FILAS
-        function recalcularFila(id, isInverse) {
-            const pInput = parseFloat(document.getElementById(`plan_${id}`).value) || 0;
-            const eInput = parseFloat(document.getElementById(`ejec_${id}`).value) || 0;
-            const pctSpan = document.getElementById(`pct_${id}`);
-            
-            let pct = 0;
-            let esExitoso = true;
-
-            if (isInverse) {
-                // Indicadores Inversos (Menor es mejor)
-                if (eInput <= pInput) {
-                    pct = 100;
-                    esExitoso = true;
-                } else {
-                    pct = pInput === 0 ? 0 : (pInput / eInput) * 100;
-                    esExitoso = false;
-                }
-            } else {
-                // Indicadores Directos (Mayor es mejor)
-                if (pInput === 0 && eInput === 0) {
-                    pct = 100;
-                } else if (pInput === 0) {
-                    pct = 100;
-                } else {
-                    pct = (eInput / pInput) * 100;
-                }
-                esExitoso = pct >= 99.9; // Margen para flotantes
-            }
-
-            if (pct > 100) pct = 100;
-
-            pctSpan.innerText = pct.toFixed(1) + "%";
-            pctSpan.className = esExitoso ? "text-emerald-500" : "text-rose-500";
-        }
-
-        // 9. LOGICA DE EVIDENCIAS (ARCHIVOS LOCACLES)
-        function asentarArchivoPlanCripto(file) {
-            if(!file || !activeUploadKpi) return;
-            const label = document.getElementById(`evidencia_${activeUploadKpi}`);
-            label.innerText = `📁 ${file.name}`;
-            label.classList.add("text-cyan-500");
-            document.getElementById("corePlanFileEngine").value = ""; 
-        }
-
-        // 10. EXPORTACIÓN A PDF DEL REPORTE
-        function generarInformePDF() {
-            const element = document.createElement("div");
-            element.style.padding = "30px";
-            element.style.color = "#000";
-            element.style.backgroundColor = "#fff";
-            element.style.fontFamily = "Arial, sans-serif";
-            
-            const tenantSelect = document.getElementById("tenantSelector");
-            const tenantNombre = tenantSelect.options[tenantSelect.selectedIndex].text;
-            const mesSelect = document.getElementById("mesControl");
-            const mesNombre = mesSelect.options[mesSelect.selectedIndex].text;
-
-            let filasHTML = "";
-            CONTEXTO_INDICADORES.forEach(kpi => {
-                const p = document.getElementById(`plan_${kpi.id}`).value;
-                const e = document.getElementById(`ejec_${kpi.id}`).value;
-                const pct = document.getElementById(`pct_${kpi.id}`).innerText;
-                
-                filasHTML += `
-                    <tr>
-                        <td style="border: 1px solid #333; padding: 8px; font-size: 11px;">${kpi.code}. ${kpi.name}</td>
-                        <td style="border: 1px solid #333; padding: 8px; text-align: center; font-size: 11px;">${p}</td>
-                        <td style="border: 1px solid #333; padding: 8px; text-align: center; font-size: 11px;">${e}</td>
-                        <td style="border: 1px solid #333; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;">${pct}</td>
-                    </tr>
-                `;
-            });
-
-            element.innerHTML = `
-                <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-                    <h2 style="margin: 0; font-size: 18px;">INFORME MENSUAL DE TRAZABILIDAD HSEQ & SOCIAL</h2>
-                    <p style="margin: 5px 0 0 0; font-size: 12px; font-weight: bold;">Plataforma: Integrow Smart Safety 4.0</p>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <p style="margin: 2px 0; font-size: 12px;"><strong>Centro de Trabajo / Cliente:</strong> ${tenantNombre}</p>
-                    <p style="margin: 2px 0; font-size: 12px;"><strong>Periodo Evaluado:</strong> ${mesNombre} 2026</p>
-                </div>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background-color: #f1f5f9;">
-                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; text-align: left;">Indicador de Gestión Operativa</th>
-                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; width: 15%;">Planificado</th>
-                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; width: 15%;">Ejecutado</th>
-                            <th style="border: 1px solid #333; padding: 10px; font-size: 11px; width: 15%;">% Cumplimiento</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filasHTML}
-                    </tbody>
-                </table>
-                <div style="margin-top: 50px; text-align: center;">
-                    <p style="font-size: 10px; color: #666; margin: 0;">__________________________________________________</p>
-                    <p style="font-size: 10px; color: #666; margin-top: 5px;">Firma Digital Autorizada</p>
-                    <p style="font-size: 9px; color: #999;">Generado automáticamente por el algoritmo de trazabilidad.</p>
-                </div>
-            `;
-
-            const opt = {
-                margin: 0.5,
-                filename: `Reporte_HSEQ_${tenantNombre.replace(/\s+/g, '_')}_${mesNombre}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save();
-        }
+        render();
+        lucide.createIcons();
     </script>
 </body>
 </html>
