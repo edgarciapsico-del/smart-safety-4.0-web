@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART SAFETY 4.0 | SISTEMA GESTION INDICADORES </title>
+    <title>SMART SAFETY 4.0 | ÍNDICE GLOBAL PREVENTIVO SST</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -434,17 +434,17 @@
                 ]}
             },
             {
-                id: "RES", name: "4. GESTIÓN DE RESIDUOS 2025-2026", formula: "Comunes vs Reciclados (Kg) + Subindicadores", type: "waste-grouped", val: "5,536.5 Kg Reciclados", links: { v: "", t: "" },
+                id: "RES", name: "4. GESTIÓN DE RESIDUOS 2025-2026", formula: "Comunes vs Reciclados (Kg) + Desglose de Desechos", type: "waste-grouped", val: "5,536.5 Kg Reciclados", links: { v: "", t: "" },
                 inputs: [ { id: "in_com", label: "Comunes (Kg)" }, { id: "in_rec", label: "Reciclados (Kg)" } ], calc: (v) => v[1] + " Kg",
                 hist: { labels: [...lbl6], series: [
                     { name: "Desechos Comunes (Kg)", data: [375, 1350, 4340, 1350, 426, 761.77] },
                     { name: "Residuos Reciclados (Kg)", data: [57, 94, 1345.5, 1113.2, 329.65, 5536.5] }
                 ]},
                 wasteSub: [
-                    { title: "Ordinarios", val: "761.77 kg" },
-                    { title: "Reciclables", val: "5536.5 kg" },
-                    { title: "Peligrosos", val: "45 kg" },
-                    { title: "Escombros", val: "12 m³" }
+                    { title: "Ordinarios", val: 761.77, unit: "kg", data: [120, 150, 180, 110, 100, 101.77] },
+                    { title: "Reciclables", val: 5536.5, unit: "kg", data: [800, 1200, 950, 1100, 786.5, 700] },
+                    { title: "Peligrosos", val: 45, unit: "kg", data: [5, 10, 8, 7, 10, 5] },
+                    { title: "Escombros", val: 12, unit: "m³", data: [2, 3, 1, 2, 2, 2] }
                 ]
             },
             {
@@ -532,10 +532,8 @@
                 subW.classList.remove('hidden');
                 subW.className = "w-full mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6";
 
-                // Render principal primero
                 renderMainChart(kpi, txtColor, gridColor);
 
-                // Render sub-indicadores después
                 kpi.subIndicators.forEach((s, i) => {
                     subW.innerHTML += `
                         <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[150px]">
@@ -558,21 +556,41 @@
                 }, 50);
 
             } 
-            // 2. GESTIÓN DE RESIDUOS: Gráfica principal ARRIBA, Sub-tarjetas ABAJO
+            // 2. GESTIÓN DE RESIDUOS: Gráfica principal ARRIBA, 4 Mini-gráficas de barras ABAJO
             else if (kpi.id === 'RES') {
                 mainW.classList.remove('hidden');
                 subW.classList.remove('hidden');
-                subW.className = "w-full mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6";
+                subW.className = "w-full mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6";
 
                 renderMainChart(kpi, txtColor, gridColor);
 
-                kpi.wasteSub.forEach(w => {
+                kpi.wasteSub.forEach((w, i) => {
                     subW.innerHTML += `
-                        <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 rounded-lg text-center">
-                            <span class="text-[9px] font-black uppercase text-slate-500 block mb-1">${w.title}</span>
-                            <span class="text-lg font-black font-mono text-emerald-600 dark:text-emerald-400">${w.val}</span>
+                        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-3 rounded-lg flex flex-col h-[180px]">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[9px] font-black uppercase text-slate-500">${w.title}</span>
+                                <span class="text-[10px] font-black font-mono text-emerald-600 dark:text-emerald-400">${w.val} ${w.unit}</span>
+                            </div>
+                            <div id="wastechart-${i}" class="flex-1 w-full"></div>
                         </div>`;
                 });
+
+                setTimeout(() => {
+                    kpi.wasteSub.forEach((w, i) => {
+                        const opt = {
+                            chart: { type: 'bar', height: 130, toolbar: { show: false }, sparkline: { enabled: false } },
+                            colors: ['#10b981'],
+                            plotOptions: { bar: { borderRadius: 3, columnWidth: '55%' } },
+                            series: [{ name: w.title, data: w.data }],
+                            xaxis: { categories: ['Trim 1', 'Trim 2', 'Trim 3', 'Trim 4', 'Trim 5', 'Trim 6'], labels: { style: { fontSize: '8px', colors: txtColor } } },
+                            yaxis: { show: false },
+                            grid: { show: false },
+                            tooltip: { x: { show: false } }
+                        };
+                        const chart = new ApexCharts(document.querySelector(`#wastechart-${i}`), opt);
+                        chart.render(); subCharts.push(chart);
+                    });
+                }, 50);
             } 
             // 3. RESTO DE INDICADORES
             else {
