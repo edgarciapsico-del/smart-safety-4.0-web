@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART SAFETY 4.0 | ÍNDICE GLOBAL PREVENTIVO SST</title>
+    <title>INTEGROW / SMART SAFETY 4.0 | SISTEMA DE GESTIÓN DE INDICADORES (KPI´S)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,13 +34,13 @@
     <!-- CABECERA -->
     <nav class="flex flex-wrap justify-between items-center mb-4 p-4 bg-white dark:bg-darkcard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div>
-            <span class="text-[9px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-widest block">Integrow S.A. | Módulo Auditoría</span>
+            <span class="text-[9px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-widest block">INTEGROW / SMART SAFETY 4.0</span>
             <h1 class="font-black text-lg flex items-center gap-2 mt-0.5 uppercase tracking-tight">
-                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> ÍNDICE GLOBAL PREVENTIVO SST
+                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> SISTEMA DE GESTIÓN DE INDICADORES (KPI´S)
             </h1>
         </div>
         
-        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 overflow-x-auto">
+        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 overflow-x-auto my-2 sm:my-0">
             <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard KPIs
             </button>
@@ -50,9 +50,12 @@
             <button onclick="switchView('planificacion')" id="btn-planificacion" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
                 <i data-lucide="calendar" class="w-4 h-4"></i> Planificación Anual
             </button>
+            <button onclick="switchView('config-kpi')" id="btn-config-kpi" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="settings" class="w-4 h-4"></i> Crear KPI SMART
+            </button>
         </div>
 
-        <div class="flex items-center gap-3 mt-3 sm:mt-0">
+        <div class="flex items-center gap-3">
             <!-- Selector y Configuración de Centros de Trabajo -->
             <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
                 <select id="centro-trabajo-select" class="bg-transparent text-xs font-bold focus:outline-none px-2 py-1 outline-none">
@@ -107,8 +110,9 @@
                         <div>
                             <h2 id="kpi-title" class="text-xl font-black uppercase text-sky-700 dark:text-sky-400">Cargando...</h2>
                             <p id="kpi-desc" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-2 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block font-bold"></p>
+                            <div id="smart-goal-box" class="mt-2 text-[11px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 p-2 rounded border border-emerald-200 dark:border-emerald-800"></div>
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3 mt-3 md:mt-0">
                             <!-- Toggle Tipo de Gráfica: Corrida vs Barras -->
                             <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 flex text-[10px] font-bold">
                                 <button onclick="setChartType('line')" id="chart-type-line" class="px-3 py-1.5 rounded bg-sky-600 text-white transition-colors">Corrida</button>
@@ -123,7 +127,7 @@
 
                     <!-- Gráfica Principal -->
                     <div id="main-chart-wrapper" class="w-full relative mt-2 min-h-[350px]">
-                        <h3 class="absolute top-0 left-0 z-10 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-darkcard px-2 rounded">Histórico General</h3>
+                        <h3 class="absolute top-0 left-0 z-10 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-darkcard px-2 rounded">Histórico General vs Meta</h3>
                         <div id="chartContainer" class="w-full h-full mt-4"></div>
                     </div>
                     
@@ -191,6 +195,51 @@
                     </div>
 
                 </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- VISTA NUEVA: CONFIGURACIÓN DE CREAR KPI SMART -->
+    <main id="view-config-kpi" class="hidden flex-1 w-full max-w-4xl mx-auto mt-4">
+        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow-sm border-t-[6px] border-t-purple-600">
+            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5">
+                <h2 class="text-xl font-black uppercase flex items-center gap-2">
+                    <i data-lucide="settings" class="w-6 h-6 text-purple-600"></i> Configuración y Creación de Nuevo Indicador SMART
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Configure las métricas, fórmula de cálculo, meta y el objetivo SMART para incluirlo inmediatamente en el Dashboard.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nombre del Indicador</label>
+                        <input type="text" id="new-kpi-name" placeholder="Ej. 10. Control de Ruido Ocupacional" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded text-xs font-bold outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fórmula o Métrica de Medición</label>
+                        <input type="text" id="new-kpi-formula" placeholder="Ej. (Monitoreados / Totales) * 100 | Meta: 90%" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded text-xs font-bold outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Meta Numérica (%) o Valor</label>
+                        <input type="number" id="new-kpi-meta" placeholder="90" value="90" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded text-xs font-bold outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Valor Inicial Actual (%)</label>
+                        <input type="number" id="new-kpi-val" placeholder="88.5" value="88.5" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded text-xs font-bold outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Objetivo SMART (Específico, Medible, Alcanzable, Relevante, Temporal)</label>
+                    <textarea id="new-kpi-smart" rows="3" placeholder="Ej. Mantener el cumplimiento de mitigación de ruido por encima del 90% durante cada trimestre del año 2026..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded text-xs outline-none focus:border-purple-500 resize-none"></textarea>
+                </div>
+
+                <button onclick="crearNuevoKpiSmart()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-black py-3 rounded-lg uppercase text-xs flex items-center justify-center gap-2 transition-colors shadow-md">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Crear Indicador SMART e Incluir en el Dashboard
+                </button>
             </div>
         </div>
     </main>
@@ -394,6 +443,7 @@
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-inspecciones').classList.add('hidden');
             document.getElementById('view-planificacion').classList.add('hidden');
+            document.getElementById('view-config-kpi').classList.add('hidden');
             
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
@@ -442,13 +492,13 @@
             }
         }
 
-        // BASE DE DATOS HSEQ CON 10 KPIs
+        // BASE DE DATOS HSEQ CON 9 KPIs INICIALES + SOPORTE PARA NUEVOS SMART
         const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
         const lbl6 = ['I Trim 25','II Trim 25','III Trim 25','IV Trim 25','I Trim 26','II Trim 26'];
         
         const BD_HSEQ = [
             {
-                id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Frecuencia Mensual | Meta Global: 85%", type: "line-meta", val: "92.7%", links: { v: "", t: "" },
+                id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Frecuencia Mensual | Meta Global: 85%", smart: "Garantizar una cultura preventiva superior al 85% de cumplimiento mensual en las auditorías de procesos operativos de SST.", metaVal: 85.0, type: "line-meta", val: "92.7%", links: { v: "", t: "" },
                 inputs: [ { id: "in_p", label: "Resultado %" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [
                     { name: "Resultado (%)", data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7] },
@@ -465,7 +515,7 @@
                 ]
             },
             {
-                id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", type: "bar", val: "0.00", links: { v: "", t: "" },
+                id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", smart: "Mantener la tasa de riesgo por debajo del umbral regulatorio establecido en 5.27 durante el periodo anual.", metaVal: 5.27, type: "bar", val: "0.00", links: { v: "", t: "" },
                 inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ],
                 calc: (v) => v[1] === 0 ? 0 : (v[0] / v[1]).toFixed(2),
                 hist: { labels: [...lbl18], series: [
@@ -474,14 +524,14 @@
                 ]}
             },
             {
-                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados | Meta: 0", type: "bar", val: "1", links: { v: "", t: "" },
+                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados | Meta: 0", smart: "Alcanzar cero accidentes con tiempo perdido mediante inspecciones preventivas rigurosas.", metaVal: 0, type: "bar", val: "1", links: { v: "", t: "" },
                 inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
                 hist: { labels: [...lbl18], series: [
                     { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } 
                 ]}
             },
             {
-                id: "RES", name: "4. GESTIÓN DE RESIDUOS 2025-2026", formula: "Comunes vs Reciclados (Kg) + Desglose de Desechos", type: "waste-grouped", val: "5,536.5 Kg Reciclados", links: { v: "", t: "" },
+                id: "RES", name: "4. GESTIÓN DE RESIDUOS 2025-2026", formula: "Comunes vs Reciclados (Kg) + Desglose de Desechos", smart: "Incrementar la tasa de aprovechamiento y reciclaje de residuos sólidos industriales y hospitalarios en un 20% interanual.", metaVal: 1000, type: "waste-grouped", val: "5,536.5 Kg Reciclados", links: { v: "", t: "" },
                 inputs: [ { id: "in_com", label: "Comunes (Kg)" }, { id: "in_rec", label: "Reciclados (Kg)" } ], calc: (v) => v[1] + " Kg",
                 hist: { labels: [...lbl6], series: [
                     { name: "Desechos Comunes (Kg)", data: [375, 1350, 4340, 1350, 426, 761.77] },
@@ -495,34 +545,49 @@
                 ]
             },
             {
-                id: "PMA", name: "5. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", type: "line", val: "100%", links: { v: "", t: "" },
+                id: "PMA", name: "5. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", smart: "Asegurar el cumplimiento estricto del 100% de los compromisos del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
                 inputs: [ { id: "in_pma", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "% Alcanzado", data: [92,92,92,98,98,98,98,98,98,94,94,94, 100,100,100,100,100,100] }] }
+                hist: { labels: [...lbl18], series: [
+                    { name: "% Alcanzado", data: [92,92,92,98,98,98,98,98,98,94,94,94, 100,100,100,100,100,100] },
+                    { name: "Meta (%)", data: Array(18).fill(100.0) }
+                ]}
             },
             {
-                id: "CAP", name: "6. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "119%", links: { v: "", t: "" },
+                id: "CAP", name: "6. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", smart: "Ejecutar al menos el 85% de las capacitaciones programadas en la matriz anual de formación SST.", metaVal: 85.0, type: "line-meta", val: "119%", links: { v: "", t: "" },
                 inputs: [ { id: "in_cap", label: "% Capacitación" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "% Alcance", data: [70,85,96,87,92,97,92,92,95,85,100,100, 120,110,113,116,122,119] }] }
+                hist: { labels: [...lbl18], series: [
+                    { name: "% Alcance", data: [70,85,96,87,92,97,92,92,95,85,100,100, 120,110,113,116,122,119] },
+                    { name: "Meta (%)", data: Array(18).fill(85.0) }
+                ]}
             },
             {
-                id: "COM", name: "7. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "100%", links: { v: "", t: "" },
+                id: "COM", name: "7. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", smart: "Cumplir con las actividades de relacionamiento comunitario programadas con una efectividad superior al 85%.", metaVal: 85.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
                 inputs: [ { id: "in_comun", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "Alcance", data: [100,100,92,129,100,100,100,100,80,80,80,100, 100,100,100,100,100,100] }] }
+                hist: { labels: [...lbl18], series: [
+                    { name: "Alcance", data: [100,100,92,129,100,100,100,100,80,80,80,100, 100,100,100,100,100,100] },
+                    { name: "Meta (%)", data: Array(18).fill(85.0) }
+                ]}
             },
             {
-                id: "QEX", name: "8. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", type: "bar", val: "75%", links: { v: "", t: "" },
+                id: "QEX", name: "8. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", smart: "Atender y dar resolución oportuna al 85% o más de las quejas externas recibidas en el trimestre.", metaVal: 85.0, type: "line-meta", val: "75%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qex", label: "% Atención" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "Atención %", data: [0,0,0,0,0,0,0,0,0,100,100,100, 100,100,0,100,0,75] }] }
+                hist: { labels: [...lbl18], series: [
+                    { name: "Atención %", data: [0,0,0,0,0,0,0,0,0,100,100,100, 100,100,0,100,0,75] },
+                    { name: "Meta (%)", data: Array(18).fill(85.0) }
+                ]}
             },
             {
-                id: "QIN", name: "9. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", type: "bar", val: "95.8%", links: { v: "", t: "" },
+                id: "QIN", name: "9. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", smart: "Resolver el 100% de las inconformidades y quejas internas reportadas por el personal operativo.", metaVal: 100.0, type: "line-meta", val: "95.8%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qin", label: "% Resolución" } ], calc: (v) => v[0] + "%",
-                hist: { labels: ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'], series: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] }] }
+                hist: { labels: ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'], series: [
+                    { name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] },
+                    { name: "Meta (%)", data: Array(6).fill(100.0) }
+                ]}
             }
         ];
 
         let currentKpiId = "PREV";
-        let mainChartType = "line"; // Permite cambiar entre 'line' y 'bar'
+        let mainChartType = "line";
         let mainChart = null;
         let subCharts = [];
 
@@ -538,6 +603,52 @@
                 btnLine.className = "px-3 py-1.5 rounded text-slate-600 dark:text-slate-300 transition-colors";
             }
             renderCharts();
+        }
+
+        // FUNCIÓN PARA CREAR NUEVO KPI SMART DESDE LA VISTA DE CONFIGURACIÓN
+        function crearNuevoKpiSmart() {
+            const nombre = document.getElementById('new-kpi-name').value.trim();
+            const formula = document.getElementById('new-kpi-formula').value.trim();
+            const meta = parseFloat(document.getElementById('new-kpi-meta').value) || 90;
+            const val = parseFloat(document.getElementById('new-kpi-val').value) || 0;
+            const smart = document.getElementById('new-kpi-smart').value.trim();
+
+            if(!nombre || !formula || !smart) {
+                alert("Por favor complete todos los campos obligatorios del indicador SMART.");
+                return;
+            }
+
+            const newId = "SMART_" + (BD_HSEQ.length + 1);
+            const nuevoKpi = {
+                id: newId,
+                name: nombre.toUpperCase(),
+                formula: formula,
+                smart: smart,
+                metaVal: meta,
+                type: "line-meta",
+                val: val + "%",
+                links: { v: "", t: "" },
+                inputs: [ { id: "in_val", label: "Resultado %" } ],
+                calc: (v) => v[0] + "%",
+                hist: {
+                    labels: [...lbl18],
+                    series: [
+                        { name: "Resultado (%)", data: Array(18).fill(val) },
+                        { name: "Meta (%)", data: Array(18).fill(meta) }
+                    ]
+                }
+            };
+
+            BD_HSEQ.push(nuevoKpi);
+            alert(`¡Indicador SMART "${nombre.toUpperCase()}" creado con éxito e incluido en el Dashboard!`);
+            
+            // Limpiar inputs
+            document.getElementById('new-kpi-name').value = '';
+            document.getElementById('new-kpi-formula').value = '';
+            document.getElementById('new-kpi-smart').value = '';
+
+            switchView('dashboard');
+            selectKpi(newId);
         }
 
         function renderKpiList() {
@@ -566,6 +677,7 @@
             document.getElementById("kpi-title").innerText = kpi.name;
             document.getElementById("kpi-desc").innerText = kpi.formula;
             document.getElementById("kpi-value").innerText = kpi.val;
+            document.getElementById("smart-goal-box").innerHTML = `<strong>Objetivo SMART:</strong> ${kpi.smart || 'Cumplimiento de estándares corporativos HSEQ.'}`;
 
             document.getElementById("entry-inputs-container").innerHTML = kpi.inputs.map(inp => `
                 <input type="number" id="${inp.id}" placeholder="${inp.label}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
@@ -658,7 +770,7 @@
                     });
                 }, 50);
             } 
-            // 3. RESTO DE INDICADORES
+            // 3. RESTO DE INDICADORES (CON LÍNEA ROJA DE META)
             else {
                 mainW.classList.remove('hidden');
                 subW.classList.add('hidden');
@@ -670,12 +782,14 @@
             let chartType = mainChartType;
             if(kpi.type === 'waste-grouped') chartType = 'bar';
 
-            let colors = chartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#e74c3c'];
+            let colors = chartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'];
+            let strokeWidth = chartType === 'line' ? [3, 2] : [1, 1];
+            let dashArray = chartType === 'line' ? [0, 4] : [0, 0];
 
             const opt = {
                 chart: { type: chartType, height: 320, toolbar: { show: false }, background: 'transparent' },
                 colors: colors,
-                stroke: { curve: 'smooth', width: chartType === 'line' ? 3 : 1 },
+                stroke: { curve: 'smooth', width: strokeWidth, dashArray: dashArray },
                 series: kpi.hist.series,
                 xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px', fontWeight: 600 } } },
                 yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
@@ -709,6 +823,7 @@
             } else {
                 kpi.hist.labels.push(mes);
                 kpi.hist.series[0].data.push(parseFloat(vals[0]));
+                if(kpi.hist.series[1]) kpi.hist.series[1].data.push(kpi.metaVal || 85);
             }
             kpi.inputs.forEach(inp => document.getElementById(inp.id).value = "");
             alert(`Dato registrado correctamente para ${mes}.`);
