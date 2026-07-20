@@ -1,516 +1,311 @@
 <!DOCTYPE html>
-<html lang="es" class="light">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART SAFETY 4.0 | DASHBOARD HSEQ</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: { extend: { colors: { brand: '#0284c7', darkbg: '#0f172a', darkcard: '#1e293b' } } }
-        }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>Índice Global Preventivo SST</title>
+    <!-- Importar la librería Chart.js para las gráficas interactivas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #0284c7; border-radius: 3px; }
-        
-        .tab-btn { color: #64748b; }
-        .dark .tab-btn { color: #94a3b8; }
-        .tab-btn.active { background-color: #0284c7; color: white; }
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #27ae60;
+            --danger-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+        }
+        .chart-container {
+            position: relative;
+            height: 40vh;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        /* Resaltado específico para la planificación anual */
+        #planificacion-anual {
+            border-left: 5px solid var(--secondary-color);
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-darkbg text-slate-800 dark:text-slate-100 p-2 md:p-4 min-h-screen flex flex-col antialiased">
+<body>
 
-    <!-- CABECERA -->
-    <nav class="flex flex-wrap justify-between items-center mb-4 p-4 bg-white dark:bg-darkcard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 sticky top-0 z-50">
-        <div>
-            <span class="text-[9px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-widest block">Integrow S.A. | Módulo Auditoría</span>
-            <h1 class="font-black text-lg flex items-center gap-2 mt-0.5 uppercase tracking-tight">
-                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> Smart Safety 4.0
-            </h1>
-        </div>
-        
-        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
-            <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard KPIs
-            </button>
-            <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
-                <i data-lucide="smartphone" class="w-4 h-4"></i> Operativa en Campo
-            </button>
-        </div>
+    <header>
+        <h1>ÍNDICE GLOBAL PREVENTIVO SST</h1>
+    </header>
 
-        <div class="flex items-center gap-3">
-            <select class="bg-slate-100 dark:bg-slate-800 text-xs font-bold focus:outline-none p-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                <option>HOSPITAL MILLENIUM MED</option>
-            </select>
-            <button onclick="toggleTheme()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-sky-500 transition-colors">
-                <i data-lucide="moon" id="theme-icon" class="w-5 h-5 text-slate-600 dark:text-yellow-400"></i>
-            </button>
-        </div>
-    </nav>
-
-    <!-- VISTA 1: DASHBOARD -->
-    <main id="view-dashboard" class="flex-1 w-full max-w-[1600px] mx-auto">
-        
-        <!-- 1. CONTADOR LTI -->
-        <section class="mb-4 bg-white dark:bg-darkcard p-4 md:p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between border-l-[6px] border-emerald-500 border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-            <div class="z-10 text-center md:text-left mb-4 md:mb-0">
-                <h2 class="text-sm font-black uppercase tracking-widest mb-1">1. Días sin accidentes con tiempo perdido (LTI)</h2>
-                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Eficiencia global del sistema de seguridad</p>
-                <p class="text-[9px] text-sky-600 dark:text-sky-400 font-bold mt-1">Contabilizado automáticamente desde: 01 Enero 2025</p>
-            </div>
-            <div class="flex items-center gap-6 z-10">
-                <div class="flex items-baseline gap-2">
-                    <span id="diasSinAccidentes" class="text-5xl md:text-7xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tighter">0</span>
-                    <span class="text-sm font-bold text-slate-500 dark:text-slate-400">DÍAS</span>
-                </div>
-                <button onclick="reiniciarDias()" class="px-4 py-3 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg text-[10px] font-black uppercase hover:bg-rose-600 hover:text-white transition-all">
-                    ⚠ Reportar Accidente
-                </button>
+    <main>
+        <!-- 1. Indicador Principal -->
+        <section>
+            <h2>1. Desempeño de la Gestión Preventiva</h2>
+            <div class="chart-container">
+                <canvas id="chartIndicadorPrincipal"></canvas>
             </div>
         </section>
 
-        <!-- GRID PRINCIPAL -->
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
-            
-            <!-- LISTA DE INDICADORES (IZQUIERDA) -->
-            <div class="xl:col-span-1 flex flex-col gap-2 max-h-[850px] overflow-y-auto pr-1" id="kpi-list">
-                <!-- Inyectado por JS -->
-            </div>
-
-            <!-- ZONA DE TRABAJO (DERECHA) -->
-            <div class="xl:col-span-3 flex flex-col gap-4">
-                
-                <!-- CABECERA Y GRÁFICAS -->
-                <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-5 rounded-xl shadow-sm flex flex-col">
-                    <div class="flex flex-col md:flex-row justify-between items-start mb-4 border-b border-slate-100 dark:border-slate-800 pb-4">
-                        <div>
-                            <h2 id="kpi-title" class="text-xl font-black uppercase text-sky-700 dark:text-sky-400">Cargando...</h2>
-                            <p id="kpi-desc" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-2 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block font-bold"></p>
-                        </div>
-                        <div class="mt-3 md:mt-0 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                            <span class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Desempeño Actual</span>
-                            <span id="kpi-value" class="text-3xl font-black font-mono">0</span>
-                        </div>
-                    </div>
-
-                    <!-- Gráfica Principal -->
-                    <div id="main-chart-wrapper" class="w-full relative mt-2 min-h-[350px]">
-                        <h3 class="absolute top-0 left-0 z-10 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-darkcard px-2 rounded">Histórico General</h3>
-                        <div id="chartContainer" class="w-full h-full mt-4"></div>
-                    </div>
-                    
-                    <!-- Sub-Gráficas (Gestión Preventiva) -->
-                    <div id="sub-charts-wrapper" class="hidden w-full mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">
-                        <!-- Inyectado por JS -->
-                    </div>
-                </div>
-
-                <!-- PANELES INFERIORES: INGRESO DE DATOS Y ENLACES -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- Panel Registro -->
-                    <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm border-t-4 border-t-sky-500">
-                        <h3 class="text-xs font-black uppercase flex items-center gap-2 mb-2">
-                            <i data-lucide="database" class="w-4 h-4 text-sky-500"></i> Tabla de Ingreso de Datos (Mensual)
-                        </h3>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-4">Seleccione el periodo y registre las variables. Las gráficas se actualizarán automáticamente.</p>
-                        
-                        <div class="flex gap-2 mb-3">
-                            <div class="w-1/3">
-                                <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Periodo</label>
-                                <select id="entry-month" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
-                                    <option value="Jul 26">Julio 2026</option>
-                                    <option value="Ago 26">Agosto 2026</option>
-                                    <option value="Sep 26">Sept. 2026</option>
-                                    <option value="Oct 26">Octubre 2026</option>
-                                    <option value="Nov 26">Nov. 2026</option>
-                                    <option value="Dic 26">Dic. 2026</option>
-                                </select>
-                            </div>
-                            <div class="w-2/3 grid grid-cols-1 gap-2" id="entry-inputs-container">
-                                <!-- Inputs dinámicos -->
-                            </div>
-                        </div>
-                        
-                        <button onclick="guardarDatosMensuales()" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 dark:hover:bg-sky-500 text-white font-black text-[10px] py-2.5 rounded transition-colors uppercase tracking-widest">
-                            Registrar y Actualizar
-                        </button>
-                    </div>
-
-                    <!-- Panel Vínculos -->
-                    <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm border-t-4 border-t-emerald-500">
-                        <h3 class="text-xs font-black uppercase flex items-center gap-2 mb-4">
-                            <i data-lucide="folder-check" class="w-4 h-4 text-emerald-500"></i> Gestión Documental y Evidencias
-                        </h3>
-                        
-                        <div class="grid grid-cols-1 gap-3">
-                            <!-- Botón 1: Medio Verificación -->
-                            <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-3 rounded-lg flex flex-col justify-between">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[10px] font-black uppercase flex items-center gap-1.5"><i data-lucide="paperclip" class="w-3.5 h-3.5 text-sky-500"></i> Medio de Verificación</span>
-                                    <button onclick="vincularUrl('verificacion')" class="text-[9px] bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold px-2 py-1 rounded hover:bg-sky-200 dark:hover:bg-sky-800 transition-colors">+ Asignar URL</button>
-                                </div>
-                                <div id="link-verificacion" class="text-[10px] text-slate-500 truncate bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-1.5 rounded text-center">Sin Enlace Configurado</div>
-                            </div>
-
-                            <!-- Botón 2: Trazabilidad -->
-                            <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-3 rounded-lg flex flex-col justify-between">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-[10px] font-black uppercase flex items-center gap-1.5"><i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-500"></i> Trazabilidad / Acciones</span>
-                                    <button onclick="vincularUrl('trazabilidad')" class="text-[9px] bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-2 py-1 rounded hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors">+ Asignar URL</button>
-                                </div>
-                                <div id="link-trazabilidad" class="text-[10px] text-slate-500 truncate bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-1.5 rounded text-center">Sin Enlace Configurado</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- VISTA 2: INSPECCIONES CAMPO -->
-    <main id="view-inspecciones" class="hidden flex-1 w-full max-w-3xl mx-auto mt-4">
-        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow-sm border-t-[6px] border-t-sky-600">
-            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5">
-                <h2 class="text-xl font-black uppercase flex items-center gap-2">
-                    <i data-lucide="smartphone" class="w-6 h-6 text-sky-600"></i> Reporte Operativo en Campo
-                </h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Levantamiento fotográfico y registro de hallazgos para la base de datos central.</p>
+        <!-- 2. Gestión de Residuos -->
+        <section>
+            <h2>2. Gestión de Residuos 2025-2026</h2>
+            <div class="chart-container">
+                <canvas id="chartGestionResiduos"></canvas>
             </div>
             
-            <div class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Clasificación</label>
-                        <select class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none focus:border-sky-500">
-                            <option>Condición Subestándar</option><option>Acto Subestándar</option><option>Incidente</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fecha</label>
-                        <input type="date" id="insp-fecha" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Descripción de la Desviación</label>
-                    <textarea rows="2" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs outline-none focus:border-sky-500 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Carga Fotográfica (Cámara Móvil)</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="relative bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
-                            <i data-lucide="camera" class="w-6 h-6 text-slate-400 mb-1"></i>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Hallazgo</span>
-                            <input type="file" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 w-full h-full">
-                        </div>
-                        <div class="relative bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500">
-                            <i data-lucide="check-square" class="w-6 h-6 text-slate-400 mb-1"></i>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Corrección</span>
-                            <input type="file" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 w-full h-full">
-                        </div>
-                    </div>
-                </div>
-                <button onclick="alert('Guardado con éxito')" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 text-white font-black py-3 rounded-lg uppercase text-xs flex items-center justify-center gap-2">
-                    <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar y Sincronizar
-                </button>
+            <h3>Sub-indicadores de Gestión de Desechos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Categoría de Residuo</th>
+                        <th>Descripción / Origen</th>
+                        <th>Unidad de Medida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Residuos Ordinarios</strong></td>
+                        <td>Desechos comunes no reciclables generados en la operación.</td>
+                        <td>Kg</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Residuos Reciclables</strong></td>
+                        <td>Materiales revalorizables (papel, cartón, plástico, vidrio).</td>
+                        <td>Kg</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Desechos Peligrosos</strong></td>
+                        <td>Residuos con características de toxicidad, inflamabilidad o riesgo biológico.</td>
+                        <td>Kg / Gal</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Residuos de Escombros</strong></td>
+                        <td>Material sobrante de obras civiles o mantenimiento.</td>
+                        <td>m³</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 3. Control Operativo en Campo -->
+        <section>
+            <h2>3. Control Operativo en Campo</h2>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Factor de Riesgo (AM 196)</th>
+                            <th>Observación / Desviación Detectada</th>
+                            <th>Tipo de Acción</th>
+                            <th>Responsable de Resolver</th>
+                            <th>Responsable Técnico HSE</th>
+                            <th>Fecha de Apertura</th>
+                            <th>Fecha de Cierre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Físico / Químico / Biológico</td>
+                            <td><em>Ej. Falta de ventilación en área de mezclas</em></td>
+                            <td>Correctiva</td>
+                            <td>Gestión Operativa</td>
+                            <td>Técnico Asignado</td>
+                            <td>--/--/----</td>
+                            <td>--/--/----</td>
+                        </tr>
+                        <tr>
+                            <td>Seguridad / Mecánico</td>
+                            <td><em>Ej. Guarda de seguridad ausente en equipo</em></td>
+                            <td>Preventiva</td>
+                            <td>Mantenimiento</td>
+                            <td>Técnico Asignado</td>
+                            <td>--/--/----</td>
+                            <td>--/--/----</td>
+                        </tr>
+                        <tr>
+                            <td>Ergonómico / Psicosocial</td>
+                            <td><em>Ej. Diseño inadecuado de puesto de trabajo</em></td>
+                            <td>Correctiva</td>
+                            <td>Recursos Humanos</td>
+                            <td>Técnico Asignado</td>
+                            <td>--/--/----</td>
+                            <td>--/--/----</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
+        </section>
+
+        <!-- 4. Planificación Anual (Al final de la aplicación) -->
+        <section id="planificacion-anual">
+            <h2>4. Planificación Anual</h2>
+            <p>En este módulo se consolidan las actividades preventivas proyectadas para el periodo vigente. Registre a continuación los objetivos y recursos destinados al mantenimiento del Índice Global Preventivo SST.</p>
+            
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mes Planificado</th>
+                            <th>Actividad / Programa Preventivo</th>
+                            <th>Presupuesto Asignado ($)</th>
+                            <th>Responsable de Ejecución</th>
+                            <th>Estado de Avance (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Enero</td>
+                            <td>Evaluación de Riesgos Psicosociales</td>
+                            <td>0.00</td>
+                            <td>Gerencia HSE</td>
+                            <td>0%</td>
+                        </tr>
+                        <tr>
+                            <td>Febrero</td>
+                            <td>Renovación de Protocolos de Emergencia</td>
+                            <td>0.00</td>
+                            <td>Gerencia HSE</td>
+                            <td>0%</td>
+                        </tr>
+                        <!-- Filas adicionales pueden ser agregadas aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
+    <!-- Script para renderizar las gráficas con Chart.js -->
     <script>
-        // ==========================================
-        // 1. LÓGICA DE INICIALIZACIÓN Y LTI
-        // ==========================================
-        window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            initLTI();
-            document.getElementById('insp-fecha').valueAsDate = new Date();
-            renderKpiList();
-            selectKpi("TR"); 
-        });
-
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            const icon = document.getElementById('theme-icon');
-            icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-            icon.className = isDark ? "w-5 h-5 text-yellow-400" : "w-5 h-5 text-slate-600";
-            lucide.createIcons();
-            renderCharts(); 
-        }
-
-        function switchView(viewName) {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-inspecciones').classList.add('hidden');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            document.getElementById(`btn-${viewName}`).classList.add('active');
-            
-            if(viewName === 'dashboard' && currentKpiId) renderCharts();
-        }
-
-        function initLTI() {
-            const start = new Date('2025-01-01T00:00:00');
-            const now = new Date();
-            now.setHours(0,0,0,0);
-            const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24)); 
-            document.getElementById('diasSinAccidentes').innerText = diffDays;
-        }
-
-        function reiniciarDias() {
-            if(confirm("⚠ ALERTA CRÍTICA: ¿Reportar Accidente LTI? El contador volverá a 0.")) {
-                document.getElementById('diasSinAccidentes').innerText = "0";
-                document.getElementById('diasSinAccidentes').classList.replace('text-emerald-600', 'text-rose-600');
-                document.getElementById('diasSinAccidentes').classList.replace('dark:text-emerald-400', 'dark:text-rose-400');
-                
-                // Sumar al registro de incidentes general (KPI 3) automáticamente
-                const kpiInc = BD_HSEQ.find(k => k.id === "INC");
-                const lastIdx = kpiInc.hist.series[0].data.length - 1;
-                kpiInc.hist.series[0].data[lastIdx] += 1;
-                kpiInc.val = kpiInc.hist.series[0].data[lastIdx];
-                
-                renderKpiList();
-                if (currentKpiId === "INC") renderCharts();
-            }
-        }
-
-        // ==========================================
-        // 2. BASE DE DATOS (INDICADORES 2 AL 10)
-        // ==========================================
-        const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
-        const lbl6 = ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
-        
-        const BD_HSEQ = [
-            {
-                id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", type: "bar", val: "0.00", links: { v: "", t: "" },
-                inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ],
-                calc: (v) => v[1] === 0 ? 0 : (v[0] / v[1]).toFixed(2),
-                hist: { labels: [...lbl18], series: [
-                    { name: "TR Obtenido", data: Array(18).fill(0) },
-                    { name: "Meta TR", data: Array(18).fill(5.27) }
-                ]}
+        // -------------------------------------------------------------
+        // Gráfica 1: Indicador de Desempeño
+        // -------------------------------------------------------------
+        const ctxPrincipal = document.getElementById('chartIndicadorPrincipal').getContext('2d');
+        const chartIndicadorPrincipal = new Chart(ctxPrincipal, {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene (2)', 'Feb (2)', 'Mar (2)', 'Abr (2)', 'May (2)', 'Jun (2)'],
+                datasets: [
+                    {
+                        label: 'Resultado (%)',
+                        data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7],
+                        borderColor: '#2c3e50',
+                        backgroundColor: '#2c3e50',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        tension: 0.1 // Líneas rectas
+                    },
+                    {
+                        label: 'Meta (85%)',
+                        data: Array(18).fill(85.0),
+                        borderColor: '#e74c3c',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
             },
-            {
-                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados | Meta: 0", type: "bar", val: "1", links: { v: "", t: "" },
-                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
-                hist: { labels: [...lbl18], series: [
-                    { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } // Datos 2026 de imagen
-                ]}
-            },
-            {
-                id: "PREV", name: "4. GESTIÓN PREVENTIVA SST", formula: "Despliegue de 7 Sub-Indicadores | Meta Global: 85%", type: "grid", val: "Ver Detalle", links: { v: "", t: "" },
-                inputs: [ { id: "in_p", label: "Global %" } ], calc: (v) => "Ver Detalle",
-                hist: { labels: [...lbl6], series: [
-                    { name: "4.1 ART", data: [100, 102.9, 110.8, 107.6, 105, 97.6] },
-                    { name: "4.2 OPAI", data: [95.2, 87.5, 77.6, 81.6, 70.4, 71.4] },
-                    { name: "4.3 DPS", data: [80.8, 90.8, 86.8, 50.7, 89.5, 79.6] },
-                    { name: "4.4 OSEA", data: [100, 100, 100, 100, 100, 100] },
-                    { name: "4.5 CAI", data: [100, 100, 100, 100, 100, 100] },
-                    { name: "4.6 DS", data: [89.6, 96.2, 100, 92.8, 100, 96.4] },
-                    { name: "4.7 ES", data: [83.7, 76.6, 85.7, 97.1, 81.2, 100] }
-                ]}
-            },
-            {
-                id: "PMA", name: "5. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", type: "line", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_pma", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "% Alcanzado", data: [92,92,92,98,98,98,98,98,98,94,94,94, 100,100,100,100,100,100] }] }
-            },
-            {
-                id: "RES", name: "6. GESTIÓN DE RESIDUOS", formula: "% Reciclaje Trimestral", type: "bar", val: "727%", links: { v: "", t: "" },
-                inputs: [ { id: "in_res", label: "% Reciclaje" } ], calc: (v) => v[0] + "%",
-                hist: { labels: ['IT 25','IIT 25','IIIT 25','IVT 25','IT 26','IIT 26'], series: [{ name: "% Reciclaje", data: [15, 7, 31, 82, 77, 727] }] }
-            },
-            {
-                id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "119%", links: { v: "", t: "" },
-                inputs: [ { id: "in_cap", label: "% Capacitación" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "% Alcance", data: [70,85,96,87,92,97,92,92,95,85,100,100, 120,110,113,116,122,119] }] }
-            },
-            {
-                id: "COM", name: "8. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_com", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "Alcance", data: [100,100,92,129,100,100,100,100,80,80,80,100, 100,100,100,100,100,100] }] }
-            },
-            {
-                id: "QEX", name: "9. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", type: "bar", val: "75%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qex", label: "% Atención" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl18], series: [{ name: "Atención %", data: [0,0,0,0,0,0,0,0,0,100,100,100, 100,100,0,100,0,75] }] }
-            },
-            {
-                id: "QIN", name: "10. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", type: "bar", val: "95.8%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qin", label: "% Resolución" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl6], series: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] }] }
-            }
-        ];
-
-        let currentKpiId = "TR";
-        let mainChart = null;
-        let subCharts = [];
-
-        function renderKpiList() {
-            const list = document.getElementById("kpi-list");
-            list.innerHTML = "";
-            BD_HSEQ.forEach(k => {
-                const isAct = k.id === currentKpiId;
-                const actStyle = isAct 
-                    ? "border-sky-500 bg-sky-50 dark:bg-slate-800/80 shadow-md" 
-                    : "border-transparent hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-darkcard";
-                
-                list.innerHTML += `
-                    <div onclick="selectKpi('${k.id}')" class="p-3.5 rounded-xl cursor-pointer transition-all border-l-[5px] border border-slate-200 dark:border-slate-700 ${actStyle}">
-                        <div class="text-[10px] font-black text-slate-500 uppercase truncate">${k.name}</div>
-                        <div class="text-sm md:text-lg font-black font-mono mt-1">${k.val}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function selectKpi(id) {
-            currentKpiId = id;
-            renderKpiList();
-            
-            const kpi = BD_HSEQ.find(k => k.id === id);
-            document.getElementById("kpi-title").innerText = kpi.name;
-            document.getElementById("kpi-desc").innerText = kpi.formula;
-            document.getElementById("kpi-value").innerText = kpi.val;
-
-            // Renderizar Inputs Mensuales Dinámicos
-            document.getElementById("entry-inputs-container").innerHTML = kpi.inputs.map(inp => `
-                <input type="number" id="${inp.id}" placeholder="${inp.label}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
-            `).join('');
-
-            renderLinks(kpi.links);
-            renderCharts();
-        }
-
-        // ==========================================
-        // 3. GRÁFICAS APEXCHARTS
-        // ==========================================
-        function renderCharts() {
-            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-            const isDark = document.documentElement.classList.contains('dark');
-            const txtColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 / slate-500
-            const gridColor = isDark ? '#334155' : '#e2e8f0'; // slate-700 / slate-200
-
-            const mainW = document.getElementById("main-chart-wrapper");
-            const subW = document.getElementById("sub-charts-wrapper");
-
-            if (mainChart) mainChart.destroy();
-            subCharts.forEach(c => c.destroy()); subCharts = [];
-
-            if (kpi.type === 'grid') {
-                // MODALIDAD 7 GRÁFICAS (GESTIÓN PREVENTIVA)
-                mainW.classList.add('hidden');
-                subW.classList.remove('hidden');
-                subW.innerHTML = "";
-
-                kpi.hist.series.forEach((s, i) => {
-                    subW.innerHTML += `
-                        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[160px]">
-                            <span class="text-[9px] font-black uppercase text-center text-slate-500 mb-1">${s.name}</span>
-                            <div id="subchart-${i}" class="flex-1 w-full"></div>
-                        </div>`;
-                });
-
-                setTimeout(() => {
-                    kpi.hist.series.forEach((s, i) => {
-                        const opt = {
-                            chart: { type: 'area', height: 120, sparkline: { enabled: true } },
-                            colors: ['#0284c7'], stroke: { curve: 'smooth', width: 2 },
-                            series: [{ name: s.name, data: s.data }],
-                            tooltip: { fixed: { enabled: false }, x: { show: false } }
-                        };
-                        const chart = new ApexCharts(document.querySelector(`#subchart-${i}`), opt);
-                        chart.render(); subCharts.push(chart);
-                    });
-                }, 50);
-
-            } else {
-                // MODALIDAD GRÁFICA ÚNICA
-                mainW.classList.remove('hidden');
-                subW.classList.add('hidden');
-
-                const opt = {
-                    chart: { type: kpi.type, height: 320, toolbar: { show: false }, background: 'transparent' },
-                    colors: ['#0284c7', '#cbd5e1'], stroke: { curve: 'smooth', width: kpi.type === 'line' ? 3 : 1 },
-                    series: kpi.hist.series,
-                    xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px', fontWeight: 600 } } },
-                    yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
-                    grid: { borderColor: gridColor, strokeDashArray: 3 },
-                    dataLabels: { enabled: false },
-                    plotOptions: { bar: { borderRadius: 3, columnWidth: '60%' } },
-                    legend: { labels: { colors: txtColor } }
-                };
-                mainChart = new ApexCharts(document.querySelector("#chartContainer"), opt);
-                mainChart.render();
-            }
-        }
-
-        // ==========================================
-        // 4. REGISTRO DE DATOS Y ENLACES
-        // ==========================================
-        function guardarDatosMensuales() {
-            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-            const mes = document.getElementById("entry-month").value;
-            
-            let vals = []; let vacio = true;
-            kpi.inputs.forEach(inp => {
-                const v = parseFloat(document.getElementById(inp.id).value) || 0;
-                vals.push(v);
-                if (document.getElementById(inp.id).value !== "") vacio = false;
-            });
-            if(vacio) { alert("Debe ingresar valores."); return; }
-
-            const nVal = kpi.calc(vals);
-            if(kpi.type !== 'grid') kpi.val = nVal;
-
-            const idx = kpi.hist.labels.indexOf(mes);
-            if(kpi.type === 'grid') {
-                // Para simplificar, en modo grid, si el usuario registra el Global %, actualizamos las mini gráficas con un random cercano a la meta (ejemplo).
-                alert("En modo PREV, las 7 gráficas requieren carga masiva de Excel o conexión DB. En UI se visualizan históricos.");
-            } else {
-                if(idx !== -1) { kpi.hist.series[0].data[idx] = parseFloat(nVal); } 
-                else {
-                    kpi.hist.labels.push(mes);
-                    kpi.hist.series[0].data.push(parseFloat(nVal));
-                    if(kpi.hist.series[1]) kpi.hist.series[1].data.push(kpi.hist.series[1].data[0]);
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: { display: true, text: 'Porcentaje de Cumplimiento (%)' }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' }
                 }
             }
-            kpi.inputs.forEach(inp => document.getElementById(inp.id).value = "");
-            alert(`Dato registrado para: ${mes}.`);
-            selectKpi(currentKpiId);
-        }
+        });
 
-        function vincularUrl(tipo) {
-            const url = prompt(`Ingrese la URL directa de SharePoint/Drive para ${tipo.toUpperCase()}:`);
-            if (url) {
-                const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-                kpi.links[tipo === 'verificacion' ? 'v' : 't'] = url;
-                renderLinks(kpi.links);
+        // -------------------------------------------------------------
+        // Gráfica 2: Gestión de Residuos
+        // -------------------------------------------------------------
+        const ctxResiduos = document.getElementById('chartGestionResiduos').getContext('2d');
+        const chartGestionResiduos = new Chart(ctxResiduos, {
+            type: 'bar',
+            data: {
+                labels: ['I Trim 25', 'II Trim 25', 'III Trim 25', 'IV Trim 25', 'I Trim 26', 'II Trim 26'],
+                datasets: [
+                    {
+                        label: 'Desechos Comunes (Kg)',
+                        data: [375, 1350, 4340, 1350, 426, 761.77],
+                        backgroundColor: '#7f8c8d'
+                    },
+                    {
+                        label: 'Residuos Reciclados (Kg)',
+                        data: [57, 94, 1345.5, 1113.2, 329.65, 5536.5],
+                        backgroundColor: '#27ae60'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Volumen Generado (Kg)' }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' }
+                }
             }
-        }
-
-        function renderLinks(links) {
-            const boxV = document.getElementById("link-verificacion");
-            if (links.v) boxV.innerHTML = `<a href="${links.v}" target="_blank" class="text-sky-600 dark:text-sky-400 font-bold uppercase hover:underline">🔗 Abrir Documento</a>`;
-            else boxV.innerHTML = "Sin Enlace Configurado";
-
-            const boxT = document.getElementById("link-trazabilidad");
-            if (links.t) boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase hover:underline">🔗 Abrir Trazabilidad</a>`;
-            else boxT.innerHTML = "Sin Enlace Configurado";
-        }
+        });
     </script>
 </body>
 </html>
