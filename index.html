@@ -362,22 +362,64 @@
         </div>
     </main>
 
-    <!-- VISTA 3: PLANIFICACIÓN ANUAL -->
+    <!-- VISTA 3: PLANIFICACIÓN ANUAL (CON EDICIÓN, ELIMINACIÓN Y NUEVOS PLANES) -->
     <main id="view-planificacion" class="hidden flex-1 w-full max-w-5xl mx-auto mt-4">
         <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow-sm border-t-[6px] border-t-amber-500">
-            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5 flex justify-between items-center">
+            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5 flex flex-wrap justify-between items-center">
                 <div>
                     <h2 class="text-xl font-black uppercase flex items-center gap-2">
                         <i data-lucide="calendar" class="w-6 h-6 text-amber-500"></i> Planificación Anual SST
                     </h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Gestión de actividades, responsables y presupuesto del Índice Global Preventivo.</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Gestión de actividades preventivas, responsables, presupuestos y control de ejecución.</p>
                 </div>
-                <button class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold px-4 py-2 rounded text-xs border border-amber-200 dark:border-amber-800 hover:bg-amber-200 transition-colors">
-                    + Nueva Actividad
-                </button>
+            </div>
+
+            <!-- Formulario de Ingreso / Edición de Planes -->
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-6">
+                <h3 id="plan-form-title" class="text-xs font-black uppercase text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Registrar Nueva Actividad en el Plan Anual
+                </h3>
+                <input type="hidden" id="plan-edit-index" value="-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 mb-3">
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Mes</label>
+                        <select id="plan-mes" class="w-full bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
+                            <option>Enero</option><option>Febrero</option><option>Marzo</option><option>Abril</option>
+                            <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+                            <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Actividad Preventiva</label>
+                        <input type="text" id="plan-actividad" placeholder="Nombre de la actividad..." class="w-full bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Responsable</label>
+                        <input type="text" id="plan-resp" placeholder="Cargo / Persona" class="w-full bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Presupuesto ($)</label>
+                        <input type="number" id="plan-presupuesto" placeholder="0.00" class="w-full bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="w-1/4">
+                        <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Estado</label>
+                        <select id="plan-estado" class="w-full bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
+                            <option value="Completado">Completado</option>
+                            <option value="En Proceso">En Proceso</option>
+                            <option value="Planificado">Planificado</option>
+                        </select>
+                    </div>
+                    <div class="w-3/4 flex items-end">
+                        <button onclick="guardarPlanAnual()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-2 rounded text-xs uppercase tracking-wider transition-colors shadow">
+                            Guardar Actividad en el Plan Anual
+                        </button>
+                    </div>
+                </div>
             </div>
             
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-lg">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider text-[10px]">
@@ -386,30 +428,11 @@
                             <th class="p-3 border-b dark:border-slate-700">Responsable</th>
                             <th class="p-3 border-b dark:border-slate-700">Presupuesto ($)</th>
                             <th class="p-3 border-b dark:border-slate-700">Estado</th>
+                            <th class="p-3 border-b dark:border-slate-700 text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="p-3 font-semibold">Enero</td>
-                            <td class="p-3">Levantamiento de Riesgos Ergonómicos</td>
-                            <td class="p-3">Gerencia HSE</td>
-                            <td class="p-3 font-mono">1,500.00</td>
-                            <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold text-[9px]">Completado</span></td>
-                        </tr>
-                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="p-3 font-semibold">Julio</td>
-                            <td class="p-3">Capacitación Brigadas de Emergencia</td>
-                            <td class="p-3">Técnico Asignado</td>
-                            <td class="p-3 font-mono">800.00</td>
-                            <td class="p-3"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold text-[9px]">En Proceso</span></td>
-                        </tr>
-                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="p-3 font-semibold">Diciembre</td>
-                            <td class="p-3">Simulacro General de Evacuación</td>
-                            <td class="p-3">Comité Paritario</td>
-                            <td class="p-3 font-mono">500.00</td>
-                            <td class="p-3"><span class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold text-[9px]">Planificado</span></td>
-                        </tr>
+                    <tbody id="tabla-planificacion-body">
+                        <!-- Inyectado por JS -->
                     </tbody>
                 </table>
             </div>
@@ -424,6 +447,7 @@
             document.getElementById('insp-apertura').valueAsDate = new Date();
             document.getElementById('insp-cierre').valueAsDate = new Date();
             renderKpiList();
+            renderTablaPlanificacion();
             selectKpi("PREV"); // Inicia con el Desempeño Preventivo como principal
         });
 
@@ -505,13 +529,13 @@
                     { name: "Meta (%)", data: Array(18).fill(85.0) }
                 ]},
                 subIndicators: [
-                    { name: "4.1 ART", data: [100, 102.9, 110.8, 107.6, 105, 97.6] },
-                    { name: "4.2 OPAI", data: [95.2, 87.5, 77.6, 81.6, 70.4, 71.4] },
-                    { name: "4.3 DPS", data: [80.8, 90.8, 86.8, 50.7, 89.5, 79.6] },
-                    { name: "4.4 OSEA", data: [100, 100, 100, 100, 100, 100] },
-                    { name: "4.5 CAI", data: [100, 100, 100, 100, 100, 100] },
-                    { name: "4.6 DS", data: [89.6, 96.2, 100, 92.8, 100, 96.4] },
-                    { name: "4.7 ES", data: [83.7, 76.6, 85.7, 97.1, 81.2, 100] }
+                    { name: "4.1 ART", val: "97.6%", data: [100, 102.9, 110.8, 107.6, 105, 97.6] },
+                    { name: "4.2 OPAI", val: "71.4%", data: [95.2, 87.5, 77.6, 81.6, 70.4, 71.4] },
+                    { name: "4.3 DPS", val: "79.6%", data: [80.8, 90.8, 86.8, 50.7, 89.5, 79.6] },
+                    { name: "4.4 OSEA", val: "100%", data: [100, 100, 100, 100, 100, 100] },
+                    { name: "4.5 CAI", val: "100%", data: [100, 100, 100, 100, 100, 100] },
+                    { name: "4.6 DS", val: "96.4%", data: [89.6, 96.2, 100, 92.8, 100, 96.4] },
+                    { name: "4.7 ES", val: "100%", data: [83.7, 76.6, 85.7, 97.1, 81.2, 100] }
                 ]
             },
             {
@@ -642,7 +666,6 @@
             BD_HSEQ.push(nuevoKpi);
             alert(`¡Indicador SMART "${nombre.toUpperCase()}" creado con éxito e incluido en el Dashboard!`);
             
-            // Limpiar inputs
             document.getElementById('new-kpi-name').value = '';
             document.getElementById('new-kpi-formula').value = '';
             document.getElementById('new-kpi-smart').value = '';
@@ -700,7 +723,7 @@
             subCharts.forEach(c => c.destroy()); subCharts = [];
             subW.innerHTML = "";
 
-            // 1. GESTIÓN PREVENTIVA: Gráfica principal ARRIBA, Sub-indicadores ABAJO con LÍNEA ROJA DE META (85%)
+            // 1. GESTIÓN PREVENTIVA: Gráfica principal ARRIBA, Sub-indicadores ABAJO con LÍNEA ROJA DE META (85%) y RESULTADO %
             if (kpi.id === 'PREV') {
                 mainW.classList.remove('hidden');
                 subW.classList.remove('hidden');
@@ -710,8 +733,12 @@
 
                 kpi.subIndicators.forEach((s, i) => {
                     subW.innerHTML += `
-                        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[150px]">
-                            <span class="text-[9px] font-black uppercase text-center text-slate-500 mb-1">${s.name} (Meta: 85%)</span>
+                        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[155px]">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[9px] font-black uppercase text-slate-500">${s.name}</span>
+                                <span class="text-[10px] font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">Act: ${s.val}</span>
+                            </div>
+                            <span class="text-[8px] font-bold text-slate-400 mb-1">Meta Global: 85%</span>
                             <div id="subchart-${i}" class="flex-1 w-full"></div>
                         </div>`;
                 });
@@ -719,7 +746,7 @@
                 setTimeout(() => {
                     kpi.subIndicators.forEach((s, i) => {
                         const opt = {
-                            chart: { type: 'line', height: 110, sparkline: { enabled: true } },
+                            chart: { type: 'line', height: 95, sparkline: { enabled: true } },
                             colors: ['#0284c7', '#ef4444'], // Azul resultado, Rojo Meta
                             stroke: { curve: 'smooth', width: [2, 2], dashArray: [0, 4] },
                             series: [
@@ -870,7 +897,6 @@
             campoInspecciones.push(item);
             renderTablaInspecciones();
 
-            // Limpieza
             document.getElementById('insp-desc').value = '';
             document.getElementById('insp-resp').value = '';
             document.getElementById('insp-foto1').value = '';
@@ -925,6 +951,91 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+        }
+
+        // GESTIÓN DE PLANIFICACIÓN ANUAL (CREAR, EDITAR, ELIMINAR)
+        let listaPlanificacion = [
+            { mes: "Enero", actividad: "Levantamiento de Riesgos Ergonómicos", resp: "Gerencia HSE", presupuesto: "1500.00", estado: "Completado" },
+            { mes: "Julio", actividad: "Capacitación Brigadas de Emergencia", resp: "Técnico Asignado", presupuesto: "800.00", estado: "En Proceso" },
+            { mes: "Diciembre", actividad: "Simulacro General de Evacuación", resp: "Comité Paritario", presupuesto: "500.00", estado: "Planificado" }
+        ];
+
+        function renderTablaPlanificacion() {
+            const tbody = document.getElementById('tabla-planificacion-body');
+            tbody.innerHTML = "";
+            if(listaPlanificacion.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay actividades planificadas aún.</td></tr>`;
+                return;
+            }
+            listaPlanificacion.forEach((p, idx) => {
+                let badgeColor = "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400";
+                if(p.estado === "Completado") badgeColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400";
+                if(p.estado === "Planificado") badgeColor = "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
+
+                tbody.innerHTML += `
+                    <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <td class="p-3 font-semibold">${p.mes}</td>
+                        <td class="p-3">${p.actividad}</td>
+                        <td class="p-3">${p.resp}</td>
+                        <td class="p-3 font-mono">${p.presupuesto}</td>
+                        <td class="p-3"><span class="${badgeColor} px-2 py-1 rounded font-bold text-[9px]">${p.estado}</span></td>
+                        <td class="p-3 text-center space-x-1">
+                            <button onclick="editarPlan(${idx})" class="p-1 bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded hover:bg-sky-200 transition-colors" title="Editar"><i data-lucide="edit-3" class="w-3.5 h-3.5 inline"></i></button>
+                            <button onclick="eliminarPlan(${idx})" class="p-1 bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 rounded hover:bg-rose-200 transition-colors" title="Eliminar"><i data-lucide="trash-2" class="w-3.5 h-3.5 inline"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function guardarPlanAnual() {
+            const editIdx = parseInt(document.getElementById('plan-edit-index').value);
+            const mes = document.getElementById('plan-mes').value;
+            const actividad = document.getElementById('plan-actividad').value.trim();
+            const resp = document.getElementById('plan-resp').value.trim() || 'No asignado';
+            const presupuesto = document.getElementById('plan-presupuesto').value.trim() || '0.00';
+            const estado = document.getElementById('plan-estado').value;
+
+            if(!actividad) {
+                alert("Por favor ingrese la descripción de la actividad preventiva.");
+                return;
+            }
+
+            if(editIdx === -1) {
+                listaPlanificacion.push({ mes, actividad, resp, presupuesto, estado });
+                alert("Actividad agregada exitosamente al plan anual.");
+            } else {
+                listaPlanificacion[editIdx] = { mes, actividad, resp, presupuesto, estado };
+                document.getElementById('plan-edit-index').value = "-1";
+                document.getElementById('plan-form-title').innerHTML = `<i data-lucide="plus-circle" class="w-4 h-4 inline"></i> Registrar Nueva Actividad en el Plan Anual`;
+                alert("Actividad actualizada exitosamente.");
+            }
+
+            document.getElementById('plan-actividad').value = '';
+            document.getElementById('plan-resp').value = '';
+            document.getElementById('plan-presupuesto').value = '';
+            renderTablaPlanificacion();
+        }
+
+        function editarPlan(idx) {
+            const p = listaPlanificacion[idx];
+            document.getElementById('plan-edit-index').value = idx;
+            document.getElementById('plan-mes').value = p.mes;
+            document.getElementById('plan-actividad').value = p.actividad;
+            document.getElementById('plan-resp').value = p.resp;
+            document.getElementById('plan-presupuesto').value = p.presupuesto;
+            document.getElementById('plan-estado').value = p.estado;
+            document.getElementById('plan-form-title').innerHTML = `<i data-lucide="edit-3" class="w-4 h-4 inline"></i> Editando Actividad N° ${idx + 1}`;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function eliminarPlan(idx) {
+            if(confirm("¿Está seguro de eliminar esta actividad de la planificación anual?")) {
+                listaPlanificacion.splice(idx, 1);
+                renderTablaPlanificacion();
+                alert("Actividad eliminada correctamente.");
+            }
         }
     </script>
 </body>
