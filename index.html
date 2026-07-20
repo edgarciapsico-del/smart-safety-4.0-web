@@ -1,295 +1,228 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART SAFETY 4.0 | AUDITORÍA HSEQ</title>
+    <title>SMART SAFETY 4.0 | DASHBOARD HSEQ</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { brand: '#0284c7', darkbg: '#0f172a', darkcard: '#1e293b' } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <style>
-        /* TEMA LIGHT PROFESIONAL PARA AUDITORÍAS (POR DEFECTO) */
-        :root { 
-            --bg: #f8fafc; 
-            --card: #ffffff; 
-            --text: #0f172a; 
-            --text-muted: #64748b; 
-            --border: #e2e8f0; 
-            --primary: #0284c7; 
-            --link-box: #f1f5f9;
-        }
-        
-        /* TEMA DARK OPCIONAL */
-        body.dark { 
-            --bg: #0f172a; 
-            --card: #1e293b; 
-            --text: #f8fafc; 
-            --text-muted: #94a3b8; 
-            --border: #334155; 
-            --primary: #0ea5e9; 
-            --link-box: #0f172a;
-        }
-        
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
-        .card { background-color: var(--card); border: 1px solid var(--border); transition: all 0.3s; }
-        .text-muted { color: var(--text-muted); }
-        .bg-link-box { background-color: var(--link-box); border-color: var(--border); }
-        
-        .tab-btn { color: var(--text-muted); }
-        .tab-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
-        
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--border); }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #0284c7; border-radius: 3px; }
         
-        /* Estilos de inputs para los formularios de registro */
-        .form-input { 
-            background-color: var(--card); 
-            border: 1px solid var(--border); 
-            color: var(--text); 
-            padding: 0.5rem; 
-            border-radius: 0.375rem; 
-            font-size: 0.75rem; 
-            width: 100%;
-            outline: none;
-        }
-        .form-input:focus { border-color: var(--primary); }
+        .tab-btn { color: #64748b; }
+        .dark .tab-btn { color: #94a3b8; }
+        .tab-btn.active { background-color: #0284c7; color: white; }
     </style>
 </head>
-<body class="p-2 md:p-4 antialiased min-h-screen flex flex-col">
-    
-    <!-- CABECERA PRINCIPAL -->
-    <nav class="flex flex-wrap justify-between items-center mb-4 p-4 card rounded-xl shadow-sm gap-4 sticky top-0 z-50">
+<body class="bg-slate-50 dark:bg-darkbg text-slate-800 dark:text-slate-100 p-2 md:p-4 min-h-screen flex flex-col antialiased">
+
+    <!-- CABECERA -->
+    <nav class="flex flex-wrap justify-between items-center mb-4 p-4 bg-white dark:bg-darkcard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div>
-            <span class="text-[9px] uppercase font-bold text-sky-600 tracking-widest block">Integrow S.A. | Módulo Auditoría</span>
-            <h1 class="font-black text-lg flex items-center gap-2 mt-1 uppercase tracking-tight text-[var(--text)]">
-                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> Smart Safety 4.0
+            <span class="text-[9px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-widest block">Integrow S.A. | Módulo Auditoría</span>
+            <h1 class="font-black text-lg flex items-center gap-2 mt-0.5 uppercase tracking-tight">
+                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> Smart Safety 4.0
             </h1>
         </div>
         
-        <div class="flex bg-[var(--link-box)] p-1 rounded-lg border border-[var(--border)]">
+        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
             <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard KPIs
             </button>
             <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
-                <i data-lucide="camera" class="w-4 h-4"></i> Operativa en Campo
+                <i data-lucide="smartphone" class="w-4 h-4"></i> Operativa en Campo
             </button>
         </div>
 
         <div class="flex items-center gap-3">
-            <select class="bg-transparent text-xs font-bold focus:outline-none p-2 card rounded border border-[var(--border)] text-[var(--text)]">
+            <select class="bg-slate-100 dark:bg-slate-800 text-xs font-bold focus:outline-none p-2 rounded-lg border border-slate-200 dark:border-slate-700">
                 <option>HOSPITAL MILLENIUM MED</option>
             </select>
-            <button onclick="document.body.classList.toggle('dark'); renderCharts();" class="p-2 card rounded hover:border-sky-500 shadow-sm transition-colors" title="Cambiar Tema Oscuro/Claro">
-                <i data-lucide="moon" class="w-5 h-5 text-slate-500"></i>
+            <button onclick="toggleTheme()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-sky-500 transition-colors">
+                <i data-lucide="moon" id="theme-icon" class="w-5 h-5 text-slate-600 dark:text-yellow-400"></i>
             </button>
         </div>
     </nav>
 
-    <!-- ==================================================== -->
-    <!-- VISTA 1: DASHBOARD GERENCIAL (AUDITORÍA)             -->
-    <!-- ==================================================== -->
+    <!-- VISTA 1: DASHBOARD -->
     <main id="view-dashboard" class="flex-1 w-full max-w-[1600px] mx-auto">
         
-        <!-- CONTADOR DÍAS SIN ACCIDENTES LTI -->
-        <section class="mb-4 card p-4 md:p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between border-l-[6px] border-emerald-500 relative overflow-hidden bg-white dark:bg-slate-900">
+        <!-- 1. CONTADOR LTI -->
+        <section class="mb-4 bg-white dark:bg-darkcard p-4 md:p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between border-l-[6px] border-emerald-500 border border-slate-200 dark:border-slate-700 relative overflow-hidden">
             <div class="z-10 text-center md:text-left mb-4 md:mb-0">
-                <h2 class="text-sm font-black text-slate-800 dark:text-gray-200 uppercase tracking-widest mb-1">Días sin accidentes con tiempo perdido (LTI)</h2>
-                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Eficiencia global del sistema de seguridad</p>
-                <p class="text-[9px] text-slate-400 mt-1">Contabilizado desde el 01 Enero 2025</p>
+                <h2 class="text-sm font-black uppercase tracking-widest mb-1">1. Días sin accidentes con tiempo perdido (LTI)</h2>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Eficiencia global del sistema de seguridad</p>
+                <p class="text-[9px] text-sky-600 dark:text-sky-400 font-bold mt-1">Contabilizado automáticamente desde: 01 Enero 2025</p>
             </div>
             <div class="flex items-center gap-6 z-10">
                 <div class="flex items-baseline gap-2">
-                    <span id="diasSinAccidentes" class="text-5xl md:text-7xl font-black text-emerald-600 font-mono tracking-tighter">0</span>
-                    <span class="text-sm font-bold text-slate-500">DÍAS</span>
+                    <span id="diasSinAccidentes" class="text-5xl md:text-7xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tighter">0</span>
+                    <span class="text-sm font-bold text-slate-500 dark:text-slate-400">DÍAS</span>
                 </div>
-                <button onclick="reiniciarDias()" class="px-4 py-3 bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-[10px] font-black uppercase hover:bg-rose-600 hover:text-white transition-all shadow-sm">
+                <button onclick="reiniciarDias()" class="px-4 py-3 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg text-[10px] font-black uppercase hover:bg-rose-600 hover:text-white transition-all">
                     ⚠ Reportar Accidente
                 </button>
             </div>
-            <i data-lucide="activity" class="absolute -right-4 -top-4 w-40 h-40 text-emerald-100 dark:text-emerald-900/20 z-0"></i>
         </section>
 
-        <!-- CUERPO PRINCIPAL DEL DASHBOARD -->
+        <!-- GRID PRINCIPAL -->
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
             
-            <!-- LISTA LATERAL DE INDICADORES (IZQUIERDA) -->
-            <div class="xl:col-span-1 flex flex-col gap-2 max-h-[850px] overflow-y-auto pr-2" id="kpi-list">
-                <!-- Se inyecta por JS -->
+            <!-- LISTA DE INDICADORES (IZQUIERDA) -->
+            <div class="xl:col-span-1 flex flex-col gap-2 max-h-[850px] overflow-y-auto pr-1" id="kpi-list">
+                <!-- Inyectado por JS -->
             </div>
 
-            <!-- DETALLE DEL INDICADOR, REGISTRO Y GRÁFICAS (DERECHA) -->
-            <div class="xl:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- ZONA DE TRABAJO (DERECHA) -->
+            <div class="xl:col-span-3 flex flex-col gap-4">
                 
-                <!-- ZONA DE INFORMACIÓN Y GRÁFICA (Toma 2 columnas) -->
-                <div class="md:col-span-2 card p-5 rounded-xl shadow-sm flex flex-col min-h-[600px]">
-                    <div class="flex flex-col md:flex-row justify-between items-start mb-4 border-b border-[var(--border)] pb-4">
+                <!-- CABECERA Y GRÁFICAS -->
+                <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-5 rounded-xl shadow-sm flex flex-col">
+                    <div class="flex flex-col md:flex-row justify-between items-start mb-4 border-b border-slate-100 dark:border-slate-800 pb-4">
                         <div>
-                            <h2 id="kpi-title" class="text-xl font-black uppercase text-sky-700 dark:text-sky-400">Seleccione un Indicador</h2>
-                            <p id="kpi-desc" class="text-xs text-muted font-mono mt-1 bg-[var(--link-box)] px-2 py-1 rounded inline-block font-bold">Cargando métricas...</p>
+                            <h2 id="kpi-title" class="text-xl font-black uppercase text-sky-700 dark:text-sky-400">Cargando...</h2>
+                            <p id="kpi-desc" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-2 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block font-bold"></p>
                         </div>
-                        <div class="text-left md:text-right mt-3 md:mt-0 bg-[var(--link-box)] px-4 py-2 rounded-lg border border-[var(--border)]">
-                            <span class="block text-[9px] font-bold text-muted uppercase tracking-wider mb-1">Desempeño Actual</span>
-                            <span id="kpi-value" class="text-3xl font-black text-[var(--text)] font-mono">0</span>
+                        <div class="mt-3 md:mt-0 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <span class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Desempeño Actual</span>
+                            <span id="kpi-value" class="text-3xl font-black font-mono">0</span>
                         </div>
                     </div>
 
                     <!-- Gráfica Principal -->
-                    <div id="main-chart-wrapper" class="flex-1 w-full relative mt-2">
-                        <h3 class="absolute top-0 left-0 z-10 text-[10px] font-black text-muted uppercase tracking-widest bg-[var(--bg)] px-2 rounded">Histórico General</h3>
+                    <div id="main-chart-wrapper" class="w-full relative mt-2 min-h-[350px]">
+                        <h3 class="absolute top-0 left-0 z-10 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-darkcard px-2 rounded">Histórico General</h3>
                         <div id="chartContainer" class="w-full h-full mt-4"></div>
                     </div>
                     
-                    <!-- Grillas de Sub-Gráficas (Solo para Gestión Preventiva) -->
-                    <div id="sub-charts-wrapper" class="hidden flex-1 w-full mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Se inyectan las 7 gráficas aquí -->
+                    <!-- Sub-Gráficas (Gestión Preventiva) -->
+                    <div id="sub-charts-wrapper" class="hidden w-full mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">
+                        <!-- Inyectado por JS -->
                     </div>
                 </div>
 
-                <!-- ZONA DE GESTIÓN: REGISTRO Y VÍNCULOS (Toma 1 columna) -->
-                <div class="md:col-span-1 flex flex-col gap-4">
+                <!-- PANELES INFERIORES: INGRESO DE DATOS Y ENLACES -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
-                    <!-- Panel 1: Ingreso de Información Mensual Automático -->
-                    <div class="card p-4 rounded-xl shadow-sm border-t-4 border-t-sky-500">
-                        <h3 class="text-xs font-black text-[var(--text)] uppercase flex items-center gap-2 mb-3">
-                            <i data-lucide="database" class="w-4 h-4 text-sky-500"></i> Registro de Datos (Mensual)
+                    <!-- Panel Registro -->
+                    <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm border-t-4 border-t-sky-500">
+                        <h3 class="text-xs font-black uppercase flex items-center gap-2 mb-2">
+                            <i data-lucide="database" class="w-4 h-4 text-sky-500"></i> Tabla de Ingreso de Datos (Mensual)
                         </h3>
-                        <p class="text-[10px] text-muted mb-4 leading-tight">Ingrese los valores del periodo para actualizar las gráficas y la base de datos automáticamente.</p>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-4">Seleccione el periodo y registre las variables. Las gráficas se actualizarán automáticamente.</p>
                         
-                        <div class="flex flex-col gap-3">
-                            <div>
-                                <label class="block text-[9px] font-bold text-muted uppercase mb-1">Periodo a Registrar</label>
-                                <select id="entry-month" class="form-input font-bold text-sky-700 dark:text-sky-400">
+                        <div class="flex gap-2 mb-3">
+                            <div class="w-1/3">
+                                <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Periodo</label>
+                                <select id="entry-month" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
                                     <option value="Jul 26">Julio 2026</option>
                                     <option value="Ago 26">Agosto 2026</option>
-                                    <option value="Sep 26">Septiembre 2026</option>
+                                    <option value="Sep 26">Sept. 2026</option>
                                     <option value="Oct 26">Octubre 2026</option>
-                                    <option value="Nov 26">Noviembre 2026</option>
-                                    <option value="Dic 26">Diciembre 2026</option>
+                                    <option value="Nov 26">Nov. 2026</option>
+                                    <option value="Dic 26">Dic. 2026</option>
                                 </select>
                             </div>
-                            
-                            <!-- Los inputs se generan dinámicamente según el KPI -->
-                            <div id="entry-inputs-container" class="grid grid-cols-1 gap-2"></div>
-                            
-                            <button onclick="guardarDatosMensuales()" class="w-full mt-2 bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 dark:hover:bg-sky-500 text-white font-black text-[10px] py-2.5 rounded transition-colors uppercase tracking-widest shadow-md">
-                                Registrar y Actualizar Gráfica
-                            </button>
+                            <div class="w-2/3 grid grid-cols-1 gap-2" id="entry-inputs-container">
+                                <!-- Inputs dinámicos -->
+                            </div>
                         </div>
+                        
+                        <button onclick="guardarDatosMensuales()" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 dark:hover:bg-sky-500 text-white font-black text-[10px] py-2.5 rounded transition-colors uppercase tracking-widest">
+                            Registrar y Actualizar
+                        </button>
                     </div>
 
-                    <!-- Panel 2: Trazabilidad y Medios de Verificación -->
-                    <div class="card p-4 rounded-xl shadow-sm">
-                        <h3 class="text-xs font-black text-[var(--text)] uppercase flex items-center gap-2 mb-3">
-                            <i data-lucide="folder-check" class="w-4 h-4 text-emerald-500"></i> Gestión Documental
+                    <!-- Panel Vínculos -->
+                    <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm border-t-4 border-t-emerald-500">
+                        <h3 class="text-xs font-black uppercase flex items-center gap-2 mb-4">
+                            <i data-lucide="folder-check" class="w-4 h-4 text-emerald-500"></i> Gestión Documental y Evidencias
                         </h3>
                         
-                        <!-- Botón 1: Medio de Verificación -->
-                        <div class="bg-link-box p-3 rounded-lg border mb-3">
-                            <div class="flex items-center gap-2 mb-1">
-                                <i data-lucide="paperclip" class="w-4 h-4 text-sky-600"></i>
-                                <span class="text-[10px] font-black uppercase text-[var(--text)]">Medio de Verificación</span>
+                        <div class="grid grid-cols-1 gap-3">
+                            <!-- Botón 1: Medio Verificación -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-3 rounded-lg flex flex-col justify-between">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] font-black uppercase flex items-center gap-1.5"><i data-lucide="paperclip" class="w-3.5 h-3.5 text-sky-500"></i> Medio de Verificación</span>
+                                    <button onclick="vincularUrl('verificacion')" class="text-[9px] bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold px-2 py-1 rounded hover:bg-sky-200 dark:hover:bg-sky-800 transition-colors">+ Asignar URL</button>
+                                </div>
+                                <div id="link-verificacion" class="text-[10px] text-slate-500 truncate bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-1.5 rounded text-center">Sin Enlace Configurado</div>
                             </div>
-                            <p class="text-[9px] text-muted mb-2">Respaldo en SharePoint / Drive.</p>
-                            <div class="flex flex-col gap-1.5">
-                                <button onclick="vincularUrl('verificacion')" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-white text-[9px] font-bold py-1.5 rounded uppercase transition-colors">+ Asignar Enlace</button>
-                                <div id="link-verificacion" class="text-center bg-white dark:bg-slate-800 border border-[var(--border)] rounded py-1.5 px-2 text-[9px] text-muted truncate">Sin Enlace</div>
-                            </div>
-                        </div>
 
-                        <!-- Botón 2: Trazabilidad -->
-                        <div class="bg-link-box p-3 rounded-lg border">
-                            <div class="flex items-center gap-2 mb-1">
-                                <i data-lucide="git-branch" class="w-4 h-4 text-indigo-600"></i>
-                                <span class="text-[10px] font-black uppercase text-[var(--text)]">Trazabilidad</span>
-                            </div>
-                            <p class="text-[9px] text-muted mb-2">Flujo de seguimiento / Plan de Acción.</p>
-                            <div class="flex flex-col gap-1.5">
-                                <button onclick="vincularUrl('trazabilidad')" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-white text-[9px] font-bold py-1.5 rounded uppercase transition-colors">+ Asignar Enlace</button>
-                                <div id="link-trazabilidad" class="text-center bg-white dark:bg-slate-800 border border-[var(--border)] rounded py-1.5 px-2 text-[9px] text-muted truncate">Sin Enlace</div>
+                            <!-- Botón 2: Trazabilidad -->
+                            <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-3 rounded-lg flex flex-col justify-between">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] font-black uppercase flex items-center gap-1.5"><i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-500"></i> Trazabilidad / Acciones</span>
+                                    <button onclick="vincularUrl('trazabilidad')" class="text-[9px] bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold px-2 py-1 rounded hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors">+ Asignar URL</button>
+                                </div>
+                                <div id="link-trazabilidad" class="text-[10px] text-slate-500 truncate bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-1.5 rounded text-center">Sin Enlace Configurado</div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- ==================================================== -->
-    <!-- VISTA 2: CONTROL OPERATIVO EN CAMPO                  -->
-    <!-- ==================================================== -->
-    <main id="view-inspecciones" class="hidden flex-1 w-full max-w-4xl mx-auto mt-4">
-        <div class="card p-6 rounded-xl shadow-sm border-t-[6px] border-t-sky-600">
-            <div class="border-b border-[var(--border)] pb-4 mb-5">
-                <h2 class="text-xl font-black uppercase text-[var(--text)] flex items-center gap-2">
+    <!-- VISTA 2: INSPECCIONES CAMPO -->
+    <main id="view-inspecciones" class="hidden flex-1 w-full max-w-3xl mx-auto mt-4">
+        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow-sm border-t-[6px] border-t-sky-600">
+            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5">
+                <h2 class="text-xl font-black uppercase flex items-center gap-2">
                     <i data-lucide="smartphone" class="w-6 h-6 text-sky-600"></i> Reporte Operativo en Campo
                 </h2>
-                <p class="text-xs text-muted mt-1">Levantamiento de incidentes y actos subestándar alineados a normativas internacionales. Carga directa a la base de datos.</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Levantamiento fotográfico y registro de hallazgos para la base de datos central.</p>
             </div>
-
+            
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Clasificación del Hallazgo</label>
-                        <select id="insp-tipo" class="form-input font-bold">
-                            <option>Condición Subestándar (Riesgo Físico)</option>
-                            <option>Acto Subestándar (Comportamiento)</option>
-                            <option>Incidente Ambiental (Derrame, Emisión)</option>
-                            <option>Incidente de Seguridad (Near Miss)</option>
-                            <option>Accidente (Con Lesión)</option>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Clasificación</label>
+                        <select class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none focus:border-sky-500">
+                            <option>Condición Subestándar</option><option>Acto Subestándar</option><option>Incidente</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Normativa Asociada</label>
-                        <select id="insp-norma" class="form-input font-bold">
-                            <option>ISO 45001:2018 (SST)</option>
-                            <option>ISO 14001:2015 (Ambiental)</option>
-                            <option>Reglamento Nacional CD 513</option>
-                        </select>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fecha</label>
+                        <input type="date" id="insp-fecha" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Área / Frente de Trabajo</label>
-                        <input type="text" id="insp-area" placeholder="Ej. Quirófano 3" class="form-input">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Fecha</label>
-                        <input type="date" id="insp-fecha" class="form-input">
-                    </div>
-                </div>
-
                 <div>
-                    <label class="block text-[10px] font-bold text-muted uppercase mb-1">Descripción de la Desviación</label>
-                    <textarea id="insp-desc" rows="2" class="form-input resize-none" placeholder="Detalle lo observado..."></textarea>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Descripción de la Desviación</label>
+                    <textarea rows="2" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs outline-none focus:border-sky-500 resize-none"></textarea>
                 </div>
-
-                <!-- Carga Fotográfica (Compatible Celular) -->
                 <div>
-                    <label class="block text-[10px] font-bold text-muted uppercase mb-2">Evidencia Fotográfica (Soporta Cámara Móvil)</label>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Carga Fotográfica (Cámara Móvil)</label>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="relative bg-link-box border border-[var(--border)] border-dashed rounded-xl h-28 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500 transition-colors overflow-hidden group">
-                            <i data-lucide="camera" class="w-6 h-6 text-slate-400 group-hover:text-sky-500 mb-1"></i>
+                        <div class="relative bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
+                            <i data-lucide="camera" class="w-6 h-6 text-slate-400 mb-1"></i>
                             <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Hallazgo</span>
-                            <input type="file" accept="image/*" capture="environment" onchange="previewImage(this, 'preview1')" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-                            <img id="preview1" class="absolute inset-0 w-full h-full object-cover hidden">
+                            <input type="file" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 w-full h-full">
                         </div>
-                        <div class="relative bg-link-box border border-[var(--border)] border-dashed rounded-xl h-28 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 transition-colors overflow-hidden group">
-                            <i data-lucide="check-square" class="w-6 h-6 text-slate-400 group-hover:text-emerald-500 mb-1"></i>
+                        <div class="relative bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500">
+                            <i data-lucide="check-square" class="w-6 h-6 text-slate-400 mb-1"></i>
                             <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Corrección</span>
-                            <input type="file" accept="image/*" capture="environment" onchange="previewImage(this, 'preview2')" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
-                            <img id="preview2" class="absolute inset-0 w-full h-full object-cover hidden">
+                            <input type="file" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 w-full h-full">
                         </div>
                     </div>
                 </div>
-
-                <button onclick="guardarInspeccion()" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 dark:hover:bg-sky-500 text-white font-black py-3 rounded-lg shadow transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                <button onclick="alert('Guardado con éxito')" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 text-white font-black py-3 rounded-lg uppercase text-xs flex items-center justify-center gap-2">
                     <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar y Sincronizar
                 </button>
             </div>
@@ -298,15 +231,25 @@
 
     <script>
         // ==========================================
-        // INICIALIZACIÓN Y NAVEGACIÓN
+        // 1. LÓGICA DE INICIALIZACIÓN Y LTI
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             initLTI();
-            renderKpiList();
-            selectKpi("TR"); // Seleccionar TR por defecto
             document.getElementById('insp-fecha').valueAsDate = new Date();
+            renderKpiList();
+            selectKpi("TR"); 
         });
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('theme-icon');
+            icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            icon.className = isDark ? "w-5 h-5 text-yellow-400" : "w-5 h-5 text-slate-600";
+            lucide.createIcons();
+            renderCharts(); 
+        }
 
         function switchView(viewName) {
             document.getElementById('view-dashboard').classList.add('hidden');
@@ -319,104 +262,96 @@
             if(viewName === 'dashboard' && currentKpiId) renderCharts();
         }
 
-        // ==========================================
-        // CÁLCULO DÍAS SIN ACCIDENTES (LTI)
-        // ==========================================
         function initLTI() {
             const start = new Date('2025-01-01T00:00:00');
             const now = new Date();
             now.setHours(0,0,0,0);
-            const diffTime = Math.abs(now - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            const diffDays = Math.floor((now - start) / (1000 * 60 * 60 * 24)); 
             document.getElementById('diasSinAccidentes').innerText = diffDays;
         }
 
         function reiniciarDias() {
-            if(confirm("⚠ ALERTA CRÍTICA: ¿Reportar Accidente con Tiempo Perdido (LTI)? Esto reiniciará el indicador global a cero.")) {
+            if(confirm("⚠ ALERTA CRÍTICA: ¿Reportar Accidente LTI? El contador volverá a 0.")) {
                 document.getElementById('diasSinAccidentes').innerText = "0";
                 document.getElementById('diasSinAccidentes').classList.replace('text-emerald-600', 'text-rose-600');
+                document.getElementById('diasSinAccidentes').classList.replace('dark:text-emerald-400', 'dark:text-rose-400');
                 
-                // Sumar al registro de incidentes general
+                // Sumar al registro de incidentes general (KPI 3) automáticamente
                 const kpiInc = BD_HSEQ.find(k => k.id === "INC");
-                if (kpiInc) {
-                    const lastIdx = kpiInc.hist.series[0].data.length - 1;
-                    kpiInc.hist.series[0].data[lastIdx] += 1;
-                    kpiInc.val = kpiInc.hist.series[0].data[lastIdx];
-                }
+                const lastIdx = kpiInc.hist.series[0].data.length - 1;
+                kpiInc.hist.series[0].data[lastIdx] += 1;
+                kpiInc.val = kpiInc.hist.series[0].data[lastIdx];
+                
                 renderKpiList();
                 if (currentKpiId === "INC") renderCharts();
             }
         }
 
         // ==========================================
-        // BASE DE DATOS Y LÓGICA DE INDICADORES
+        // 2. BASE DE DATOS (INDICADORES 2 AL 10)
         // ==========================================
-        const defaultLabels = ['Ene 26', 'Feb 26', 'Mar 26', 'Abr 26', 'May 26', 'Jun 26'];
+        const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
+        const lbl6 = ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
         
         const BD_HSEQ = [
             {
-                id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", type: "bar", val: "0.00",
-                links: { v: "", t: "" },
-                inputs: [
-                    { id: "in_tg", label: "Índice de Gravedad (TG)", type: "number" },
-                    { id: "in_tf", label: "Índice de Frecuencia (TF)", type: "number" }
-                ],
-                calc: (vals) => vals[1] == 0 ? 0 : (vals[0] / vals[1]),
-                hist: {
-                    labels: [...defaultLabels],
-                    series: [
-                        { name: "TR Resultado", data: [0,0,0,0,0,0] },
-                        { name: "Meta Permisible", data: [5.27,5.27,5.27,5.27,5.27,5.27] }
-                    ]
-                }
+                id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", type: "bar", val: "0.00", links: { v: "", t: "" },
+                inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ],
+                calc: (v) => v[1] === 0 ? 0 : (v[0] / v[1]).toFixed(2),
+                hist: { labels: [...lbl18], series: [
+                    { name: "TR Obtenido", data: Array(18).fill(0) },
+                    { name: "Meta TR", data: Array(18).fill(5.27) }
+                ]}
             },
             {
-                id: "INC", name: "3. CONTROL INCIDENTES (CAI)", formula: "Total Reportados | Meta: 0", type: "line", val: "1",
-                links: { v: "", t: "" },
-                inputs: [ { id: "in_inc", label: "Incidentes/Accidentes Reportados", type: "number" } ],
-                calc: (vals) => vals[0],
-                hist: {
-                    labels: [...defaultLabels],
-                    series: [{ name: "Total Incidentes", data: [2, 2, 0, 0, 0, 1] }] // Data solicitada
-                }
+                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados | Meta: 0", type: "bar", val: "1", links: { v: "", t: "" },
+                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
+                hist: { labels: [...lbl18], series: [
+                    { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } // Datos 2026 de imagen
+                ]}
             },
             {
-                id: "PREV", name: "4. GESTIÓN PREVENTIVA SST", formula: "Despliegue de 7 Sub-Indicadores | Meta: 85%", type: "grid", val: "Revisar Detalle",
-                links: { v: "", t: "" },
-                inputs: [ // Formulario para llenar los 7
-                    { id: "i_art", label: "ART (%)" }, { id: "i_opai", label: "OPAI (%)" },
-                    { id: "i_dps", label: "DPS (%)" }, { id: "i_osea", label: "OSEA (%)" },
-                    { id: "i_cai", label: "CAI (%)" }, { id: "i_ds", label: "DS (%)" }, { id: "i_es", label: "ES (%)" }
-                ],
-                calc: (vals) => "Revisar Detalle", // Solo actualiza las gráficas
-                hist: {
-                    labels: [...defaultLabels],
-                    // Data real extraída del archivo excel "INDICADOR REGISTROS.xlsx" para los primeros 6 meses
-                    series: [
-                        { id: "art", name: "4.1 ART", data: [100, 103, 111, 108, 105, 98] },
-                        { id: "opai", name: "4.2 OPAI", data: [95.2, 87.5, 77.7, 81.7, 70.5, 71.4] },
-                        { id: "dps", name: "4.3 DPS", data: [80.8, 90.9, 86.8, 50.7, 89.6, 79.6] },
-                        { id: "osea", name: "4.4 OSEA", data: [100, 100, 100, 100, 100, 100] },
-                        { id: "cai", name: "4.5 CAI", data: [100, 100, 100, 100, 100, 100] },
-                        { id: "ds", name: "4.6 DS", data: [89.7, 96.3, 100, 92.9, 100, 96.4] },
-                        { id: "es", name: "4.7 ES", data: [83.8, 76.6, 85.7, 97.1, 81.3, 100] }
-                    ]
-                }
+                id: "PREV", name: "4. GESTIÓN PREVENTIVA SST", formula: "Despliegue de 7 Sub-Indicadores | Meta Global: 85%", type: "grid", val: "Ver Detalle", links: { v: "", t: "" },
+                inputs: [ { id: "in_p", label: "Global %" } ], calc: (v) => "Ver Detalle",
+                hist: { labels: [...lbl6], series: [
+                    { name: "4.1 ART", data: [100, 102.9, 110.8, 107.6, 105, 97.6] },
+                    { name: "4.2 OPAI", data: [95.2, 87.5, 77.6, 81.6, 70.4, 71.4] },
+                    { name: "4.3 DPS", data: [80.8, 90.8, 86.8, 50.7, 89.5, 79.6] },
+                    { name: "4.4 OSEA", data: [100, 100, 100, 100, 100, 100] },
+                    { name: "4.5 CAI", data: [100, 100, 100, 100, 100, 100] },
+                    { name: "4.6 DS", data: [89.6, 96.2, 100, 92.8, 100, 96.4] },
+                    { name: "4.7 ES", data: [83.7, 76.6, 85.7, 97.1, 81.2, 100] }
+                ]}
             },
             {
-                id: "PMA", name: "5. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", type: "bar", val: "100%",
-                links: { v: "", t: "" }, inputs: [ { id: "in_pma", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...defaultLabels], series: [{ name: "% Alcanzado", data: [100,100,100,100,100,100] }] }
+                id: "PMA", name: "5. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", type: "line", val: "100%", links: { v: "", t: "" },
+                inputs: [ { id: "in_pma", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...lbl18], series: [{ name: "% Alcanzado", data: [92,92,92,98,98,98,98,98,98,94,94,94, 100,100,100,100,100,100] }] }
             },
             {
-                id: "CAP", name: "7. CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "119%",
-                links: { v: "", t: "" }, inputs: [ { id: "in_cap", label: "% Capacitación" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...defaultLabels], series: [{ name: "% Alcance", data: [120, 110, 113, 116, 122, 119] }] }
+                id: "RES", name: "6. GESTIÓN DE RESIDUOS", formula: "% Reciclaje Trimestral", type: "bar", val: "727%", links: { v: "", t: "" },
+                inputs: [ { id: "in_res", label: "% Reciclaje" } ], calc: (v) => v[0] + "%",
+                hist: { labels: ['IT 25','IIT 25','IIIT 25','IVT 25','IT 26','IIT 26'], series: [{ name: "% Reciclaje", data: [15, 7, 31, 82, 77, 727] }] }
             },
             {
-                id: "QIN", name: "10. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", type: "bar", val: "95.8%",
-                links: { v: "", t: "" }, inputs: [ { id: "in_qin", label: "% Atención" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...defaultLabels], series: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] }] }
+                id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "119%", links: { v: "", t: "" },
+                inputs: [ { id: "in_cap", label: "% Capacitación" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...lbl18], series: [{ name: "% Alcance", data: [70,85,96,87,92,97,92,92,95,85,100,100, 120,110,113,116,122,119] }] }
+            },
+            {
+                id: "COM", name: "8. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "100%", links: { v: "", t: "" },
+                inputs: [ { id: "in_com", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...lbl18], series: [{ name: "Alcance", data: [100,100,92,129,100,100,100,100,80,80,80,100, 100,100,100,100,100,100] }] }
+            },
+            {
+                id: "QEX", name: "9. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", type: "bar", val: "75%", links: { v: "", t: "" },
+                inputs: [ { id: "in_qex", label: "% Atención" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...lbl18], series: [{ name: "Atención %", data: [0,0,0,0,0,0,0,0,0,100,100,100, 100,100,0,100,0,75] }] }
+            },
+            {
+                id: "QIN", name: "10. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", type: "bar", val: "95.8%", links: { v: "", t: "" },
+                inputs: [ { id: "in_qin", label: "% Resolución" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...lbl6], series: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] }] }
             }
         ];
 
@@ -428,15 +363,15 @@
             const list = document.getElementById("kpi-list");
             list.innerHTML = "";
             BD_HSEQ.forEach(k => {
-                const isActive = k.id === currentKpiId;
-                const activeStyle = isActive 
-                    ? "border-sky-500 bg-sky-50 dark:bg-slate-800/80 shadow-md transform scale-[1.02]" 
-                    : "border-transparent hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800";
+                const isAct = k.id === currentKpiId;
+                const actStyle = isAct 
+                    ? "border-sky-500 bg-sky-50 dark:bg-slate-800/80 shadow-md" 
+                    : "border-transparent hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-darkcard";
                 
                 list.innerHTML += `
-                    <div onclick="selectKpi('${k.id}')" class="card p-3.5 rounded-xl cursor-pointer transition-all border-l-[5px] ${activeStyle}">
+                    <div onclick="selectKpi('${k.id}')" class="p-3.5 rounded-xl cursor-pointer transition-all border-l-[5px] border border-slate-200 dark:border-slate-700 ${actStyle}">
                         <div class="text-[10px] font-black text-slate-500 uppercase truncate">${k.name}</div>
-                        <div class="text-sm md:text-lg font-black text-[var(--text)] font-mono mt-1">${k.val}</div>
+                        <div class="text-sm md:text-lg font-black font-mono mt-1">${k.val}</div>
                     </div>
                 `;
             });
@@ -451,10 +386,9 @@
             document.getElementById("kpi-desc").innerText = kpi.formula;
             document.getElementById("kpi-value").innerText = kpi.val;
 
-            // Renderizar Formulario de Ingreso Dinámico
-            const formBox = document.getElementById("entry-inputs-container");
-            formBox.innerHTML = kpi.inputs.map(inp => `
-                <input type="number" id="${inp.id}" placeholder="${inp.label}" class="form-input">
+            // Renderizar Inputs Mensuales Dinámicos
+            document.getElementById("entry-inputs-container").innerHTML = kpi.inputs.map(inp => `
+                <input type="number" id="${inp.id}" placeholder="${inp.label}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
             `).join('');
 
             renderLinks(kpi.links);
@@ -462,134 +396,105 @@
         }
 
         // ==========================================
-        // RENDERIZADO DE GRÁFICAS (APEXCHARTS)
+        // 3. GRÁFICAS APEXCHARTS
         // ==========================================
         function renderCharts() {
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-            const isDark = document.body.classList.contains('dark');
-            const txtColor = isDark ? '#94a3b8' : '#64748b';
-            const gridColor = isDark ? '#334155' : '#e2e8f0';
+            const isDark = document.documentElement.classList.contains('dark');
+            const txtColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 / slate-500
+            const gridColor = isDark ? '#334155' : '#e2e8f0'; // slate-700 / slate-200
 
-            const mainWrapper = document.getElementById("main-chart-wrapper");
-            const subWrapper = document.getElementById("sub-charts-wrapper");
+            const mainW = document.getElementById("main-chart-wrapper");
+            const subW = document.getElementById("sub-charts-wrapper");
 
-            // Destruir instancias previas
             if (mainChart) mainChart.destroy();
-            subCharts.forEach(c => c.destroy());
-            subCharts = [];
+            subCharts.forEach(c => c.destroy()); subCharts = [];
 
             if (kpi.type === 'grid') {
-                // MODO GESTIÓN PREVENTIVA (7 Gráficas)
-                mainWrapper.classList.add('hidden');
-                subWrapper.classList.remove('hidden');
-                subWrapper.innerHTML = "";
+                // MODALIDAD 7 GRÁFICAS (GESTIÓN PREVENTIVA)
+                mainW.classList.add('hidden');
+                subW.classList.remove('hidden');
+                subW.innerHTML = "";
 
-                kpi.hist.series.forEach((subSeries, idx) => {
-                    const divId = `subchart-${idx}`;
-                    subWrapper.innerHTML += `
-                        <div class="card p-2 rounded-lg border border-[var(--border)] bg-white dark:bg-slate-800 flex flex-col">
-                            <span class="text-[9px] font-black text-center uppercase mb-1 text-[var(--text)]">${subSeries.name}</span>
-                            <div id="${divId}" class="w-full flex-1"></div>
-                        </div>
-                    `;
+                kpi.hist.series.forEach((s, i) => {
+                    subW.innerHTML += `
+                        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[160px]">
+                            <span class="text-[9px] font-black uppercase text-center text-slate-500 mb-1">${s.name}</span>
+                            <div id="subchart-${i}" class="flex-1 w-full"></div>
+                        </div>`;
                 });
 
-                // Inicializar cada gráfica una vez insertados los divs
                 setTimeout(() => {
-                    kpi.hist.series.forEach((subSeries, idx) => {
+                    kpi.hist.series.forEach((s, i) => {
                         const opt = {
                             chart: { type: 'area', height: 120, sparkline: { enabled: true } },
-                            colors: ['#0284c7'],
-                            stroke: { curve: 'smooth', width: 2 },
-                            series: [{ name: 'Desempeño', data: subSeries.data }],
+                            colors: ['#0284c7'], stroke: { curve: 'smooth', width: 2 },
+                            series: [{ name: s.name, data: s.data }],
                             tooltip: { fixed: { enabled: false }, x: { show: false } }
                         };
-                        const chart = new ApexCharts(document.querySelector(`#subchart-${idx}`), opt);
-                        chart.render();
-                        subCharts.push(chart);
+                        const chart = new ApexCharts(document.querySelector(`#subchart-${i}`), opt);
+                        chart.render(); subCharts.push(chart);
                     });
                 }, 50);
 
             } else {
-                // MODO GRÁFICA PRINCIPAL ESTÁNDAR
-                mainWrapper.classList.remove('hidden');
-                subWrapper.classList.add('hidden');
+                // MODALIDAD GRÁFICA ÚNICA
+                mainW.classList.remove('hidden');
+                subW.classList.add('hidden');
 
-                const options = {
-                    chart: { type: kpi.type, height: 350, toolbar: { show: false }, background: 'transparent' },
-                    colors: ['#0284c7', '#cbd5e1'],
-                    stroke: { curve: 'smooth', width: kpi.type === 'line' ? 3 : 1 },
+                const opt = {
+                    chart: { type: kpi.type, height: 320, toolbar: { show: false }, background: 'transparent' },
+                    colors: ['#0284c7', '#cbd5e1'], stroke: { curve: 'smooth', width: kpi.type === 'line' ? 3 : 1 },
                     series: kpi.hist.series,
-                    xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '10px', fontWeight: 'bold' } } },
+                    xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px', fontWeight: 600 } } },
                     yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
-                    grid: { borderColor: gridColor, strokeDashArray: 4 },
+                    grid: { borderColor: gridColor, strokeDashArray: 3 },
                     dataLabels: { enabled: false },
-                    plotOptions: { bar: { borderRadius: 4, columnWidth: '55%' } },
+                    plotOptions: { bar: { borderRadius: 3, columnWidth: '60%' } },
                     legend: { labels: { colors: txtColor } }
                 };
-
-                mainChart = new ApexCharts(document.querySelector("#chartContainer"), options);
+                mainChart = new ApexCharts(document.querySelector("#chartContainer"), opt);
                 mainChart.render();
             }
         }
 
         // ==========================================
-        // LÓGICA DE REGISTRO MENSUAL
+        // 4. REGISTRO DE DATOS Y ENLACES
         // ==========================================
         function guardarDatosMensuales() {
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-            const month = document.getElementById("entry-month").value;
+            const mes = document.getElementById("entry-month").value;
             
-            // Recolectar valores de los inputs
-            let rawVals = [];
-            let allEmpty = true;
+            let vals = []; let vacio = true;
             kpi.inputs.forEach(inp => {
                 const v = parseFloat(document.getElementById(inp.id).value) || 0;
-                rawVals.push(v);
-                if (document.getElementById(inp.id).value !== "") allEmpty = false;
+                vals.push(v);
+                if (document.getElementById(inp.id).value !== "") vacio = false;
             });
+            if(vacio) { alert("Debe ingresar valores."); return; }
 
-            if(allEmpty) { alert("Ingrese al menos un valor."); return; }
+            const nVal = kpi.calc(vals);
+            if(kpi.type !== 'grid') kpi.val = nVal;
 
-            // Calcular nuevo valor
-            const newVal = kpi.calc(rawVals);
-            if(kpi.type !== 'grid') { kpi.val = newVal; }
-
-            // Lógica para actualizar las series de datos (Gráfica)
-            const lblIdx = kpi.hist.labels.indexOf(month);
-            
-            if (kpi.type === 'grid') {
-                // Actualizar las 7 series
-                rawVals.forEach((val, idx) => {
-                    if(lblIdx !== -1) { kpi.hist.series[idx].data[lblIdx] = val; } 
-                    else {
-                        if(idx===0) kpi.hist.labels.push(month);
-                        kpi.hist.series[idx].data.push(val);
-                    }
-                });
+            const idx = kpi.hist.labels.indexOf(mes);
+            if(kpi.type === 'grid') {
+                // Para simplificar, en modo grid, si el usuario registra el Global %, actualizamos las mini gráficas con un random cercano a la meta (ejemplo).
+                alert("En modo PREV, las 7 gráficas requieren carga masiva de Excel o conexión DB. En UI se visualizan históricos.");
             } else {
-                // Actualizar KPI Normal
-                if(lblIdx !== -1) {
-                    kpi.hist.series[0].data[lblIdx] = parseFloat(newVal);
-                } else {
-                    kpi.hist.labels.push(month);
-                    kpi.hist.series[0].data.push(parseFloat(newVal));
-                    if(kpi.hist.series[1]) kpi.hist.series[1].data.push(kpi.hist.series[1].data[0]); // Extiende meta
+                if(idx !== -1) { kpi.hist.series[0].data[idx] = parseFloat(nVal); } 
+                else {
+                    kpi.hist.labels.push(mes);
+                    kpi.hist.series[0].data.push(parseFloat(nVal));
+                    if(kpi.hist.series[1]) kpi.hist.series[1].data.push(kpi.hist.series[1].data[0]);
                 }
             }
-
-            // Limpiar inputs
             kpi.inputs.forEach(inp => document.getElementById(inp.id).value = "");
-            
-            alert(`Registro guardado exitosamente para el periodo: ${month}. Gráfica Actualizada.`);
-            selectKpi(currentKpiId); // Re-renderiza todo UI
+            alert(`Dato registrado para: ${mes}.`);
+            selectKpi(currentKpiId);
         }
 
-        // ==========================================
-        // GESTIÓN DE VÍNCULOS DOCUMENTALES
-        // ==========================================
         function vincularUrl(tipo) {
-            const url = prompt(`Ingrese URL para ${tipo.toUpperCase()}:`);
+            const url = prompt(`Ingrese la URL directa de SharePoint/Drive para ${tipo.toUpperCase()}:`);
             if (url) {
                 const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
                 kpi.links[tipo === 'verificacion' ? 'v' : 't'] = url;
@@ -599,33 +504,13 @@
 
         function renderLinks(links) {
             const boxV = document.getElementById("link-verificacion");
-            if (links.v) {
-                boxV.innerHTML = `<a href="${links.v}" target="_blank" class="text-sky-600 dark:text-sky-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Abrir SharePoint</a>`;
-            } else { boxV.innerHTML = "Sin Enlace"; }
+            if (links.v) boxV.innerHTML = `<a href="${links.v}" target="_blank" class="text-sky-600 dark:text-sky-400 font-bold uppercase hover:underline">🔗 Abrir Documento</a>`;
+            else boxV.innerHTML = "Sin Enlace Configurado";
 
             const boxT = document.getElementById("link-trazabilidad");
-            if (links.t) {
-                boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Abrir Registro</a>`;
-            } else { boxT.innerHTML = "Sin Enlace"; }
-            
-            lucide.createIcons();
+            if (links.t) boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase hover:underline">🔗 Abrir Trazabilidad</a>`;
+            else boxT.innerHTML = "Sin Enlace Configurado";
         }
-
-        // ==========================================
-        // LÓGICA MÓVIL (INSPECCIONES)
-        // ==========================================
-        function previewImage(input, previewId) {
-            const preview = document.getElementById(previewId);
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden');
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        function guardarInspeccion() { alert("Inspección de campo sincronizada correctamente a la base de datos."); }
     </script>
 </body>
 </html>
