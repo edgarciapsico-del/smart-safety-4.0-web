@@ -53,9 +53,16 @@
         </div>
 
         <div class="flex items-center gap-3 mt-3 sm:mt-0">
-            <select class="bg-slate-100 dark:bg-slate-800 text-xs font-bold focus:outline-none p-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                <option>HOSPITAL MILLENIUM MED</option>
-            </select>
+            <!-- Selector y Configuración de Centros de Trabajo -->
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                <select id="centro-trabajo-select" class="bg-transparent text-xs font-bold focus:outline-none px-2 py-1 outline-none">
+                    <option value="HOSPITAL MILLENIUM MED">HOSPITAL MILLENIUM MED</option>
+                </select>
+                <button onclick="agregarCentroTrabajo()" title="Agregar nuevo centro de trabajo" class="p-1 bg-sky-600 text-white rounded hover:bg-sky-500 transition-colors">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+
             <button onclick="toggleTheme()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-sky-500 transition-colors">
                 <i data-lucide="moon" id="theme-icon" class="w-5 h-5 text-slate-600 dark:text-yellow-400"></i>
             </button>
@@ -101,9 +108,16 @@
                             <h2 id="kpi-title" class="text-xl font-black uppercase text-sky-700 dark:text-sky-400">Cargando...</h2>
                             <p id="kpi-desc" class="text-xs text-slate-500 dark:text-slate-400 font-mono mt-2 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded inline-block font-bold"></p>
                         </div>
-                        <div class="mt-3 md:mt-0 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                            <span class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Desempeño Actual</span>
-                            <span id="kpi-value" class="text-3xl font-black font-mono">0</span>
+                        <div class="flex items-center gap-3">
+                            <!-- Toggle Tipo de Gráfica: Corrida vs Barras -->
+                            <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 flex text-[10px] font-bold">
+                                <button onclick="setChartType('line')" id="chart-type-line" class="px-3 py-1.5 rounded bg-sky-600 text-white transition-colors">Corrida</button>
+                                <button onclick="setChartType('bar')" id="chart-type-bar" class="px-3 py-1.5 rounded text-slate-600 dark:text-slate-300 transition-colors">Barras</button>
+                            </div>
+                            <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-right">
+                                <span class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Desempeño Actual</span>
+                                <span id="kpi-value" class="text-3xl font-black font-mono">0</span>
+                            </div>
                         </div>
                     </div>
 
@@ -189,7 +203,7 @@
                     <h2 class="text-xl font-black uppercase flex items-center gap-2">
                         <i data-lucide="smartphone" class="w-6 h-6 text-sky-600"></i> Reporte Operativo en Campo
                     </h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Levantamiento de hallazgos por factores de riesgo, evidencias fotográficas y exportación.</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Levantamiento de hallazgos, evidencias fotográficas de desviación y constancia fotográfica de corrección cumplida.</p>
                 </div>
                 <button onclick="exportarExcel()" class="mt-2 sm:mt-0 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-2 transition-colors">
                     <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Exportar a Excel (CSV)
@@ -235,27 +249,46 @@
                     <textarea id="insp-desc" rows="2" placeholder="Detalle de la condición o acto subestándar..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs outline-none focus:border-sky-500 resize-none"></textarea>
                 </div>
 
-                <!-- Carga de hasta 3 fotografías móviles -->
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Evidencia Fotográfica (Máximo 3 Fotos - Cámara Móvil)</label>
+                <!-- 1. FOTOGRAFÍAS DE EVIDENCIA DE HALLAZGO (3 FOTOS) -->
+                <div class="bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <label class="block text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase mb-2">1. Evidencia Fotográfica de la Desviación / Hallazgo (Máx. 3 Fotos)</label>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div class="bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-2 text-center">
-                            <span class="text-[9px] font-bold block mb-1">Foto Evidencia 1</span>
+                        <div class="bg-white dark:bg-darkcard border border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-2 text-center">
+                            <span class="text-[9px] font-bold block mb-1">Hallazgo Foto 1</span>
                             <input type="file" id="insp-foto1" accept="image/*" capture="environment" class="text-[9px] w-full">
                         </div>
-                        <div class="bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-2 text-center">
-                            <span class="text-[9px] font-bold block mb-1">Foto Evidencia 2</span>
+                        <div class="bg-white dark:bg-darkcard border border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-2 text-center">
+                            <span class="text-[9px] font-bold block mb-1">Hallazgo Foto 2</span>
                             <input type="file" id="insp-foto2" accept="image/*" capture="environment" class="text-[9px] w-full">
                         </div>
-                        <div class="bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-2 text-center">
-                            <span class="text-[9px] font-bold block mb-1">Foto Evidencia 3</span>
+                        <div class="bg-white dark:bg-darkcard border border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-2 text-center">
+                            <span class="text-[9px] font-bold block mb-1">Hallazgo Foto 3</span>
                             <input type="file" id="insp-foto3" accept="image/*" capture="environment" class="text-[9px] w-full">
                         </div>
                     </div>
                 </div>
 
+                <!-- 2. FOTOGRAFÍAS DE EVIDENCIA DE CORRECCIÓN / CUMPLIMIENTO (3 FOTOS) -->
+                <div class="bg-emerald-50 dark:bg-emerald-950/20 p-3 rounded-lg border border-emerald-200 dark:border-emerald-900/50">
+                    <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-2">2. Evidencia Fotográfica de la Corrección y Cumplimiento (Máx. 3 Fotos)</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="bg-white dark:bg-darkcard border border-dashed border-emerald-300 dark:border-emerald-700 rounded-lg p-2 text-center">
+                            <span class="text-[9px] font-bold block mb-1">Corrección Foto 1</span>
+                            <input type="file" id="corr-foto1" accept="image/*" capture="environment" class="text-[9px] w-full">
+                        </div>
+                        <div class="bg-white dark:bg-darkcard border border-dashed border-emerald-300 dark:border-emerald-700 rounded-lg p-2 text-center">
+                            <span class="text-[9px] font-bold block mb-1">Corrección Foto 2</span>
+                            <input type="file" id="corr-foto2" accept="image/*" capture="environment" class="text-[9px] w-full">
+                        </div>
+                        <div class="bg-white dark:bg-darkcard border border-dashed border-emerald-300 dark:border-emerald-700 rounded-lg p-2 text-center">
+                            <span class="text-[9px] font-bold block mb-1">Corrección Foto 3</span>
+                            <input type="file" id="corr-foto3" accept="image/*" capture="environment" class="text-[9px] w-full">
+                        </div>
+                    </div>
+                </div>
+
                 <button onclick="guardarInspeccionCampo()" class="w-full bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 text-white font-black py-3 rounded-lg uppercase text-xs flex items-center justify-center gap-2 transition-colors shadow-md">
-                    <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar en la Nube y Registrar Hallazgo con Reporte Fotográfico
+                    <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar en la Nube y Registrar Hallazgo con Doble Reporte Fotográfico (Desviación y Corrección)
                 </button>
             </div>
 
@@ -269,7 +302,7 @@
                             <th class="p-3 border-b dark:border-slate-700">Resp. Corregir</th>
                             <th class="p-3 border-b dark:border-slate-700">Técnico HSE</th>
                             <th class="p-3 border-b dark:border-slate-700">F. Apertura / Cierre</th>
-                            <th class="p-3 border-b dark:border-slate-700 text-center">Evidencias</th>
+                            <th class="p-3 border-b dark:border-slate-700 text-center">Evidencias Fotos</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-inspecciones-body">
@@ -368,6 +401,20 @@
             document.getElementById(`btn-${viewName}`).classList.add('active');
             
             if(viewName === 'dashboard' && currentKpiId) renderCharts();
+        }
+
+        // GESTIÓN DE CENTROS DE TRABAJO
+        function agregarCentroTrabajo() {
+            const nuevoCentro = prompt("Ingrese el nombre del nuevo Centro de Trabajo / Sucursal:");
+            if(nuevoCentro && nuevoCentro.trim() !== "") {
+                const select = document.getElementById('centro-trabajo-select');
+                const opt = document.createElement('option');
+                opt.value = nuevoCentro.toUpperCase();
+                opt.text = nuevoCentro.toUpperCase();
+                select.appendChild(opt);
+                select.value = nuevoCentro.toUpperCase();
+                alert(`Centro de trabajo "${nuevoCentro.toUpperCase()}" agregado y seleccionado exitosamente.`);
+            }
         }
 
         function initLTI() {
@@ -475,8 +522,23 @@
         ];
 
         let currentKpiId = "PREV";
+        let mainChartType = "line"; // Permite cambiar entre 'line' y 'bar'
         let mainChart = null;
         let subCharts = [];
+
+        function setChartType(type) {
+            mainChartType = type;
+            const btnLine = document.getElementById('chart-type-line');
+            const btnBar = document.getElementById('chart-type-bar');
+            if(type === 'line') {
+                btnLine.className = "px-3 py-1.5 rounded bg-sky-600 text-white transition-colors";
+                btnBar.className = "px-3 py-1.5 rounded text-slate-600 dark:text-slate-300 transition-colors";
+            } else {
+                btnBar.className = "px-3 py-1.5 rounded bg-sky-600 text-white transition-colors";
+                btnLine.className = "px-3 py-1.5 rounded text-slate-600 dark:text-slate-300 transition-colors";
+            }
+            renderCharts();
+        }
 
         function renderKpiList() {
             const list = document.getElementById("kpi-list");
@@ -526,7 +588,7 @@
             subCharts.forEach(c => c.destroy()); subCharts = [];
             subW.innerHTML = "";
 
-            // 1. GESTIÓN PREVENTIVA: Gráfica principal ARRIBA, Sub-indicadores ABAJO
+            // 1. GESTIÓN PREVENTIVA: Gráfica principal ARRIBA, Sub-indicadores ABAJO con LÍNEA ROJA DE META (85%)
             if (kpi.id === 'PREV') {
                 mainW.classList.remove('hidden');
                 subW.classList.remove('hidden');
@@ -537,7 +599,7 @@
                 kpi.subIndicators.forEach((s, i) => {
                     subW.innerHTML += `
                         <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[150px]">
-                            <span class="text-[9px] font-black uppercase text-center text-slate-500 mb-1">${s.name}</span>
+                            <span class="text-[9px] font-black uppercase text-center text-slate-500 mb-1">${s.name} (Meta: 85%)</span>
                             <div id="subchart-${i}" class="flex-1 w-full"></div>
                         </div>`;
                 });
@@ -545,9 +607,13 @@
                 setTimeout(() => {
                     kpi.subIndicators.forEach((s, i) => {
                         const opt = {
-                            chart: { type: 'area', height: 110, sparkline: { enabled: true } },
-                            colors: ['#0284c7'], stroke: { curve: 'smooth', width: 2 },
-                            series: [{ name: s.name, data: s.data }],
+                            chart: { type: 'line', height: 110, sparkline: { enabled: true } },
+                            colors: ['#0284c7', '#ef4444'], // Azul resultado, Rojo Meta
+                            stroke: { curve: 'smooth', width: [2, 2], dashArray: [0, 4] },
+                            series: [
+                                { name: s.name, data: s.data },
+                                { name: 'Meta', data: Array(s.data.length).fill(85) }
+                            ],
                             tooltip: { fixed: { enabled: false }, x: { show: false } }
                         };
                         const chart = new ApexCharts(document.querySelector(`#subchart-${i}`), opt);
@@ -601,8 +667,10 @@
         }
 
         function renderMainChart(kpi, txtColor, gridColor) {
-            let chartType = kpi.type === 'waste-grouped' ? 'bar' : (kpi.type === 'line-meta' ? 'line' : kpi.type);
-            let colors = kpi.type === 'waste-grouped' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#e74c3c'];
+            let chartType = mainChartType;
+            if(kpi.type === 'waste-grouped') chartType = 'bar';
+
+            let colors = chartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#e74c3c'];
 
             const opt = {
                 chart: { type: chartType, height: 320, toolbar: { show: false }, background: 'transparent' },
@@ -666,7 +734,7 @@
             else boxT.innerHTML = "Sin Enlace Configurado";
         }
 
-        // SISTEMA DE INSPECCIONES EN CAMPO (FOTOS Y NUBE)
+        // SISTEMA DE INSPECCIONES EN CAMPO (CON DOBLE REPORTE FOTOGRÁFICO: HALLAZGO Y CORRECCIÓN CUMPLIDA)
         let campoInspecciones = [];
 
         function guardarInspeccionCampo() {
@@ -677,24 +745,27 @@
             const cierre = document.getElementById('insp-cierre').value;
             const desc = document.getElementById('insp-desc').value || 'Sin descripción';
 
-            const f1 = document.getElementById('insp-foto1').files.length;
-            const f2 = document.getElementById('insp-foto2').files.length;
-            const f3 = document.getElementById('insp-foto3').files.length;
-            const totalFotos = f1 + f2 + f3;
+            const fHallazgo = document.getElementById('insp-foto1').files.length + document.getElementById('insp-foto2').files.length + document.getElementById('insp-foto3').files.length;
+            const fCorreccion = document.getElementById('corr-foto1').files.length + document.getElementById('corr-foto2').files.length + document.getElementById('corr-foto3').files.length;
+            const totalFotos = fHallazgo + fCorreccion;
 
             if(!resp) { alert("Por favor ingrese el responsable de corregir."); return; }
 
-            const item = { factor, desc, resp, hse, apertura, cierre, totalFotos };
+            const item = { factor, desc, resp, hse, apertura, cierre, totalFotos, fHallazgo, fCorreccion };
             campoInspecciones.push(item);
             renderTablaInspecciones();
 
+            // Limpieza
             document.getElementById('insp-desc').value = '';
             document.getElementById('insp-resp').value = '';
             document.getElementById('insp-foto1').value = '';
             document.getElementById('insp-foto2').value = '';
             document.getElementById('insp-foto3').value = '';
+            document.getElementById('corr-foto1').value = '';
+            document.getElementById('corr-foto2').value = '';
+            document.getElementById('corr-foto3').value = '';
 
-            alert("Hallazgo guardado exitosamente en la nube con su respectivo reporte fotográfico y riesgo.");
+            alert("Hallazgo e historial fotográfico de corrección guardados exitosamente en la nube.");
         }
 
         function renderTablaInspecciones() {
@@ -712,7 +783,10 @@
                         <td class="p-3">${i.resp}</td>
                         <td class="p-3">${i.hse}</td>
                         <td class="p-3 font-mono text-[11px]">${i.apertura} al ${i.cierre}</td>
-                        <td class="p-3 text-center"><span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded font-bold text-[9px]">${i.totalFotos} Fotos Adjuntas</span></td>
+                        <td class="p-3 text-center">
+                            <span class="bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 px-2 py-0.5 rounded font-bold text-[9px] block mb-1">Hallazgo: ${i.fHallazgo} Fotos</span>
+                            <span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-bold text-[9px] block">Corrección: ${i.fCorreccion} Fotos</span>
+                        </td>
                     </tr>
                 `;
             });
@@ -723,9 +797,9 @@
                 alert("No hay datos en la tabla de inspecciones para exportar.");
                 return;
             }
-            let csv = "Factor de Riesgo,Descripcion,Responsable Corregir,Tecnico HSE,Fecha Apertura,Fecha Cierre,Total Fotos\n";
+            let csv = "Factor de Riesgo,Descripcion,Responsable Corregir,Tecnico HSE,Fecha Apertura,Fecha Cierre,Fotos Hallazgo,Fotos Correccion\n";
             campoInspecciones.forEach(i => {
-                csv += `"${i.factor}","${i.desc.replace(/"/g, '""')}","${i.resp}","${i.hse}","${i.apertura}","${i.cierre}",${i.totalFotos}\n`;
+                csv += `"${i.factor}","${i.desc.replace(/"/g, '""')}","${i.resp}","${i.hse}","${i.apertura}","${i.cierre}",${i.fHallazgo},${i.fCorreccion}\n`;
             });
 
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
