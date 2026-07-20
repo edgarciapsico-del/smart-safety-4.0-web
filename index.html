@@ -395,7 +395,7 @@
             }
         }
 
-        // BASE DE DATOS HSEQ CON 10 KPIs (SIENDO PREV EL PRINCIPAL CON SUS 7 SUB-INDICADORES Y RESIDUOS CON SUB-TARJETAS)
+        // BASE DE DATOS HSEQ CON 10 KPIs
         const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
         const lbl6 = ['I Trim 25','II Trim 25','III Trim 25','IV Trim 25','I Trim 26','II Trim 26'];
         
@@ -526,12 +526,16 @@
             subCharts.forEach(c => c.destroy()); subCharts = [];
             subW.innerHTML = "";
 
+            // 1. GESTIÓN PREVENTIVA: Gráfica principal ARRIBA, Sub-indicadores ABAJO
             if (kpi.id === 'PREV') {
-                // MODO 7 SUB-INDICADORES (GESTIÓN PREVENTIVA)
-                mainW.classList.add('hidden');
+                mainW.classList.remove('hidden');
                 subW.classList.remove('hidden');
                 subW.className = "w-full mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6";
 
+                // Render principal primero
+                renderMainChart(kpi, txtColor, gridColor);
+
+                // Render sub-indicadores después
                 kpi.subIndicators.forEach((s, i) => {
                     subW.innerHTML += `
                         <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[150px]">
@@ -553,11 +557,14 @@
                     });
                 }, 50);
 
-            } else if (kpi.id === 'RES') {
-                // MODO RESIDUOS: Gráfica principal + Sub-tarjetas de desecho
+            } 
+            // 2. GESTIÓN DE RESIDUOS: Gráfica principal ARRIBA, Sub-tarjetas ABAJO
+            else if (kpi.id === 'RES') {
                 mainW.classList.remove('hidden');
                 subW.classList.remove('hidden');
                 subW.className = "w-full mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6";
+
+                renderMainChart(kpi, txtColor, gridColor);
 
                 kpi.wasteSub.forEach(w => {
                     subW.innerHTML += `
@@ -566,10 +573,9 @@
                             <span class="text-lg font-black font-mono text-emerald-600 dark:text-emerald-400">${w.val}</span>
                         </div>`;
                 });
-
-                renderMainChart(kpi, txtColor, gridColor);
-            } else {
-                // MODO GRÁFICA ESTÁNDAR
+            } 
+            // 3. RESTO DE INDICADORES
+            else {
                 mainW.classList.remove('hidden');
                 subW.classList.add('hidden');
                 renderMainChart(kpi, txtColor, gridColor);
