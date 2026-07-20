@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART SAFETY 4.0 | DASHBOARD HSEQ</title>
+    <title>SMART SAFETY 4.0 | ÍNDICE GLOBAL PREVENTIVO SST</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -36,20 +36,23 @@
         <div>
             <span class="text-[9px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-widest block">Integrow S.A. | Módulo Auditoría</span>
             <h1 class="font-black text-lg flex items-center gap-2 mt-0.5 uppercase tracking-tight">
-                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> Smart Safety 4.0
+                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> ÍNDICE GLOBAL PREVENTIVO SST
             </h1>
         </div>
         
-        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
-            <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
+        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 overflow-x-auto">
+            <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard KPIs
             </button>
-            <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
+            <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
                 <i data-lucide="smartphone" class="w-4 h-4"></i> Operativa en Campo
+            </button>
+            <button onclick="switchView('planificacion')" id="btn-planificacion" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="calendar" class="w-4 h-4"></i> Planificación Anual
             </button>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 mt-3 sm:mt-0">
             <select class="bg-slate-100 dark:bg-slate-800 text-xs font-bold focus:outline-none p-2 rounded-lg border border-slate-200 dark:border-slate-700">
                 <option>HOSPITAL MILLENIUM MED</option>
             </select>
@@ -109,11 +112,6 @@
                         <h3 class="absolute top-0 left-0 z-10 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white dark:bg-darkcard px-2 rounded">Histórico General</h3>
                         <div id="chartContainer" class="w-full h-full mt-4"></div>
                     </div>
-                    
-                    <!-- Sub-Gráficas (Gestión Preventiva) -->
-                    <div id="sub-charts-wrapper" class="hidden w-full mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 border-t border-slate-100 dark:border-slate-800 pt-6">
-                        <!-- Inyectado por JS -->
-                    </div>
                 </div>
 
                 <!-- PANELES INFERIORES: INGRESO DE DATOS Y ENLACES -->
@@ -155,7 +153,6 @@
                         </h3>
                         
                         <div class="grid grid-cols-1 gap-3">
-                            <!-- Botón 1: Medio Verificación -->
                             <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-3 rounded-lg flex flex-col justify-between">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-[10px] font-black uppercase flex items-center gap-1.5"><i data-lucide="paperclip" class="w-3.5 h-3.5 text-sky-500"></i> Medio de Verificación</span>
@@ -164,7 +161,6 @@
                                 <div id="link-verificacion" class="text-[10px] text-slate-500 truncate bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-1.5 rounded text-center">Sin Enlace Configurado</div>
                             </div>
 
-                            <!-- Botón 2: Trazabilidad -->
                             <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-3 rounded-lg flex flex-col justify-between">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-[10px] font-black uppercase flex items-center gap-1.5"><i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-500"></i> Trazabilidad / Acciones</span>
@@ -181,64 +177,147 @@
     </main>
 
     <!-- VISTA 2: INSPECCIONES CAMPO -->
-    <main id="view-inspecciones" class="hidden flex-1 w-full max-w-3xl mx-auto mt-4">
+    <main id="view-inspecciones" class="hidden flex-1 w-full max-w-5xl mx-auto mt-4">
         <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow-sm border-t-[6px] border-t-sky-600">
-            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5">
-                <h2 class="text-xl font-black uppercase flex items-center gap-2">
-                    <i data-lucide="smartphone" class="w-6 h-6 text-sky-600"></i> Reporte Operativo en Campo
-                </h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Levantamiento fotográfico y registro de hallazgos para la base de datos central.</p>
+            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5 flex flex-wrap justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-black uppercase flex items-center gap-2">
+                        <i data-lucide="smartphone" class="w-6 h-6 text-sky-600"></i> Reporte Operativo en Campo
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Levantamiento de hallazgos por factores de riesgo y exportación a Excel.</p>
+                </div>
+                <button onclick="exportarExcel()" class="mt-2 sm:mt-0 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-2 transition-colors">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Exportar a Excel (CSV)
+                </button>
             </div>
             
-            <div class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Clasificación</label>
-                        <select class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none focus:border-sky-500">
-                            <option>Condición Subestándar</option><option>Acto Subestándar</option><option>Incidente</option>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Factor de Riesgo</label>
+                        <select id="insp-factor" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none focus:border-sky-500">
+                            <option>Locativo</option>
+                            <option>Mecánico</option>
+                            <option>Físico</option>
+                            <option>Químico</option>
+                            <option>Ergonómico</option>
+                            <option>Psicosocial</option>
+                            <option>Eléctrico</option>
+                            <option>Incendio</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fecha</label>
-                        <input type="date" id="insp-fecha" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Responsable Corregir (Cargo y Nombre)</label>
+                        <input type="text" id="insp-resp" placeholder="Ej. Juan Pérez - Mantenimiento" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
                     </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Descripción de la Desviación</label>
-                    <textarea rows="2" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs outline-none focus:border-sky-500 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Carga Fotográfica (Cámara Móvil)</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="relative bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
-                            <i data-lucide="camera" class="w-6 h-6 text-slate-400 mb-1"></i>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Hallazgo</span>
-                            <input type="file" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 w-full h-full">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Técnico HSE</label>
+                        <input type="text" id="insp-hse" placeholder="Nombre Técnico HSE" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">F. Apertura</label>
+                            <input type="date" id="insp-apertura" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1.5 rounded text-[11px] font-bold outline-none">
                         </div>
-                        <div class="relative bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500">
-                            <i data-lucide="check-square" class="w-6 h-6 text-slate-400 mb-1"></i>
-                            <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Corrección</span>
-                            <input type="file" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 w-full h-full">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">F. Cierre</label>
+                            <input type="date" id="insp-cierre" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1.5 rounded text-[11px] font-bold outline-none">
                         </div>
                     </div>
                 </div>
-                <button onclick="alert('Guardado con éxito')" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 text-white font-black py-3 rounded-lg uppercase text-xs flex items-center justify-center gap-2">
-                    <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar y Sincronizar
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Descripción del Hallazgo / Desviación</label>
+                    <textarea id="insp-desc" rows="2" placeholder="Detalle de la condición o acto subestándar..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs outline-none focus:border-sky-500 resize-none"></textarea>
+                </div>
+                <button onclick="guardarInspeccionCampo()" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 text-white font-black py-3 rounded-lg uppercase text-xs flex items-center justify-center gap-2 transition-colors">
+                    <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar y Registrar Hallazgo
                 </button>
+            </div>
+
+            <!-- Tabla de Registros de Campo -->
+            <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-lg">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider text-[10px]">
+                            <th class="p-3 border-b dark:border-slate-700">Factor Riesgo</th>
+                            <th class="p-3 border-b dark:border-slate-700">Descripción</th>
+                            <th class="p-3 border-b dark:border-slate-700">Resp. Corregir</th>
+                            <th class="p-3 border-b dark:border-slate-700">Técnico HSE</th>
+                            <th class="p-3 border-b dark:border-slate-700">F. Apertura</th>
+                            <th class="p-3 border-b dark:border-slate-700">F. Cierre</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-inspecciones-body">
+                        <!-- Inyectado por JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
 
+    <!-- VISTA 3: PLANIFICACIÓN ANUAL -->
+    <main id="view-planificacion" class="hidden flex-1 w-full max-w-5xl mx-auto mt-4">
+        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow-sm border-t-[6px] border-t-amber-500">
+            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5 flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-black uppercase flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-6 h-6 text-amber-500"></i> Planificación Anual SST
+                    </h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Gestión de actividades, responsables y presupuesto del Índice Global Preventivo.</p>
+                </div>
+                <button class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold px-4 py-2 rounded text-xs border border-amber-200 dark:border-amber-800 hover:bg-amber-200 transition-colors">
+                    + Nueva Actividad
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider text-[10px]">
+                            <th class="p-3 border-b dark:border-slate-700">Mes</th>
+                            <th class="p-3 border-b dark:border-slate-700">Actividad Preventiva</th>
+                            <th class="p-3 border-b dark:border-slate-700">Responsable</th>
+                            <th class="p-3 border-b dark:border-slate-700">Presupuesto ($)</th>
+                            <th class="p-3 border-b dark:border-slate-700">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td class="p-3 font-semibold">Enero</td>
+                            <td class="p-3">Levantamiento de Riesgos Ergonómicos</td>
+                            <td class="p-3">Gerencia HSE</td>
+                            <td class="p-3 font-mono">1,500.00</td>
+                            <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold text-[9px]">Completado</span></td>
+                        </tr>
+                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td class="p-3 font-semibold">Julio</td>
+                            <td class="p-3">Capacitación Brigadas de Emergencia</td>
+                            <td class="p-3">Técnico Asignado</td>
+                            <td class="p-3 font-mono">800.00</td>
+                            <td class="p-3"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold text-[9px]">En Proceso</span></td>
+                        </tr>
+                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td class="p-3 font-semibold">Diciembre</td>
+                            <td class="p-3">Simulacro General de Evacuación</td>
+                            <td class="p-3">Comité Paritario</td>
+                            <td class="p-3 font-mono">500.00</td>
+                            <td class="p-3"><span class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold text-[9px]">Planificado</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- SCRIPT LOGIC -->
     <script>
-        // ==========================================
-        // 1. LÓGICA DE INICIALIZACIÓN Y LTI
-        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             initLTI();
-            document.getElementById('insp-fecha').valueAsDate = new Date();
+            document.getElementById('insp-apertura').valueAsDate = new Date();
+            document.getElementById('insp-cierre').valueAsDate = new Date();
             renderKpiList();
-            selectKpi("TR"); 
+            selectKpi("PREV"); // Inicia con el Desempeño Preventivo como principal
         });
 
         function toggleTheme() {
@@ -248,12 +327,16 @@
             icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
             icon.className = isDark ? "w-5 h-5 text-yellow-400" : "w-5 h-5 text-slate-600";
             lucide.createIcons();
-            renderCharts(); 
+            if(!document.getElementById('view-dashboard').classList.contains('hidden')) {
+                renderCharts(); 
+            }
         }
 
         function switchView(viewName) {
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-inspecciones').classList.add('hidden');
+            document.getElementById('view-planificacion').classList.add('hidden');
+            
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
@@ -276,24 +359,30 @@
                 document.getElementById('diasSinAccidentes').classList.replace('text-emerald-600', 'text-rose-600');
                 document.getElementById('diasSinAccidentes').classList.replace('dark:text-emerald-400', 'dark:text-rose-400');
                 
-                // Sumar al registro de incidentes general (KPI 3) automáticamente
                 const kpiInc = BD_HSEQ.find(k => k.id === "INC");
-                const lastIdx = kpiInc.hist.series[0].data.length - 1;
-                kpiInc.hist.series[0].data[lastIdx] += 1;
-                kpiInc.val = kpiInc.hist.series[0].data[lastIdx];
-                
+                if(kpiInc) {
+                    const lastIdx = kpiInc.hist.series[0].data.length - 1;
+                    kpiInc.hist.series[0].data[lastIdx] += 1;
+                    kpiInc.val = kpiInc.hist.series[0].data[lastIdx];
+                }
                 renderKpiList();
                 if (currentKpiId === "INC") renderCharts();
             }
         }
 
-        // ==========================================
-        // 2. BASE DE DATOS (INDICADORES 2 AL 10)
-        // ==========================================
+        // BASE DE DATOS HSEQ CON 10 KPIs (SIENDO PREV EL PRINCIPAL)
         const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
-        const lbl6 = ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
+        const lbl6 = ['I Trim 25','II Trim 25','III Trim 25','IV Trim 25','I Trim 26','II Trim 26'];
         
         const BD_HSEQ = [
+            {
+                id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Frecuencia Mensual | Meta Global: 85%", type: "line-meta", val: "92.7%", links: { v: "", t: "" },
+                inputs: [ { id: "in_p", label: "Resultado %" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...lbl18], series: [
+                    { name: "Resultado (%)", data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7] },
+                    { name: "Meta (%)", data: Array(18).fill(85.0) }
+                ]}
+            },
             {
                 id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", type: "bar", val: "0.00", links: { v: "", t: "" },
                 inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ],
@@ -307,20 +396,15 @@
                 id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados | Meta: 0", type: "bar", val: "1", links: { v: "", t: "" },
                 inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
                 hist: { labels: [...lbl18], series: [
-                    { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } // Datos 2026 de imagen
+                    { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } 
                 ]}
             },
             {
-                id: "PREV", name: "4. GESTIÓN PREVENTIVA SST", formula: "Despliegue de 7 Sub-Indicadores | Meta Global: 85%", type: "grid", val: "Ver Detalle", links: { v: "", t: "" },
-                inputs: [ { id: "in_p", label: "Global %" } ], calc: (v) => "Ver Detalle",
+                id: "RES", name: "4. GESTIÓN DE RESIDUOS 2025-2026", formula: "Comunes vs Reciclados (Kg) + Subindicadores", type: "waste-grouped", val: "5,536 Kg Reciclados", links: { v: "", t: "" },
+                inputs: [ { id: "in_com", label: "Comunes (Kg)" }, { id: "in_rec", label: "Reciclados (Kg)" } ], calc: (v) => v[1] + " Kg",
                 hist: { labels: [...lbl6], series: [
-                    { name: "4.1 ART", data: [100, 102.9, 110.8, 107.6, 105, 97.6] },
-                    { name: "4.2 OPAI", data: [95.2, 87.5, 77.6, 81.6, 70.4, 71.4] },
-                    { name: "4.3 DPS", data: [80.8, 90.8, 86.8, 50.7, 89.5, 79.6] },
-                    { name: "4.4 OSEA", data: [100, 100, 100, 100, 100, 100] },
-                    { name: "4.5 CAI", data: [100, 100, 100, 100, 100, 100] },
-                    { name: "4.6 DS", data: [89.6, 96.2, 100, 92.8, 100, 96.4] },
-                    { name: "4.7 ES", data: [83.7, 76.6, 85.7, 97.1, 81.2, 100] }
+                    { name: "Desechos Comunes (Kg)", data: [375, 1350, 4340, 1350, 426, 761.77] },
+                    { name: "Residuos Reciclados (Kg)", data: [57, 94, 1345.5, 1113.2, 329.65, 5536.5] }
                 ]}
             },
             {
@@ -329,33 +413,28 @@
                 hist: { labels: [...lbl18], series: [{ name: "% Alcanzado", data: [92,92,92,98,98,98,98,98,98,94,94,94, 100,100,100,100,100,100] }] }
             },
             {
-                id: "RES", name: "6. GESTIÓN DE RESIDUOS", formula: "% Reciclaje Trimestral", type: "bar", val: "727%", links: { v: "", t: "" },
-                inputs: [ { id: "in_res", label: "% Reciclaje" } ], calc: (v) => v[0] + "%",
-                hist: { labels: ['IT 25','IIT 25','IIIT 25','IVT 25','IT 26','IIT 26'], series: [{ name: "% Reciclaje", data: [15, 7, 31, 82, 77, 727] }] }
-            },
-            {
-                id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "119%", links: { v: "", t: "" },
+                id: "CAP", name: "6. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "119%", links: { v: "", t: "" },
                 inputs: [ { id: "in_cap", label: "% Capacitación" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [{ name: "% Alcance", data: [70,85,96,87,92,97,92,92,95,85,100,100, 120,110,113,116,122,119] }] }
             },
             {
-                id: "COM", name: "8. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_com", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
+                id: "COM", name: "7. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "100%", links: { v: "", t: "" },
+                inputs: [ { id: "in_comun", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [{ name: "Alcance", data: [100,100,92,129,100,100,100,100,80,80,80,100, 100,100,100,100,100,100] }] }
             },
             {
-                id: "QEX", name: "9. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", type: "bar", val: "75%", links: { v: "", t: "" },
+                id: "QEX", name: "8. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", type: "bar", val: "75%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qex", label: "% Atención" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [{ name: "Atención %", data: [0,0,0,0,0,0,0,0,0,100,100,100, 100,100,0,100,0,75] }] }
             },
             {
-                id: "QIN", name: "10. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", type: "bar", val: "95.8%", links: { v: "", t: "" },
+                id: "QIN", name: "9. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", type: "bar", val: "95.8%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qin", label: "% Resolución" } ], calc: (v) => v[0] + "%",
-                hist: { labels: [...lbl6], series: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] }] }
+                hist: { labels: ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'], series: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] }] }
             }
         ];
 
-        let currentKpiId = "TR";
+        let currentKpiId = "PREV";
         let mainChart = null;
         let subCharts = [];
 
@@ -386,7 +465,6 @@
             document.getElementById("kpi-desc").innerText = kpi.formula;
             document.getElementById("kpi-value").innerText = kpi.val;
 
-            // Renderizar Inputs Mensuales Dinámicos
             document.getElementById("entry-inputs-container").innerHTML = kpi.inputs.map(inp => `
                 <input type="number" id="${inp.id}" placeholder="${inp.label}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
             `).join('');
@@ -395,14 +473,11 @@
             renderCharts();
         }
 
-        // ==========================================
-        // 3. GRÁFICAS APEXCHARTS
-        // ==========================================
         function renderCharts() {
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
             const isDark = document.documentElement.classList.contains('dark');
-            const txtColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 / slate-500
-            const gridColor = isDark ? '#334155' : '#e2e8f0'; // slate-700 / slate-200
+            const txtColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
 
             const mainW = document.getElementById("main-chart-wrapper");
             const subW = document.getElementById("sub-charts-wrapper");
@@ -410,57 +485,28 @@
             if (mainChart) mainChart.destroy();
             subCharts.forEach(c => c.destroy()); subCharts = [];
 
-            if (kpi.type === 'grid') {
-                // MODALIDAD 7 GRÁFICAS (GESTIÓN PREVENTIVA)
-                mainW.classList.add('hidden');
-                subW.classList.remove('hidden');
-                subW.innerHTML = "";
+            if (subW) subW.classList.add('hidden');
+            mainW.classList.remove('hidden');
 
-                kpi.hist.series.forEach((s, i) => {
-                    subW.innerHTML += `
-                        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-2 rounded-lg flex flex-col h-[160px]">
-                            <span class="text-[9px] font-black uppercase text-center text-slate-500 mb-1">${s.name}</span>
-                            <div id="subchart-${i}" class="flex-1 w-full"></div>
-                        </div>`;
-                });
+            let chartType = kpi.type === 'waste-grouped' ? 'bar' : (kpi.type === 'line-meta' ? 'line' : kpi.type);
 
-                setTimeout(() => {
-                    kpi.hist.series.forEach((s, i) => {
-                        const opt = {
-                            chart: { type: 'area', height: 120, sparkline: { enabled: true } },
-                            colors: ['#0284c7'], stroke: { curve: 'smooth', width: 2 },
-                            series: [{ name: s.name, data: s.data }],
-                            tooltip: { fixed: { enabled: false }, x: { show: false } }
-                        };
-                        const chart = new ApexCharts(document.querySelector(`#subchart-${i}`), opt);
-                        chart.render(); subCharts.push(chart);
-                    });
-                }, 50);
+            const opt = {
+                chart: { type: chartType, height: 320, toolbar: { show: false }, background: 'transparent' },
+                colors: kpi.type === 'waste-grouped' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#e74c3c'],
+                stroke: { curve: 'smooth', width: chartType === 'line' ? 3 : 1 },
+                series: kpi.hist.series,
+                xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px', fontWeight: 600 } } },
+                yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
+                grid: { borderColor: gridColor, strokeDashArray: 3 },
+                dataLabels: { enabled: false },
+                plotOptions: { bar: { borderRadius: 3, columnWidth: '60%' } },
+                legend: { labels: { colors: txtColor } }
+            };
 
-            } else {
-                // MODALIDAD GRÁFICA ÚNICA
-                mainW.classList.remove('hidden');
-                subW.classList.add('hidden');
-
-                const opt = {
-                    chart: { type: kpi.type, height: 320, toolbar: { show: false }, background: 'transparent' },
-                    colors: ['#0284c7', '#cbd5e1'], stroke: { curve: 'smooth', width: kpi.type === 'line' ? 3 : 1 },
-                    series: kpi.hist.series,
-                    xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px', fontWeight: 600 } } },
-                    yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
-                    grid: { borderColor: gridColor, strokeDashArray: 3 },
-                    dataLabels: { enabled: false },
-                    plotOptions: { bar: { borderRadius: 3, columnWidth: '60%' } },
-                    legend: { labels: { colors: txtColor } }
-                };
-                mainChart = new ApexCharts(document.querySelector("#chartContainer"), opt);
-                mainChart.render();
-            }
+            mainChart = new ApexCharts(document.querySelector("#chartContainer"), opt);
+            mainChart.render();
         }
 
-        // ==========================================
-        // 4. REGISTRO DE DATOS Y ENLACES
-        // ==========================================
         function guardarDatosMensuales() {
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
             const mes = document.getElementById("entry-month").value;
@@ -474,22 +520,17 @@
             if(vacio) { alert("Debe ingresar valores."); return; }
 
             const nVal = kpi.calc(vals);
-            if(kpi.type !== 'grid') kpi.val = nVal;
+            kpi.val = nVal;
 
             const idx = kpi.hist.labels.indexOf(mes);
-            if(kpi.type === 'grid') {
-                // Para simplificar, en modo grid, si el usuario registra el Global %, actualizamos las mini gráficas con un random cercano a la meta (ejemplo).
-                alert("En modo PREV, las 7 gráficas requieren carga masiva de Excel o conexión DB. En UI se visualizan históricos.");
+            if(idx !== -1) { 
+                kpi.hist.series[0].data[idx] = parseFloat(vals[0]); 
             } else {
-                if(idx !== -1) { kpi.hist.series[0].data[idx] = parseFloat(nVal); } 
-                else {
-                    kpi.hist.labels.push(mes);
-                    kpi.hist.series[0].data.push(parseFloat(nVal));
-                    if(kpi.hist.series[1]) kpi.hist.series[1].data.push(kpi.hist.series[1].data[0]);
-                }
+                kpi.hist.labels.push(mes);
+                kpi.hist.series[0].data.push(parseFloat(vals[0]));
             }
             kpi.inputs.forEach(inp => document.getElementById(inp.id).value = "");
-            alert(`Dato registrado para: ${mes}.`);
+            alert(`Dato registrado correctamente para ${mes}.`);
             selectKpi(currentKpiId);
         }
 
@@ -510,6 +551,69 @@
             const boxT = document.getElementById("link-trazabilidad");
             if (links.t) boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase hover:underline">🔗 Abrir Trazabilidad</a>`;
             else boxT.innerHTML = "Sin Enlace Configurado";
+        }
+
+        // SISTEMA DE INSPECCIONES EN CAMPO Y EXPORTACIÓN A EXCEL (CSV)
+        let campoInspecciones = [];
+
+        function guardarInspeccionCampo() {
+            const factor = document.getElementById('insp-factor').value;
+            const resp = document.getElementById('insp-resp').value || 'No asignado';
+            const hse = document.getElementById('insp-hse').value || 'No asignado';
+            const apertura = document.getElementById('insp-apertura').value;
+            const cierre = document.getElementById('insp-cierre').value;
+            const desc = document.getElementById('insp-desc').value || 'Sin descripción';
+
+            if(!resp) { alert("Por favor ingrese el responsable de corregir."); return; }
+
+            const item = { factor, desc, resp, hse, apertura, cierre };
+            campoInspecciones.push(item);
+            renderTablaInspecciones();
+
+            document.getElementById('insp-desc').value = '';
+            document.getElementById('insp-resp').value = '';
+            alert("Hallazgo registrado con éxito en la base de control operativo.");
+        }
+
+        function renderTablaInspecciones() {
+            const tbody = document.getElementById('tabla-inspecciones-body');
+            tbody.innerHTML = "";
+            if(campoInspecciones.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No hay registros de campo ingresados aún.</td></tr>`;
+                return;
+            }
+            campoInspecciones.forEach((i) => {
+                tbody.innerHTML += `
+                    <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <td class="p-3 font-bold text-sky-600 dark:text-sky-400">${i.factor}</td>
+                        <td class="p-3">${i.desc}</td>
+                        <td class="p-3">${i.resp}</td>
+                        <td class="p-3">${i.hse}</td>
+                        <td class="p-3 font-mono text-[11px]">${i.apertura}</td>
+                        <td class="p-3 font-mono text-[11px]">${i.cierre}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function exportarExcel() {
+            if(campoInspecciones.length === 0) {
+                alert("No hay datos en la tabla de inspecciones para exportar.");
+                return;
+            }
+            let csv = "Factor de Riesgo,Descripcion,Responsable Corregir,Tecnico HSE,Fecha Apertura,Fecha Cierre\n";
+            campoInspecciones.forEach(i => {
+                csv += `"${i.factor}","${i.desc.replace(/"/g, '""')}","${i.resp}","${i.hse}","${i.apertura}","${i.cierre}"\n`;
+            });
+
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Reporte_Control_Operativo_SST_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
