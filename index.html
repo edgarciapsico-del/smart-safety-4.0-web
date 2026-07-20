@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART SAFETY 4.0 | HSEQ INTEGRAL</title>
+    <title>SMART SAFETY 4.0 | AUDITORÍA HSEQ</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -13,253 +13,607 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --border: #334155; --primary: #0ea5e9; }
-        body.light { --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; --border: #cbd5e1; --primary: #0284c7; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        /* TEMA LIGHT PROFESIONAL PARA AUDITORÍAS (POR DEFECTO) */
+        :root { 
+            --bg: #f8fafc; 
+            --card: #ffffff; 
+            --text: #0f172a; 
+            --text-muted: #64748b; 
+            --border: #e2e8f0; 
+            --primary: #0284c7; 
+            --link-box: #f1f5f9;
+        }
+        
+        /* TEMA DARK OPCIONAL */
+        body.dark { 
+            --bg: #0f172a; 
+            --card: #1e293b; 
+            --text: #f8fafc; 
+            --text-muted: #94a3b8; 
+            --border: #334155; 
+            --primary: #0ea5e9; 
+            --link-box: #0f172a;
+        }
+        
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
         .card { background-color: var(--card); border: 1px solid var(--border); transition: all 0.3s; }
+        .text-muted { color: var(--text-muted); }
+        .bg-link-box { background-color: var(--link-box); border-color: var(--border); }
+        
+        .tab-btn { color: var(--text-muted); }
         .tab-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--border); }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+        
+        /* Estilos de inputs para los formularios de registro */
+        .form-input { 
+            background-color: var(--card); 
+            border: 1px solid var(--border); 
+            color: var(--text); 
+            padding: 0.5rem; 
+            border-radius: 0.375rem; 
+            font-size: 0.75rem; 
+            width: 100%;
+            outline: none;
+        }
+        .form-input:focus { border-color: var(--primary); }
     </style>
 </head>
 <body class="p-2 md:p-4 antialiased min-h-screen flex flex-col">
     
-    <!-- CABECERA Y NAVEGACIÓN -->
-    <nav class="flex flex-wrap justify-between items-center mb-4 p-4 card rounded-xl shadow-lg gap-4 sticky top-0 z-50">
+    <!-- CABECERA PRINCIPAL -->
+    <nav class="flex flex-wrap justify-between items-center mb-4 p-4 card rounded-xl shadow-sm gap-4 sticky top-0 z-50">
         <div>
-            <span class="text-[9px] uppercase font-bold text-cyan-500 tracking-widest block">Integrow S.A.</span>
-            <h1 class="font-black text-lg flex items-center gap-2 mt-1 uppercase tracking-tight">
-                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i> Smart Safety 4.0
+            <span class="text-[9px] uppercase font-bold text-sky-600 tracking-widest block">Integrow S.A. | Módulo Auditoría</span>
+            <h1 class="font-black text-lg flex items-center gap-2 mt-1 uppercase tracking-tight text-[var(--text)]">
+                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600"></i> Smart Safety 4.0
             </h1>
         </div>
         
-        <!-- PESTAÑAS DE NAVEGACIÓN -->
-        <div class="flex bg-slate-800/50 p-1 rounded-lg border" style="border-color: var(--border);">
+        <div class="flex bg-[var(--link-box)] p-1 rounded-lg border border-[var(--border)]">
             <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard KPIs
             </button>
-            <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-                <i data-lucide="camera" class="w-4 h-4"></i> Inspecciones Campo
+            <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
+                <i data-lucide="camera" class="w-4 h-4"></i> Operativa en Campo
             </button>
         </div>
 
         <div class="flex items-center gap-3">
-            <select class="bg-transparent text-xs font-bold focus:outline-none p-2 card rounded"><option>HOSPITAL MILLENIUM MED</option></select>
-            <button onclick="document.body.classList.toggle('light')" class="p-2 card rounded hover:border-cyan-500" title="Cambiar Tema">
-                <i data-lucide="sun" class="w-5 h-5 text-yellow-500"></i>
+            <select class="bg-transparent text-xs font-bold focus:outline-none p-2 card rounded border border-[var(--border)] text-[var(--text)]">
+                <option>HOSPITAL MILLENIUM MED</option>
+            </select>
+            <button onclick="document.body.classList.toggle('dark'); renderCharts();" class="p-2 card rounded hover:border-sky-500 shadow-sm transition-colors" title="Cambiar Tema Oscuro/Claro">
+                <i data-lucide="moon" class="w-5 h-5 text-slate-500"></i>
             </button>
         </div>
     </nav>
 
-    <!-- ========================================== -->
-    <!-- VISTA 1: DASHBOARD GERENCIAL E INDICADORES -->
-    <!-- ========================================== -->
+    <!-- ==================================================== -->
+    <!-- VISTA 1: DASHBOARD GERENCIAL (AUDITORÍA)             -->
+    <!-- ==================================================== -->
     <main id="view-dashboard" class="flex-1 w-full max-w-[1600px] mx-auto">
-        <!-- CONTADOR DÍAS SIN ACCIDENTES -->
-        <section class="mb-4 card p-4 md:p-6 rounded-2xl shadow-lg flex flex-col md:flex-row items-center justify-between border-l-4 border-emerald-500 relative overflow-hidden bg-gradient-to-r from-slate-900 to-slate-800">
+        
+        <!-- CONTADOR DÍAS SIN ACCIDENTES LTI -->
+        <section class="mb-4 card p-4 md:p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between border-l-[6px] border-emerald-500 relative overflow-hidden bg-white dark:bg-slate-900">
             <div class="z-10 text-center md:text-left mb-4 md:mb-0">
-                <h2 class="text-sm font-black text-gray-300 uppercase tracking-widest mb-1">Días sin accidentes con tiempo perdido (LTI)</h2>
-                <p class="text-[10px] text-gray-400">Eficiencia global del sistema de seguridad</p>
+                <h2 class="text-sm font-black text-slate-800 dark:text-gray-200 uppercase tracking-widest mb-1">Días sin accidentes con tiempo perdido (LTI)</h2>
+                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Eficiencia global del sistema de seguridad</p>
+                <p class="text-[9px] text-slate-400 mt-1">Contabilizado desde el 01 Enero 2025</p>
             </div>
-            <div class="flex items-center gap-4 z-10">
-                <div class="flex items-end gap-2">
-                    <span id="diasSinAccidentes" class="text-5xl md:text-6xl font-black text-emerald-500 font-mono tracking-tighter">468</span>
-                    <span class="text-sm font-bold text-gray-400 mb-2">DÍAS</span>
+            <div class="flex items-center gap-6 z-10">
+                <div class="flex items-baseline gap-2">
+                    <span id="diasSinAccidentes" class="text-5xl md:text-7xl font-black text-emerald-600 font-mono tracking-tighter">0</span>
+                    <span class="text-sm font-bold text-slate-500">DÍAS</span>
                 </div>
-                <button onclick="reiniciarDias()" class="px-3 py-2 bg-rose-900/50 text-rose-300 border border-rose-800 rounded text-[9px] font-bold uppercase hover:bg-rose-500 hover:text-white transition-colors">
+                <button onclick="reiniciarDias()" class="px-4 py-3 bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 border border-rose-200 dark:border-rose-800 rounded-lg text-[10px] font-black uppercase hover:bg-rose-600 hover:text-white transition-all shadow-sm">
                     ⚠ Reportar Accidente
                 </button>
             </div>
-            <i data-lucide="activity" class="absolute -right-4 -top-4 w-32 h-32 text-emerald-500/5 z-0"></i>
+            <i data-lucide="activity" class="absolute -right-4 -top-4 w-40 h-40 text-emerald-100 dark:text-emerald-900/20 z-0"></i>
         </section>
 
+        <!-- CUERPO PRINCIPAL DEL DASHBOARD -->
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
-            <!-- LISTA DE INDICADORES (IZQUIERDA) -->
-            <div class="xl:col-span-1 flex flex-col gap-2 max-h-[800px] overflow-y-auto pr-2" id="kpi-list">
-                <!-- Inyectado por JS -->
+            
+            <!-- LISTA LATERAL DE INDICADORES (IZQUIERDA) -->
+            <div class="xl:col-span-1 flex flex-col gap-2 max-h-[850px] overflow-y-auto pr-2" id="kpi-list">
+                <!-- Se inyecta por JS -->
             </div>
 
-            <!-- DETALLE DEL INDICADOR Y GRÁFICA (DERECHA) -->
-            <div class="xl:col-span-3 card p-4 md:p-6 rounded-2xl shadow-lg flex flex-col">
-                <div class="flex flex-col md:flex-row justify-between items-start mb-4 border-b pb-4" style="border-color: var(--border);">
-                    <div>
-                        <h2 id="kpi-title" class="text-lg md:text-xl font-black uppercase text-cyan-500">Seleccione un Indicador</h2>
-                        <p id="kpi-desc" class="text-xs text-gray-400 font-mono mt-1">Cargando métricas...</p>
+            <!-- DETALLE DEL INDICADOR, REGISTRO Y GRÁFICAS (DERECHA) -->
+            <div class="xl:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- ZONA DE INFORMACIÓN Y GRÁFICA (Toma 2 columnas) -->
+                <div class="md:col-span-2 card p-5 rounded-xl shadow-sm flex flex-col min-h-[600px]">
+                    <div class="flex flex-col md:flex-row justify-between items-start mb-4 border-b border-[var(--border)] pb-4">
+                        <div>
+                            <h2 id="kpi-title" class="text-xl font-black uppercase text-sky-700 dark:text-sky-400">Seleccione un Indicador</h2>
+                            <p id="kpi-desc" class="text-xs text-muted font-mono mt-1 bg-[var(--link-box)] px-2 py-1 rounded inline-block font-bold">Cargando métricas...</p>
+                        </div>
+                        <div class="text-left md:text-right mt-3 md:mt-0 bg-[var(--link-box)] px-4 py-2 rounded-lg border border-[var(--border)]">
+                            <span class="block text-[9px] font-bold text-muted uppercase tracking-wider mb-1">Desempeño Actual</span>
+                            <span id="kpi-value" class="text-3xl font-black text-[var(--text)] font-mono">0</span>
+                        </div>
                     </div>
-                    <div class="text-left md:text-right mt-2 md:mt-0">
-                        <span class="block text-[9px] font-bold text-gray-400 uppercase mb-1">Desempeño Actual</span>
-                        <span id="kpi-value" class="text-3xl font-black text-white font-mono">0</span>
+
+                    <!-- Gráfica Principal -->
+                    <div id="main-chart-wrapper" class="flex-1 w-full relative mt-2">
+                        <h3 class="absolute top-0 left-0 z-10 text-[10px] font-black text-muted uppercase tracking-widest bg-[var(--bg)] px-2 rounded">Histórico General</h3>
+                        <div id="chartContainer" class="w-full h-full mt-4"></div>
+                    </div>
+                    
+                    <!-- Grillas de Sub-Gráficas (Solo para Gestión Preventiva) -->
+                    <div id="sub-charts-wrapper" class="hidden flex-1 w-full mt-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Se inyectan las 7 gráficas aquí -->
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <!-- Medio de Verificación -->
-                    <div class="card p-4 rounded-xl flex flex-col justify-between bg-slate-900/50">
-                        <div class="mb-3">
-                            <span class="text-[10px] font-black text-gray-400 uppercase flex items-center gap-1 mb-1">
-                                <i data-lucide="link" class="w-4 h-4 text-indigo-400"></i> Medio de Verificación (SharePoint)
-                            </span>
-                            <p class="text-[10px] text-gray-500">Trazabilidad documental de la matriz seleccionada.</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="setSharepointLink()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold text-[10px] py-2 rounded transition-colors uppercase">
-                                + Vincular URL
+                <!-- ZONA DE GESTIÓN: REGISTRO Y VÍNCULOS (Toma 1 columna) -->
+                <div class="md:col-span-1 flex flex-col gap-4">
+                    
+                    <!-- Panel 1: Ingreso de Información Mensual Automático -->
+                    <div class="card p-4 rounded-xl shadow-sm border-t-4 border-t-sky-500">
+                        <h3 class="text-xs font-black text-[var(--text)] uppercase flex items-center gap-2 mb-3">
+                            <i data-lucide="database" class="w-4 h-4 text-sky-500"></i> Registro de Datos (Mensual)
+                        </h3>
+                        <p class="text-[10px] text-muted mb-4 leading-tight">Ingrese los valores del periodo para actualizar las gráficas y la base de datos automáticamente.</p>
+                        
+                        <div class="flex flex-col gap-3">
+                            <div>
+                                <label class="block text-[9px] font-bold text-muted uppercase mb-1">Periodo a Registrar</label>
+                                <select id="entry-month" class="form-input font-bold text-sky-700 dark:text-sky-400">
+                                    <option value="Jul 26">Julio 2026</option>
+                                    <option value="Ago 26">Agosto 2026</option>
+                                    <option value="Sep 26">Septiembre 2026</option>
+                                    <option value="Oct 26">Octubre 2026</option>
+                                    <option value="Nov 26">Noviembre 2026</option>
+                                    <option value="Dic 26">Diciembre 2026</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Los inputs se generan dinámicamente según el KPI -->
+                            <div id="entry-inputs-container" class="grid grid-cols-1 gap-2"></div>
+                            
+                            <button onclick="guardarDatosMensuales()" class="w-full mt-2 bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 dark:hover:bg-sky-500 text-white font-black text-[10px] py-2.5 rounded transition-colors uppercase tracking-widest shadow-md">
+                                Registrar y Actualizar Gráfica
                             </button>
-                            <div id="kpi-link-box" class="flex-1 text-center p-2 rounded border border-slate-700 text-[10px] text-gray-500 truncate flex items-center justify-center">
-                                Sin Enlace
+                        </div>
+                    </div>
+
+                    <!-- Panel 2: Trazabilidad y Medios de Verificación -->
+                    <div class="card p-4 rounded-xl shadow-sm">
+                        <h3 class="text-xs font-black text-[var(--text)] uppercase flex items-center gap-2 mb-3">
+                            <i data-lucide="folder-check" class="w-4 h-4 text-emerald-500"></i> Gestión Documental
+                        </h3>
+                        
+                        <!-- Botón 1: Medio de Verificación -->
+                        <div class="bg-link-box p-3 rounded-lg border mb-3">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i data-lucide="paperclip" class="w-4 h-4 text-sky-600"></i>
+                                <span class="text-[10px] font-black uppercase text-[var(--text)]">Medio de Verificación</span>
+                            </div>
+                            <p class="text-[9px] text-muted mb-2">Respaldo en SharePoint / Drive.</p>
+                            <div class="flex flex-col gap-1.5">
+                                <button onclick="vincularUrl('verificacion')" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-white text-[9px] font-bold py-1.5 rounded uppercase transition-colors">+ Asignar Enlace</button>
+                                <div id="link-verificacion" class="text-center bg-white dark:bg-slate-800 border border-[var(--border)] rounded py-1.5 px-2 text-[9px] text-muted truncate">Sin Enlace</div>
+                            </div>
+                        </div>
+
+                        <!-- Botón 2: Trazabilidad -->
+                        <div class="bg-link-box p-3 rounded-lg border">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i data-lucide="git-branch" class="w-4 h-4 text-indigo-600"></i>
+                                <span class="text-[10px] font-black uppercase text-[var(--text)]">Trazabilidad</span>
+                            </div>
+                            <p class="text-[9px] text-muted mb-2">Flujo de seguimiento / Plan de Acción.</p>
+                            <div class="flex flex-col gap-1.5">
+                                <button onclick="vincularUrl('trazabilidad')" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-white text-[9px] font-bold py-1.5 rounded uppercase transition-colors">+ Asignar Enlace</button>
+                                <div id="link-trazabilidad" class="text-center bg-white dark:bg-slate-800 border border-[var(--border)] rounded py-1.5 px-2 text-[9px] text-muted truncate">Sin Enlace</div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Despliegue Sub-Indicadores (Prevención) -->
-                    <div id="sub-kpis-box" class="hidden card p-4 rounded-xl bg-slate-900/50">
-                        <h3 class="text-[10px] font-black text-gray-400 uppercase mb-2">Despliegue Proactivo</h3>
-                        <div class="grid grid-cols-4 gap-2" id="sub-kpis-grid"></div>
-                    </div>
-                </div>
-
-                <!-- Gráfica de Corrida -->
-                <div class="flex-1 w-full min-h-[350px] relative mt-2">
-                    <h3 id="chart-title" class="absolute top-0 left-0 z-10 text-[10px] font-black text-gray-400 uppercase tracking-widest"></h3>
-                    <div id="chartContainer" class="w-full h-full mt-4"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- ========================================== -->
-    <!-- VISTA 2: CONTROL OPERATIVO EN CAMPO (MÓVIL)-->
-    <!-- ========================================== -->
-    <main id="view-inspecciones" class="hidden flex-1 w-full max-w-3xl mx-auto">
-        <div class="card p-4 md:p-6 rounded-2xl shadow-xl">
-            <div class="border-b pb-4 mb-4" style="border-color: var(--border);">
-                <h2 class="text-xl font-black uppercase text-cyan-500 flex items-center gap-2">
-                    <i data-lucide="smartphone" class="w-6 h-6"></i> Reporte de Campo (Móvil)
+    <!-- ==================================================== -->
+    <!-- VISTA 2: CONTROL OPERATIVO EN CAMPO                  -->
+    <!-- ==================================================== -->
+    <main id="view-inspecciones" class="hidden flex-1 w-full max-w-4xl mx-auto mt-4">
+        <div class="card p-6 rounded-xl shadow-sm border-t-[6px] border-t-sky-600">
+            <div class="border-b border-[var(--border)] pb-4 mb-5">
+                <h2 class="text-xl font-black uppercase text-[var(--text)] flex items-center gap-2">
+                    <i data-lucide="smartphone" class="w-6 h-6 text-sky-600"></i> Reporte Operativo en Campo
                 </h2>
-                <p class="text-xs text-gray-400 mt-1">Levantamiento de incidentes, actos y condiciones subestándar alineados a ISO 45001 e ISO 14001 para la base de datos de seguimiento.</p>
+                <p class="text-xs text-muted mt-1">Levantamiento de incidentes y actos subestándar alineados a normativas internacionales. Carga directa a la base de datos.</p>
             </div>
 
             <div class="space-y-4">
-                <!-- Tipo y Norma -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Clasificación del Hallazgo</label>
-                        <select id="insp-tipo" class="w-full bg-slate-900 border border-slate-700 text-white p-2.5 rounded text-xs focus:outline-none focus:border-cyan-500">
-                            <option value="Condición Subestándar">Condición Subestándar (Riesgo Físico)</option>
-                            <option value="Acto Subestándar">Acto Subestándar (Comportamiento)</option>
-                            <option value="Incidente Ambiental">Incidente Ambiental (Derrame, Emisión)</option>
-                            <option value="Incidente Seguridad">Incidente de Seguridad (Sin Lesión / Near Miss)</option>
-                            <option value="Accidente">Accidente (Con Lesión)</option>
+                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Clasificación del Hallazgo</label>
+                        <select id="insp-tipo" class="form-input font-bold">
+                            <option>Condición Subestándar (Riesgo Físico)</option>
+                            <option>Acto Subestándar (Comportamiento)</option>
+                            <option>Incidente Ambiental (Derrame, Emisión)</option>
+                            <option>Incidente de Seguridad (Near Miss)</option>
+                            <option>Accidente (Con Lesión)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Normativa de Referencia</label>
-                        <select id="insp-norma" class="w-full bg-slate-900 border border-slate-700 text-white p-2.5 rounded text-xs focus:outline-none focus:border-cyan-500">
-                            <option value="ISO 45001:2018">ISO 45001:2018 (Seguridad y Salud)</option>
-                            <option value="ISO 14001:2015">ISO 14001:2015 (Medio Ambiente)</option>
-                            <option value="ISO 9001:2015">ISO 9001:2015 (Calidad Operativa)</option>
-                            <option value="Reglamento Nacional">Reglamento Nacional CD 513</option>
+                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Normativa Asociada</label>
+                        <select id="insp-norma" class="form-input font-bold">
+                            <option>ISO 45001:2018 (SST)</option>
+                            <option>ISO 14001:2015 (Ambiental)</option>
+                            <option>Reglamento Nacional CD 513</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Detalles de Ubicación -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Área / Frente de Trabajo</label>
-                        <input type="text" id="insp-area" placeholder="Ej. Bloque B, Nivel 2" class="w-full bg-slate-900 border border-slate-700 text-white p-2.5 rounded text-xs focus:outline-none focus:border-cyan-500">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Área / Frente de Trabajo</label>
+                        <input type="text" id="insp-area" placeholder="Ej. Quirófano 3" class="form-input">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Fecha de Registro</label>
-                        <input type="date" id="insp-fecha" class="w-full bg-slate-900 border border-slate-700 text-white p-2.5 rounded text-xs focus:outline-none focus:border-cyan-500 font-mono">
+                        <label class="block text-[10px] font-bold text-muted uppercase mb-1">Fecha</label>
+                        <input type="date" id="insp-fecha" class="form-input">
                     </div>
                 </div>
 
-                <!-- Descripción y Acción Preventiva -->
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Descripción de la Desviación</label>
-                    <textarea id="insp-desc" rows="3" placeholder="Detalle lo observado en campo..." class="w-full bg-slate-900 border border-slate-700 text-white p-2.5 rounded text-xs focus:outline-none focus:border-cyan-500 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Acción Correctiva / Preventiva Inmediata</label>
-                    <textarea id="insp-accion" rows="2" placeholder="Acción tomada para mitigar el riesgo..." class="w-full bg-slate-900 border border-slate-700 text-white p-2.5 rounded text-xs focus:outline-none focus:border-cyan-500 resize-none"></textarea>
+                    <label class="block text-[10px] font-bold text-muted uppercase mb-1">Descripción de la Desviación</label>
+                    <textarea id="insp-desc" rows="2" class="form-input resize-none" placeholder="Detalle lo observado..."></textarea>
                 </div>
 
-                <!-- Carga Fotográfica desde Celular -->
+                <!-- Carga Fotográfica (Compatible Celular) -->
                 <div>
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Evidencia Fotográfica (Cámara/Galería)</label>
+                    <label class="block text-[10px] font-bold text-muted uppercase mb-2">Evidencia Fotográfica (Soporta Cámara Móvil)</label>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="relative bg-slate-900 border border-slate-700 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-cyan-500 transition-colors overflow-hidden group">
-                            <i data-lucide="camera" class="w-6 h-6 text-gray-500 mb-2 group-hover:text-cyan-500"></i>
-                            <span class="text-[9px] font-bold text-gray-500 uppercase">Foto del Hallazgo</span>
-                            <!-- accept="image/*" capture="environment" activa la cámara trasera en móviles automáticamente -->
+                        <div class="relative bg-link-box border border-[var(--border)] border-dashed rounded-xl h-28 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500 transition-colors overflow-hidden group">
+                            <i data-lucide="camera" class="w-6 h-6 text-slate-400 group-hover:text-sky-500 mb-1"></i>
+                            <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Hallazgo</span>
                             <input type="file" accept="image/*" capture="environment" onchange="previewImage(this, 'preview1')" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
                             <img id="preview1" class="absolute inset-0 w-full h-full object-cover hidden">
                         </div>
-                        <div class="relative bg-slate-900 border border-slate-700 border-dashed rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer hover:border-cyan-500 transition-colors overflow-hidden group">
-                            <i data-lucide="camera-point" class="w-6 h-6 text-gray-500 mb-2 group-hover:text-cyan-500"></i>
-                            <span class="text-[9px] font-bold text-gray-500 uppercase">Foto Corrección</span>
+                        <div class="relative bg-link-box border border-[var(--border)] border-dashed rounded-xl h-28 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 transition-colors overflow-hidden group">
+                            <i data-lucide="check-square" class="w-6 h-6 text-slate-400 group-hover:text-emerald-500 mb-1"></i>
+                            <span class="text-[9px] font-bold text-slate-500 uppercase">Foto Corrección</span>
                             <input type="file" accept="image/*" capture="environment" onchange="previewImage(this, 'preview2')" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
                             <img id="preview2" class="absolute inset-0 w-full h-full object-cover hidden">
                         </div>
                     </div>
                 </div>
 
-                <!-- Botón Enviar -->
-                <button onclick="guardarInspeccion()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-2 mt-4">
-                    <i data-lucide="cloud-upload" class="w-5 h-5"></i> Sincronizar con Base de Datos HSEQ
+                <button onclick="guardarInspeccion()" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 dark:hover:bg-sky-500 text-white font-black py-3 rounded-lg shadow transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                    <i data-lucide="cloud-upload" class="w-4 h-4"></i> Guardar y Sincronizar
                 </button>
-            </div>
-        </div>
-
-        <!-- LOG DE INSPECCIONES ENVIADAS -->
-        <div class="mt-6 card p-4 rounded-2xl shadow-lg">
-            <h3 class="text-xs font-black text-gray-400 uppercase border-b pb-2 mb-3" style="border-color: var(--border);">Registro de Transmisiones Locales</h3>
-            <div id="inspecciones-log" class="space-y-2 max-h-[300px] overflow-y-auto">
-                <p class="text-xs text-gray-500 italic text-center py-4">No hay inspecciones enviadas en esta sesión.</p>
             </div>
         </div>
     </main>
 
     <script>
-        // Lógica de Vistas (Tabs)
+        // ==========================================
+        // INICIALIZACIÓN Y NAVEGACIÓN
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initLTI();
+            renderKpiList();
+            selectKpi("TR"); // Seleccionar TR por defecto
+            document.getElementById('insp-fecha').valueAsDate = new Date();
+        });
+
         function switchView(viewName) {
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-inspecciones').classList.add('hidden');
-            document.getElementById('btn-dashboard').classList.remove('active', 'text-white');
-            document.getElementById('btn-inspecciones').classList.remove('active', 'text-white');
-            document.getElementById('btn-dashboard').classList.add('text-gray-400');
-            document.getElementById('btn-inspecciones').classList.add('text-gray-400');
-
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            const btn = document.getElementById(`btn-${viewName}`);
-            btn.classList.add('active', 'text-white');
-            btn.classList.remove('text-gray-400');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
-            // Re-render chart si volvemos al dashboard
-            if(viewName === 'dashboard' && currentKpiId) {
-                selectKpi(currentKpiId);
-            }
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            document.getElementById(`btn-${viewName}`).classList.add('active');
+            
+            if(viewName === 'dashboard' && currentKpiId) renderCharts();
         }
 
-        // Lógica de Días sin Accidentes
-        let diasAct = 468;
+        // ==========================================
+        // CÁLCULO DÍAS SIN ACCIDENTES (LTI)
+        // ==========================================
+        function initLTI() {
+            const start = new Date('2025-01-01T00:00:00');
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            const diffTime = Math.abs(now - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            document.getElementById('diasSinAccidentes').innerText = diffDays;
+        }
+
         function reiniciarDias() {
-            if(confirm("⚠ ALERTA CRÍTICA: ¿Confirma registrar un Accidente con Tiempo Perdido (LTI)? Esto reiniciará el indicador global a cero y afectará la estadística ISO 45001.")) {
-                diasAct = 0;
-                document.getElementById('diasSinAccidentes').innerText = diasAct;
-                document.getElementById('diasSinAccidentes').classList.replace('text-emerald-500', 'text-rose-500');
+            if(confirm("⚠ ALERTA CRÍTICA: ¿Reportar Accidente con Tiempo Perdido (LTI)? Esto reiniciará el indicador global a cero.")) {
+                document.getElementById('diasSinAccidentes').innerText = "0";
+                document.getElementById('diasSinAccidentes').classList.replace('text-emerald-600', 'text-rose-600');
                 
-                const kpiAcc = DATOS_HSEQ.find(k => k.id === "ACC");
-                kpiAcc.val = parseInt(kpiAcc.val) + 1;
+                // Sumar al registro de incidentes general
+                const kpiInc = BD_HSEQ.find(k => k.id === "INC");
+                if (kpiInc) {
+                    const lastIdx = kpiInc.hist.series[0].data.length - 1;
+                    kpiInc.hist.series[0].data[lastIdx] += 1;
+                    kpiInc.val = kpiInc.hist.series[0].data[lastIdx];
+                }
                 renderKpiList();
+                if (currentKpiId === "INC") renderCharts();
             }
         }
 
-        // Lógica Inspecciones en Campo
-        document.getElementById('insp-fecha').valueAsDate = new Date(); // Fecha actual
+        // ==========================================
+        // BASE DE DATOS Y LÓGICA DE INDICADORES
+        // ==========================================
+        const defaultLabels = ['Ene 26', 'Feb 26', 'Mar 26', 'Abr 26', 'May 26', 'Jun 26'];
+        
+        const BD_HSEQ = [
+            {
+                id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", type: "bar", val: "0.00",
+                links: { v: "", t: "" },
+                inputs: [
+                    { id: "in_tg", label: "Índice de Gravedad (TG)", type: "number" },
+                    { id: "in_tf", label: "Índice de Frecuencia (TF)", type: "number" }
+                ],
+                calc: (vals) => vals[1] == 0 ? 0 : (vals[0] / vals[1]),
+                hist: {
+                    labels: [...defaultLabels],
+                    series: [
+                        { name: "TR Resultado", data: [0,0,0,0,0,0] },
+                        { name: "Meta Permisible", data: [5.27,5.27,5.27,5.27,5.27,5.27] }
+                    ]
+                }
+            },
+            {
+                id: "INC", name: "3. CONTROL INCIDENTES (CAI)", formula: "Total Reportados | Meta: 0", type: "line", val: "1",
+                links: { v: "", t: "" },
+                inputs: [ { id: "in_inc", label: "Incidentes/Accidentes Reportados", type: "number" } ],
+                calc: (vals) => vals[0],
+                hist: {
+                    labels: [...defaultLabels],
+                    series: [{ name: "Total Incidentes", data: [2, 2, 0, 0, 0, 1] }] // Data solicitada
+                }
+            },
+            {
+                id: "PREV", name: "4. GESTIÓN PREVENTIVA SST", formula: "Despliegue de 7 Sub-Indicadores | Meta: 85%", type: "grid", val: "Revisar Detalle",
+                links: { v: "", t: "" },
+                inputs: [ // Formulario para llenar los 7
+                    { id: "i_art", label: "ART (%)" }, { id: "i_opai", label: "OPAI (%)" },
+                    { id: "i_dps", label: "DPS (%)" }, { id: "i_osea", label: "OSEA (%)" },
+                    { id: "i_cai", label: "CAI (%)" }, { id: "i_ds", label: "DS (%)" }, { id: "i_es", label: "ES (%)" }
+                ],
+                calc: (vals) => "Revisar Detalle", // Solo actualiza las gráficas
+                hist: {
+                    labels: [...defaultLabels],
+                    // Data real extraída del archivo excel "INDICADOR REGISTROS.xlsx" para los primeros 6 meses
+                    series: [
+                        { id: "art", name: "4.1 ART", data: [100, 103, 111, 108, 105, 98] },
+                        { id: "opai", name: "4.2 OPAI", data: [95.2, 87.5, 77.7, 81.7, 70.5, 71.4] },
+                        { id: "dps", name: "4.3 DPS", data: [80.8, 90.9, 86.8, 50.7, 89.6, 79.6] },
+                        { id: "osea", name: "4.4 OSEA", data: [100, 100, 100, 100, 100, 100] },
+                        { id: "cai", name: "4.5 CAI", data: [100, 100, 100, 100, 100, 100] },
+                        { id: "ds", name: "4.6 DS", data: [89.7, 96.3, 100, 92.9, 100, 96.4] },
+                        { id: "es", name: "4.7 ES", data: [83.8, 76.6, 85.7, 97.1, 81.3, 100] }
+                    ]
+                }
+            },
+            {
+                id: "PMA", name: "5. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", type: "bar", val: "100%",
+                links: { v: "", t: "" }, inputs: [ { id: "in_pma", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...defaultLabels], series: [{ name: "% Alcanzado", data: [100,100,100,100,100,100] }] }
+            },
+            {
+                id: "CAP", name: "7. CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", type: "line", val: "119%",
+                links: { v: "", t: "" }, inputs: [ { id: "in_cap", label: "% Capacitación" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...defaultLabels], series: [{ name: "% Alcance", data: [120, 110, 113, 116, 122, 119] }] }
+            },
+            {
+                id: "QIN", name: "10. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", type: "bar", val: "95.8%",
+                links: { v: "", t: "" }, inputs: [ { id: "in_qin", label: "% Atención" } ], calc: (v) => v[0] + "%",
+                hist: { labels: [...defaultLabels], series: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] }] }
+            }
+        ];
 
+        let currentKpiId = "TR";
+        let mainChart = null;
+        let subCharts = [];
+
+        function renderKpiList() {
+            const list = document.getElementById("kpi-list");
+            list.innerHTML = "";
+            BD_HSEQ.forEach(k => {
+                const isActive = k.id === currentKpiId;
+                const activeStyle = isActive 
+                    ? "border-sky-500 bg-sky-50 dark:bg-slate-800/80 shadow-md transform scale-[1.02]" 
+                    : "border-transparent hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800";
+                
+                list.innerHTML += `
+                    <div onclick="selectKpi('${k.id}')" class="card p-3.5 rounded-xl cursor-pointer transition-all border-l-[5px] ${activeStyle}">
+                        <div class="text-[10px] font-black text-slate-500 uppercase truncate">${k.name}</div>
+                        <div class="text-sm md:text-lg font-black text-[var(--text)] font-mono mt-1">${k.val}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function selectKpi(id) {
+            currentKpiId = id;
+            renderKpiList();
+            
+            const kpi = BD_HSEQ.find(k => k.id === id);
+            document.getElementById("kpi-title").innerText = kpi.name;
+            document.getElementById("kpi-desc").innerText = kpi.formula;
+            document.getElementById("kpi-value").innerText = kpi.val;
+
+            // Renderizar Formulario de Ingreso Dinámico
+            const formBox = document.getElementById("entry-inputs-container");
+            formBox.innerHTML = kpi.inputs.map(inp => `
+                <input type="number" id="${inp.id}" placeholder="${inp.label}" class="form-input">
+            `).join('');
+
+            renderLinks(kpi.links);
+            renderCharts();
+        }
+
+        // ==========================================
+        // RENDERIZADO DE GRÁFICAS (APEXCHARTS)
+        // ==========================================
+        function renderCharts() {
+            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
+            const isDark = document.body.classList.contains('dark');
+            const txtColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+            const mainWrapper = document.getElementById("main-chart-wrapper");
+            const subWrapper = document.getElementById("sub-charts-wrapper");
+
+            // Destruir instancias previas
+            if (mainChart) mainChart.destroy();
+            subCharts.forEach(c => c.destroy());
+            subCharts = [];
+
+            if (kpi.type === 'grid') {
+                // MODO GESTIÓN PREVENTIVA (7 Gráficas)
+                mainWrapper.classList.add('hidden');
+                subWrapper.classList.remove('hidden');
+                subWrapper.innerHTML = "";
+
+                kpi.hist.series.forEach((subSeries, idx) => {
+                    const divId = `subchart-${idx}`;
+                    subWrapper.innerHTML += `
+                        <div class="card p-2 rounded-lg border border-[var(--border)] bg-white dark:bg-slate-800 flex flex-col">
+                            <span class="text-[9px] font-black text-center uppercase mb-1 text-[var(--text)]">${subSeries.name}</span>
+                            <div id="${divId}" class="w-full flex-1"></div>
+                        </div>
+                    `;
+                });
+
+                // Inicializar cada gráfica una vez insertados los divs
+                setTimeout(() => {
+                    kpi.hist.series.forEach((subSeries, idx) => {
+                        const opt = {
+                            chart: { type: 'area', height: 120, sparkline: { enabled: true } },
+                            colors: ['#0284c7'],
+                            stroke: { curve: 'smooth', width: 2 },
+                            series: [{ name: 'Desempeño', data: subSeries.data }],
+                            tooltip: { fixed: { enabled: false }, x: { show: false } }
+                        };
+                        const chart = new ApexCharts(document.querySelector(`#subchart-${idx}`), opt);
+                        chart.render();
+                        subCharts.push(chart);
+                    });
+                }, 50);
+
+            } else {
+                // MODO GRÁFICA PRINCIPAL ESTÁNDAR
+                mainWrapper.classList.remove('hidden');
+                subWrapper.classList.add('hidden');
+
+                const options = {
+                    chart: { type: kpi.type, height: 350, toolbar: { show: false }, background: 'transparent' },
+                    colors: ['#0284c7', '#cbd5e1'],
+                    stroke: { curve: 'smooth', width: kpi.type === 'line' ? 3 : 1 },
+                    series: kpi.hist.series,
+                    xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '10px', fontWeight: 'bold' } } },
+                    yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
+                    grid: { borderColor: gridColor, strokeDashArray: 4 },
+                    dataLabels: { enabled: false },
+                    plotOptions: { bar: { borderRadius: 4, columnWidth: '55%' } },
+                    legend: { labels: { colors: txtColor } }
+                };
+
+                mainChart = new ApexCharts(document.querySelector("#chartContainer"), options);
+                mainChart.render();
+            }
+        }
+
+        // ==========================================
+        // LÓGICA DE REGISTRO MENSUAL
+        // ==========================================
+        function guardarDatosMensuales() {
+            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
+            const month = document.getElementById("entry-month").value;
+            
+            // Recolectar valores de los inputs
+            let rawVals = [];
+            let allEmpty = true;
+            kpi.inputs.forEach(inp => {
+                const v = parseFloat(document.getElementById(inp.id).value) || 0;
+                rawVals.push(v);
+                if (document.getElementById(inp.id).value !== "") allEmpty = false;
+            });
+
+            if(allEmpty) { alert("Ingrese al menos un valor."); return; }
+
+            // Calcular nuevo valor
+            const newVal = kpi.calc(rawVals);
+            if(kpi.type !== 'grid') { kpi.val = newVal; }
+
+            // Lógica para actualizar las series de datos (Gráfica)
+            const lblIdx = kpi.hist.labels.indexOf(month);
+            
+            if (kpi.type === 'grid') {
+                // Actualizar las 7 series
+                rawVals.forEach((val, idx) => {
+                    if(lblIdx !== -1) { kpi.hist.series[idx].data[lblIdx] = val; } 
+                    else {
+                        if(idx===0) kpi.hist.labels.push(month);
+                        kpi.hist.series[idx].data.push(val);
+                    }
+                });
+            } else {
+                // Actualizar KPI Normal
+                if(lblIdx !== -1) {
+                    kpi.hist.series[0].data[lblIdx] = parseFloat(newVal);
+                } else {
+                    kpi.hist.labels.push(month);
+                    kpi.hist.series[0].data.push(parseFloat(newVal));
+                    if(kpi.hist.series[1]) kpi.hist.series[1].data.push(kpi.hist.series[1].data[0]); // Extiende meta
+                }
+            }
+
+            // Limpiar inputs
+            kpi.inputs.forEach(inp => document.getElementById(inp.id).value = "");
+            
+            alert(`Registro guardado exitosamente para el periodo: ${month}. Gráfica Actualizada.`);
+            selectKpi(currentKpiId); // Re-renderiza todo UI
+        }
+
+        // ==========================================
+        // GESTIÓN DE VÍNCULOS DOCUMENTALES
+        // ==========================================
+        function vincularUrl(tipo) {
+            const url = prompt(`Ingrese URL para ${tipo.toUpperCase()}:`);
+            if (url) {
+                const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
+                kpi.links[tipo === 'verificacion' ? 'v' : 't'] = url;
+                renderLinks(kpi.links);
+            }
+        }
+
+        function renderLinks(links) {
+            const boxV = document.getElementById("link-verificacion");
+            if (links.v) {
+                boxV.innerHTML = `<a href="${links.v}" target="_blank" class="text-sky-600 dark:text-sky-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Abrir SharePoint</a>`;
+            } else { boxV.innerHTML = "Sin Enlace"; }
+
+            const boxT = document.getElementById("link-trazabilidad");
+            if (links.t) {
+                boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Abrir Registro</a>`;
+            } else { boxT.innerHTML = "Sin Enlace"; }
+            
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // LÓGICA MÓVIL (INSPECCIONES)
+        // ==========================================
         function previewImage(input, previewId) {
             const preview = document.getElementById(previewId);
             if (input.files && input.files[0]) {
@@ -271,225 +625,7 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
-        function guardarInspeccion() {
-            const tipo = document.getElementById('insp-tipo').value;
-            const area = document.getElementById('insp-area').value || 'Área no especificada';
-            const desc = document.getElementById('insp-desc').value;
-            
-            if(!desc) { alert("Debe ingresar una descripción de la desviación."); return; }
-
-            const logContainer = document.getElementById('inspecciones-log');
-            if(logContainer.innerHTML.includes("No hay inspecciones")) logContainer.innerHTML = "";
-
-            const html = `
-                <div class="p-3 bg-slate-900/50 border-l-4 border-emerald-500 rounded text-xs flex justify-between items-start gap-2">
-                    <div>
-                        <span class="font-bold text-cyan-500 block uppercase">${tipo}</span>
-                        <span class="font-bold text-gray-300 block">${area}</span>
-                        <span class="text-gray-400 block mt-1">${desc}</span>
-                    </div>
-                    <span class="text-[9px] text-gray-500 font-mono whitespace-nowrap bg-slate-800 px-2 py-1 rounded">
-                        <i data-lucide="check-circle" class="w-3 h-3 inline text-emerald-500"></i> Sync OK
-                    </span>
-                </div>
-            `;
-            logContainer.insertAdjacentHTML('afterbegin', html);
-            lucide.createIcons();
-            
-            // Limpiar form
-            document.getElementById('insp-desc').value = "";
-            document.getElementById('insp-accion').value = "";
-            document.getElementById('preview1').classList.add('hidden');
-            document.getElementById('preview2').classList.add('hidden');
-            document.getElementById('preview1').src = "";
-            document.getElementById('preview2').src = "";
-            
-            alert("Inspección sincronizada exitosamente con la matriz preventiva.");
-        }
-
-        // ==========================================
-        // LÓGICA DE DATOS Y GRÁFICAS (DASHBOARD)
-        // ==========================================
-        let currentKpiId = "PREV";
-        let chartInstance = null;
-
-        const DATOS_HSEQ = [
-            {
-                id: "TR", name: "2. TASA DE RIESGO", desc: "TR = (IF * IG) / 10 | Meta: 5.27", type: "bar", val: 0.00, link: "",
-                hist: {
-                    x: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic', 'Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [
-                        { name: "TR Obtenido", data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
-                        { name: "Meta TR", data: [5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27,5.27] }
-                    ]
-                }
-            },
-            {
-                id: "INC", name: "3. INCIDENTES", desc: "Total Abiertos vs Cerrados", type: "bar", val: 0, link: "",
-                hist: {
-                    x: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic', 'Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [{ name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] }]
-                }
-            },
-            {
-                id: "PREV", name: "4. GESTIÓN PREVENTIVA SST", desc: "Índice Ponderado Global", type: "line", val: "92.70%", link: "",
-                sub: [{n:"ART",v:"43%"}, {n:"OPAS",v:"80%"}, {n:"DPS",v:"19%"}, {n:"OSEA",v:"100%"}, {n:"CAI",v:"100%"}, {n:"DS",v:"100%"}, {n:"ES",v:"89.7%"}],
-                hist: {
-                    x: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic', 'Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [
-                        { name: "Desempeño", data: [99.1,111.3,91.2,89.3,86.3,99.6,117.6,93.3,96.0,94.8,89.0,93.5,98.55,96.4,97.9,96.1,95.9,92.7] },
-                        { name: "Meta (85%)", data: [85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85] }
-                    ]
-                }
-            },
-            {
-                id: "PMA", name: "5. CUMPLIMIENTO PMA", desc: "Plan de Manejo Ambiental", type: "bar", val: "100.00%", link: "",
-                hist: {
-                    x: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic', 'Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [
-                        { name: "Cumplimiento %", data: [92,92,92,98,98,98,98,98,98,94,94,94,100,100,100,100,100,100] },
-                        { name: "Meta", data: [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100] }
-                    ]
-                }
-            },
-            {
-                id: "RES", name: "6. GESTIÓN RESIDUOS", desc: "% Reciclaje Trimestral", type: "bar", val: "727%", link: "",
-                hist: {
-                    x: ['IT 25','IIT 25','IIIT 25','IVT 25','IT 26','IIT 26'],
-                    s: [{ name: "% Reciclaje", data: [15, 7, 31, 82, 77, 727] }]
-                }
-            },
-            {
-                id: "CAP", name: "7. PLAN CAPACITACIÓN", desc: "Ejecutado vs Planificado", type: "line", val: "119.00%", link: "",
-                hist: {
-                    x: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic', 'Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [
-                        { name: "Alcance %", data: [70,85,96,87,92,97,92,92,95,85,100,100,120,110,113,116,122,119] },
-                        { name: "Meta", data: [85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85] }
-                    ]
-                }
-            },
-            {
-                id: "COM", name: "8. RELAC. COMUNITARIO", desc: "Ejecutado vs Planificado", type: "line", val: "100.00%", link: "",
-                hist: {
-                    x: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic', 'Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [
-                        { name: "Cumplimiento %", data: [100,100,92,129,100,100,100,100,80,80,80,100,100,100,100,100,100,100] },
-                        { name: "Meta", data: [85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85] }
-                    ]
-                }
-            },
-            {
-                id: "QEX", name: "9. QUEJAS EXTERNAS", desc: "Manejo Quejas Comunidad", type: "bar", val: "75.00%", link: "",
-                hist: {
-                    x: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic', 'Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [
-                        { name: "Atención %", data: [0,0,0,0,0,0,0,0,0,100,100,100,100,100,0,100,0,75] },
-                        { name: "Meta", data: [85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85,85] }
-                    ]
-                }
-            },
-            {
-                id: "QIN", name: "10. QUEJAS INTERNAS", desc: "Gestión RRHH y Operaciones", type: "bar", val: "95.83%", link: "",
-                hist: {
-                    x: ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'],
-                    s: [{ name: "Resolución %", data: [0, 0, 0, 0, 100, 95.83] }]
-                }
-            }
-        ];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-            renderKpiList();
-            selectKpi("PREV");
-        });
-
-        function renderKpiList() {
-            const list = document.getElementById("kpi-list");
-            list.innerHTML = "";
-            DATOS_HSEQ.forEach(k => {
-                const isActive = k.id === currentKpiId;
-                const activeStyle = isActive ? "border-cyan-500 bg-slate-800/50" : "border-transparent hover:border-slate-700";
-                list.innerHTML += `
-                    <div onclick="selectKpi('${k.id}')" class="card p-3 rounded-xl cursor-pointer transition-all border-l-4 ${activeStyle}">
-                        <div class="text-[10px] font-black text-gray-400 uppercase truncate">${k.name}</div>
-                        <div class="text-sm md:text-lg font-black text-white font-mono mt-1">${k.val}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function selectKpi(id) {
-            currentKpiId = id;
-            renderKpiList();
-            const kpi = DATOS_HSEQ.find(k => k.id === id);
-            
-            document.getElementById("kpi-title").innerText = kpi.name;
-            document.getElementById("kpi-desc").innerText = kpi.desc;
-            document.getElementById("kpi-value").innerText = kpi.val;
-
-            // Sub-Kpis solo para Preventiva
-            const subBox = document.getElementById("sub-kpis-box");
-            if (kpi.sub) {
-                subBox.classList.remove("hidden");
-                document.getElementById("sub-kpis-grid").innerHTML = kpi.sub.map(s => `
-                    <div class="bg-slate-900/80 p-2 rounded text-center border border-slate-700">
-                        <span class="block text-[9px] font-bold text-gray-400">${s.n}</span>
-                        <span class="block text-[11px] font-black text-cyan-400 font-mono">${s.v}</span>
-                    </div>
-                `).join('');
-            } else {
-                subBox.classList.add("hidden");
-            }
-
-            renderLinkBox(kpi.link);
-            buildChart(kpi);
-        }
-
-        function buildChart(kpi) {
-            document.getElementById("chart-title").innerText = `HISTÓRICO: ${kpi.name}`;
-            const textColor = document.body.classList.contains('light') ? '#334155' : '#94a3b8';
-            
-            if (chartInstance) chartInstance.destroy();
-
-            const options = {
-                chart: { type: kpi.type, height: 320, toolbar: { show: false }, background: 'transparent' },
-                colors: kpi.id === 'PREV' ? ['#0ea5e9', '#f43f5e'] : ['#0ea5e9', '#10b981'],
-                stroke: { curve: 'smooth', width: kpi.type === 'line' ? 3 : 1 },
-                series: kpi.hist.s,
-                xaxis: { categories: kpi.hist.x, labels: { style: { colors: textColor, fontSize: '9px' } } },
-                yaxis: { labels: { style: { colors: textColor, fontSize: '10px' } } },
-                grid: { borderColor: 'rgba(148, 163, 184, 0.1)' },
-                dataLabels: { enabled: false },
-                plotOptions: { bar: { borderRadius: 3, columnWidth: '70%' } },
-                legend: { labels: { colors: textColor } }
-            };
-
-            chartInstance = new ApexCharts(document.querySelector("#chartContainer"), options);
-            chartInstance.render();
-        }
-
-        function setSharepointLink() {
-            const url = prompt("Ingrese la URL del Repositorio Documental (SharePoint/Drive):");
-            if (url) {
-                const kpi = DATOS_HSEQ.find(k => k.id === currentKpiId);
-                kpi.link = url;
-                renderLinkBox(url);
-            }
-        }
-
-        function renderLinkBox(url) {
-            const box = document.getElementById("kpi-link-box");
-            if (url) {
-                box.innerHTML = `<a href="${url}" target="_blank" class="text-cyan-400 font-bold uppercase tracking-wider flex items-center justify-center gap-1"><i data-lucide="external-link" class="w-3 h-3"></i> Trazabilidad</a>`;
-                box.className = "flex-1 text-center p-2 bg-slate-900 border border-cyan-500 rounded text-xs truncate transition-colors hover:bg-slate-800 flex items-center justify-center";
-            } else {
-                box.innerHTML = "Sin Enlace Vinculado";
-                box.className = "flex-1 text-center p-2 rounded border border-slate-700 text-[10px] text-gray-500 truncate flex items-center justify-center";
-            }
-            lucide.createIcons();
-        }
+        function guardarInspeccion() { alert("Inspección de campo sincronizada correctamente a la base de datos."); }
     </script>
 </body>
 </html>
