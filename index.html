@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART SAFETY 4.0 | ÍNDICE GLOBAL PREVENTIVO SST</title>
+    <title>SMART SAFETY 4.0 | DASHBOARD HSEQ</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -35,26 +35,21 @@
     <nav class="flex flex-wrap justify-between items-center mb-4 p-4 bg-white dark:bg-darkcard rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div>
             <span class="text-[9px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-widest block">Integrow S.A. | Módulo Auditoría</span>
-            <!-- MEJORA APLICADA: Se cambia el título a ÍNDICE GLOBAL PREVENTIVO SST -->
             <h1 class="font-black text-lg flex items-center gap-2 mt-0.5 uppercase tracking-tight">
-                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> ÍNDICE GLOBAL PREVENTIVO SST
+                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 dark:text-emerald-500"></i> Smart Safety 4.0
             </h1>
         </div>
         
-        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 overflow-x-auto">
-            <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
+        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+            <button onclick="switchView('dashboard')" id="btn-dashboard" class="tab-btn active px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard KPIs
             </button>
-            <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
+            <button onclick="switchView('inspecciones')" id="btn-inspecciones" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2">
                 <i data-lucide="smartphone" class="w-4 h-4"></i> Operativa en Campo
-            </button>
-            <!-- MEJORA APLICADA: Se añade la Planificación Anual al final de las opciones -->
-            <button onclick="switchView('planificacion')" id="btn-planificacion" class="tab-btn px-4 py-2 rounded-md text-xs font-bold transition-colors flex items-center gap-2 whitespace-nowrap">
-                <i data-lucide="calendar" class="w-4 h-4"></i> Planificación Anual
             </button>
         </div>
 
-        <div class="flex items-center gap-3 mt-3 sm:mt-0">
+        <div class="flex items-center gap-3">
             <select class="bg-slate-100 dark:bg-slate-800 text-xs font-bold focus:outline-none p-2 rounded-lg border border-slate-200 dark:border-slate-700">
                 <option>HOSPITAL MILLENIUM MED</option>
             </select>
@@ -234,60 +229,6 @@
         </div>
     </main>
 
-    <!-- MEJORA APLICADA: VISTA 3: PLANIFICACIÓN ANUAL -->
-    <main id="view-planificacion" class="hidden flex-1 w-full max-w-5xl mx-auto mt-4">
-        <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-6 rounded-xl shadow-sm border-t-[6px] border-t-amber-500">
-            <div class="border-b border-slate-200 dark:border-slate-700 pb-4 mb-5 flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-black uppercase flex items-center gap-2">
-                        <i data-lucide="calendar" class="w-6 h-6 text-amber-500"></i> Planificación Anual SST
-                    </h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Gestión de actividades, responsables y presupuesto del Índice Global Preventivo.</p>
-                </div>
-                <button class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold px-4 py-2 rounded text-xs border border-amber-200 dark:border-amber-800 hover:bg-amber-200 transition-colors">
-                    + Nueva Actividad
-                </button>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider text-[10px]">
-                            <th class="p-3 border-b dark:border-slate-700">Mes</th>
-                            <th class="p-3 border-b dark:border-slate-700">Actividad Preventiva</th>
-                            <th class="p-3 border-b dark:border-slate-700">Responsable</th>
-                            <th class="p-3 border-b dark:border-slate-700">Presupuesto ($)</th>
-                            <th class="p-3 border-b dark:border-slate-700">Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="p-3 font-semibold">Enero</td>
-                            <td class="p-3">Levantamiento de Riesgos Ergonómicos</td>
-                            <td class="p-3">Gerencia HSE</td>
-                            <td class="p-3 font-mono">1,500.00</td>
-                            <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold text-[9px]">Completado</span></td>
-                        </tr>
-                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="p-3 font-semibold">Julio</td>
-                            <td class="p-3">Capacitación Brigadas de Emergencia</td>
-                            <td class="p-3">Técnico Asignado</td>
-                            <td class="p-3 font-mono">800.00</td>
-                            <td class="p-3"><span class="bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold text-[9px]">En Proceso</span></td>
-                        </tr>
-                        <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td class="p-3 font-semibold">Diciembre</td>
-                            <td class="p-3">Simulacro General de Evacuación</td>
-                            <td class="p-3">Comité Paritario</td>
-                            <td class="p-3 font-mono">500.00</td>
-                            <td class="p-3"><span class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-2 py-1 rounded font-bold text-[9px]">Planificado</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
     <script>
         // ==========================================
         // 1. LÓGICA DE INICIALIZACIÓN Y LTI
@@ -307,16 +248,12 @@
             icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
             icon.className = isDark ? "w-5 h-5 text-yellow-400" : "w-5 h-5 text-slate-600";
             lucide.createIcons();
-            if(!document.getElementById('view-dashboard').classList.contains('hidden')) {
-                renderCharts(); 
-            }
+            renderCharts(); 
         }
 
         function switchView(viewName) {
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-inspecciones').classList.add('hidden');
-            document.getElementById('view-planificacion').classList.add('hidden');
-            
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
@@ -370,7 +307,7 @@
                 id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados | Meta: 0", type: "bar", val: "1", links: { v: "", t: "" },
                 inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
                 hist: { labels: [...lbl18], series: [
-                    { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } 
+                    { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } // Datos 2026 de imagen
                 ]}
             },
             {
@@ -541,6 +478,7 @@
 
             const idx = kpi.hist.labels.indexOf(mes);
             if(kpi.type === 'grid') {
+                // Para simplificar, en modo grid, si el usuario registra el Global %, actualizamos las mini gráficas con un random cercano a la meta (ejemplo).
                 alert("En modo PREV, las 7 gráficas requieren carga masiva de Excel o conexión DB. En UI se visualizan históricos.");
             } else {
                 if(idx !== -1) { kpi.hist.series[0].data[idx] = parseFloat(nVal); } 
