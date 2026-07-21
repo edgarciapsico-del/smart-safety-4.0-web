@@ -169,7 +169,7 @@
                         </button>
                     </div>
 
-                    <!-- Panel Vínculos Independentes por KPI -->
+                    <!-- Panel Vínculos Con Persistencia Local -->
                     <div class="bg-white dark:bg-darkcard border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm border-t-4 border-t-emerald-500">
                         <h3 class="text-xs font-black uppercase flex items-center gap-2 mb-4">
                             <i data-lucide="folder-check" class="w-4 h-4 text-emerald-500"></i> Gestión Documental y Evidencias
@@ -452,6 +452,15 @@
             initLTI();
             document.getElementById('insp-apertura').valueAsDate = new Date();
             document.getElementById('insp-cierre').valueAsDate = new Date();
+            
+            // Cargar links guardados en localStorage si existen
+            BD_HSEQ.forEach(k => {
+                const savedV = localStorage.getItem(`link_v_${k.id}`);
+                const savedT = localStorage.getItem(`link_t_${k.id}`);
+                if(savedV) k.links.v = savedV;
+                if(savedT) k.links.t = savedT;
+            });
+
             renderKpiList();
             renderTablaPlanificacion();
             selectKpi("PREV"); // Inicia con el Desempeño Preventivo como principal
@@ -522,7 +531,7 @@
             }
         }
 
-        // BASE DE DATOS HSEQ CON 10 KPIs (CON ENLACES INDEPENDIENTES POR CADA KPI)
+        // BASE DE DATOS HSEQ CON 10 KPIs
         const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
         const lbl6 = ['I Trim 25','II Trim 25','III Trim 25','IV Trim 25','I Trim 26','II Trim 26'];
         
@@ -873,9 +882,14 @@
             const url = prompt(`Ingrese la URL directa o nombre del archivo para ${tipo.toUpperCase()}:`);
             if (url && url.trim() !== "") {
                 const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-                kpi.links[tipo === 'verificacion' ? 'v' : 't'] = url.trim();
+                const cleanUrl = url.trim();
+                kpi.links[tipo === 'verificacion' ? 'v' : 't'] = cleanUrl;
+                
+                // Guardar permanentemente en localStorage
+                localStorage.setItem(`link_${tipo === 'verificacion' ? 'v' : 't'}_${kpi.id}`, cleanUrl);
+                
                 renderLinks(kpi.links);
-                alert(`Enlace asignado correctamente al indicador ${kpi.name}.`);
+                alert(`Enlace asignado y guardado permanentemente para el indicador ${kpi.name}.`);
             }
         }
 
@@ -883,6 +897,10 @@
             if(confirm(`¿Desea eliminar el enlace de ${tipo.toUpperCase()} para este indicador?`)) {
                 const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
                 kpi.links[tipo === 'verificacion' ? 'v' : 't'] = "";
+                
+                // Remover de localStorage
+                localStorage.removeItem(`link_${tipo === 'verificacion' ? 'v' : 't'}_${kpi.id}`);
+                
                 renderLinks(kpi.links);
                 alert("Enlace eliminado correctamente.");
             }
