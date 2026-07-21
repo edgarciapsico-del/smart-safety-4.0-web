@@ -509,14 +509,14 @@
                 if(kpiInc) {
                     const lastIdx = kpiInc.hist.series[0].data.length - 1;
                     kpiInc.hist.series[0].data[lastIdx] += 1;
-                    kpiInc.val = kpiInc.hist.series[0].data[lastIdx];
+                    kpiInc.val = kpiInc.hist.series[0].data.reduce((a, b) => a + b, 0);
                 }
                 renderKpiList();
                 if (currentKpiId === "INC") renderCharts();
             }
         }
 
-        // BASE DE DATOS HSEQ CON 9 KPIs INICIALES + SOPORTE PARA NUEVOS SMART
+        // BASE DE DATOS HSEQ CON 10 KPIs (INCIDENTES CON CONTADOR EN 5 Y CAI ACTUALIZADO)
         const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
         const lbl6 = ['I Trim 25','II Trim 25','III Trim 25','IV Trim 25','I Trim 26','II Trim 26'];
         
@@ -548,14 +548,23 @@
                 ]}
             },
             {
-                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados | Meta: 0", smart: "Alcanzar cero accidentes con tiempo perdido mediante inspecciones preventivas rigurosas.", metaVal: 0, type: "bar", val: "1", links: { v: "", t: "" },
-                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
+                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Reportados (Contador Anual) | Meta: 0", smart: "Alcanzar cero accidentes con tiempo perdido mediante inspecciones preventivas rigurosas y control estricto de incidentes.", metaVal: 0, type: "bar", val: "5", links: { v: "Incidente Ene 26.PDF", t: "Incidente Jun 26.PDF" },
+                inputs: [ { id: "in_inc", label: "N° Incidentes Periodo" } ], calc: (v) => v[0],
                 hist: { labels: [...lbl18], series: [
                     { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0, 2,2,0,0,0,1] } 
                 ]}
             },
             {
-                id: "RES", name: "4. GESTIÓN DE RESIDUOS 2025-2026", formula: "Comunes vs Reciclados (Kg) + Desglose de Desechos", smart: "Incrementar la tasa de aprovechamiento y reciclaje de residuos sólidos industriales y hospitalarios en un 20% interanual.", metaVal: 1000, type: "waste-grouped", val: "5,536.5 Kg Reciclados", links: { v: "", t: "" },
+                id: "CAI", name: "4. CONTROL DE ACCIDENTES / INCIDENTES (CAI)", formula: "(No. Medidas Implementadas / No. Medidas Propuestas) * 100 | Meta: 100%", smart: "Lograr el 100% de implementación de las medidas correctivas propuestas en la investigación de incidentes y accidentes.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "Incidente Ene 26.PDF", t: "Incidente Jun 26.PDF" },
+                inputs: [ { id: "in_cai_imp", label: "Medidas Implementadas" }, { id: "in_cai_prop", label: "Medidas Propuestas" } ], 
+                calc: (v) => v[1] === 0 ? "0%" : ((v[0] / v[1]) * 100).toFixed(0) + "%",
+                hist: { labels: ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'], series: [
+                    { name: "Indicador CAI (%)", data: [100, 100, 0, 0, 0, 100] },
+                    { name: "Meta (%)", data: Array(6).fill(100.0) }
+                ]}
+            },
+            {
+                id: "RES", name: "5. GESTIÓN DE RESIDUOS 2025-2026", formula: "Comunes vs Reciclados (Kg) + Desglose de Desechos", smart: "Incrementar la tasa de aprovechamiento y reciclaje de residuos sólidos industriales y hospitalarios en un 20% interanual.", metaVal: 1000, type: "waste-grouped", val: "5,536.5 Kg Reciclados", links: { v: "", t: "" },
                 inputs: [ { id: "in_com", label: "Comunes (Kg)" }, { id: "in_rec", label: "Reciclados (Kg)" } ], calc: (v) => v[1] + " Kg",
                 hist: { labels: [...lbl6], series: [
                     { name: "Desechos Comunes (Kg)", data: [375, 1350, 4340, 1350, 426, 761.77] },
@@ -569,7 +578,7 @@
                 ]
             },
             {
-                id: "PMA", name: "5. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", smart: "Asegurar el cumplimiento estricto del 100% de los compromisos del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
+                id: "PMA", name: "6. CUMPLIMIENTO PMA", formula: "Ambiental | Meta: 100%", smart: "Asegurar el cumplimiento estricto del 100% de los compromisos del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
                 inputs: [ { id: "in_pma", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [
                     { name: "% Alcanzado", data: [92,92,92,98,98,98,98,98,98,94,94,94, 100,100,100,100,100,100] },
@@ -577,7 +586,7 @@
                 ]}
             },
             {
-                id: "CAP", name: "6. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", smart: "Ejecutar al menos el 85% de las capacitaciones programadas en la matriz anual de formación SST.", metaVal: 85.0, type: "line-meta", val: "119%", links: { v: "", t: "" },
+                id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "Ejecutado vs Planificado | Meta: 85%", smart: "Ejecutar al menos el 85% de las capacitaciones programadas en la matriz anual de formación SST.", metaVal: 85.0, type: "line-meta", val: "119%", links: { v: "", t: "" },
                 inputs: [ { id: "in_cap", label: "% Capacitación" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [
                     { name: "% Alcance", data: [70,85,96,87,92,97,92,92,95,85,100,100, 120,110,113,116,122,119] },
@@ -585,7 +594,7 @@
                 ]}
             },
             {
-                id: "COM", name: "7. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", smart: "Cumplir con las actividades de relacionamiento comunitario programadas con una efectividad superior al 85%.", metaVal: 85.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
+                id: "COM", name: "8. RELAC. COMUNITARIO", formula: "Ejecutado vs Planificado | Meta: 85%", smart: "Cumplir con las actividades de relacionamiento comunitario programadas con una efectividad superior al 85%.", metaVal: 85.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
                 inputs: [ { id: "in_comun", label: "% Cumplimiento" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [
                     { name: "Alcance", data: [100,100,92,129,100,100,100,100,80,80,80,100, 100,100,100,100,100,100] },
@@ -593,7 +602,7 @@
                 ]}
             },
             {
-                id: "QEX", name: "8. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", smart: "Atender y dar resolución oportuna al 85% o más de las quejas externas recibidas en el trimestre.", metaVal: 85.0, type: "line-meta", val: "75%", links: { v: "", t: "" },
+                id: "QEX", name: "9. QUEJAS EXTERNAS", formula: "Manejo Quejas Externas | Meta: 85%", smart: "Atender y dar resolución oportuna al 85% o más de las quejas externas recibidas en el trimestre.", metaVal: 85.0, type: "line-meta", val: "75%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qex", label: "% Atención" } ], calc: (v) => v[0] + "%",
                 hist: { labels: [...lbl18], series: [
                     { name: "Atención %", data: [0,0,0,0,0,0,0,0,0,100,100,100, 100,100,0,100,0,75] },
@@ -601,7 +610,7 @@
                 ]}
             },
             {
-                id: "QIN", name: "9. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", smart: "Resolver el 100% de las inconformidades y quejas internas reportadas por el personal operativo.", metaVal: 100.0, type: "line-meta", val: "95.8%", links: { v: "", t: "" },
+                id: "QIN", name: "10. QUEJAS INTERNAS", formula: "Gestión Operativa | Meta: 100%", smart: "Resolver el 100% de las inconformidades y quejas internas reportadas por el personal operativo.", metaVal: 100.0, type: "line-meta", val: "95.8%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qin", label: "% Resolución" } ], calc: (v) => v[0] + "%",
                 hist: { labels: ['Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'], series: [
                     { name: "Resolución %", data: [0, 0, 0, 0, 100, 95.8] },
@@ -868,11 +877,11 @@
 
         function renderLinks(links) {
             const boxV = document.getElementById("link-verificacion");
-            if (links.v) boxV.innerHTML = `<a href="${links.v}" target="_blank" class="text-sky-600 dark:text-sky-400 font-bold uppercase hover:underline">🔗 Abrir Documento</a>`;
+            if (links.v) boxV.innerHTML = `<a href="${links.v}" target="_blank" class="text-sky-600 dark:text-sky-400 font-bold uppercase hover:underline">🔗 ${links.v}</a>`;
             else boxV.innerHTML = "Sin Enlace Configurado";
 
             const boxT = document.getElementById("link-trazabilidad");
-            if (links.t) boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase hover:underline">🔗 Abrir Trazabilidad</a>`;
+            if (links.t) boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase hover:underline">🔗 ${links.t}</a>`;
             else boxT.innerHTML = "Sin Enlace Configurado";
         }
 
