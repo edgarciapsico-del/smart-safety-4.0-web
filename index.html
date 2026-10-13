@@ -275,12 +275,11 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO CON TODOS LOS INDICADORES RESTAURADOS -->
+    <!-- 🟢 SCRIPT MAESTRO REESTRUCTURADO ANTI-FALLOS -->
     <!-- ================================================== -->
     <script>
+        // 1. DATOS ESTÁTICOS (Movidos arriba para evitar bloqueos)
         const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
-        
-        // 🟢 RESTAURACIÓN DE LA BASE DE DATOS COMPLETA DE INDICADORES
         const BD_HSEQ = [
             {
                 id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Meta Global: 85%", smart: "Garantizar cultura preventiva superior al 85%.", metaVal: 85.0, type: "line-meta", val: "92.7%", links: { v: "", t: "" },
@@ -293,29 +292,9 @@
                 hist: { labels: [...lbl18], series: [ { name: "TR Obtenido", data: Array(18).fill(0) }, { name: "Meta TR", data: Array(18).fill(5.27) } ]}
             },
             {
-                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "1", links: { v: "", t: "" },
+                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "5", links: { v: "", t: "" },
                 inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
                 hist: { labels: [...lbl18], series: [ { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,1] } ]}
-            },
-            {
-                id: "CAP", name: "4. CAPACITACIÓN Y ENTRENAMIENTO", formula: "(Horas Realizadas / Horas Programadas) * 100", smart: "Alcanzar el 90% de cumplimiento en el plan de capacitación anual.", metaVal: 90.0, type: "line-meta", val: "94.5%", links: { v: "", t: "" },
-                inputs: [ { id: "in_hr", label: "Realizadas" }, { id: "in_hp", label: "Programadas" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
-                hist: { labels: [...lbl18], series: [ { name: "Cumplimiento (%)", data: [88, 92, 95, 90, 91, 93, 96, 94, 92, 95, 90, 93, 94, 91, 95, 96, 92, 94.5] }, { name: "Meta (%)", data: Array(18).fill(90) } ]}
-            },
-            {
-                id: "AUD", name: "5. CUMPLIMIENTO DE AUDITORÍAS", formula: "(Auditorías Ejecutadas / Programadas) * 100", smart: "Ejecutar el 100% de las auditorías internas programadas.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_ae", label: "Ejecutadas" }, { id: "in_ap", label: "Programadas" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
-                hist: { labels: [...lbl18], series: [ { name: "Ejecución (%)", data: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100] }, { name: "Meta (%)", data: Array(18).fill(100) } ]}
-            },
-            {
-                id: "EPP", name: "6. ENTREGA Y USO DE EPP", formula: "(Trabajadores con EPP / Total Trabajadores) * 100", smart: "Mantener el 100% de dotación y uso correcto de EPP.", metaVal: 100.0, type: "line-meta", val: "98.2%", links: { v: "", t: "" },
-                inputs: [ { id: "in_eu", label: "Con EPP" }, { id: "in_et", label: "Total" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
-                hist: { labels: [...lbl18], series: [ { name: "Efectividad (%)", data: [95, 96, 97, 98, 98, 99, 99, 98, 97, 98, 99, 98, 98.5, 97.8, 99, 98, 98.2, 98.2] }, { name: "Meta (%)", data: Array(18).fill(100) } ]}
-            },
-            {
-                id: "SIM", name: "7. SIMULACROS DE EMERGENCIA", formula: "(Simulacros Realizados / Programados) * 100", smart: "100 de efectividad en simulacros planificados.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_sr", label: "Realizados" }, { id: "in_sp", label: "Programados" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
-                hist: { labels: [...lbl18], series: [ { name: "Cumplimiento (%)", data: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100] }, { name: "Meta (%)", data: Array(18).fill(100) } ]}
             }
         ];
 
@@ -323,7 +302,7 @@
         let mainChartType = "line";
         let mainChart = null;
 
-        // CONEXIÓN A SUPABASE
+        // 2. CONEXIÓN SEGURA A SUPABASE
         const SUPABASE_URL = 'https://edggnutfoeghocgtidzj.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_ZEvl16Vx5FfUS_qNPary9Q_GKf2tbmx'; 
         
@@ -333,9 +312,10 @@
                 clienteDB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
         } catch(e) {
-            console.error("Modo Local Activado.", e);
+            console.error("Supabase CDN bloqueado o no disponible. Modo Local Activado.", e);
         }
 
+        // 3. INICIALIZADOR PRINCIPAL
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 if(window.lucide) lucide.createIcons();
@@ -346,6 +326,7 @@
                 if(inpApertura) inpApertura.valueAsDate = new Date();
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
+                // SISTEMA DE RESCATE LOCAL -> NUBE
                 BD_HSEQ.forEach(async k => {
                     const savedV = localStorage.getItem(`link_v_${k.id}`);
                     const savedT = localStorage.getItem(`link_t_${k.id}`);
@@ -353,8 +334,21 @@
                     if(savedV || savedT) {
                         k.links.v = savedV || "";
                         k.links.t = savedT || "";
+                        
+                        if(clienteDB && !localStorage.getItem('rescate_nube_completado')) {
+                            try {
+                                await clienteDB.from('evidencias_kpi').insert([{
+                                    centro_trabajo: 'Rescate',
+                                    kpi_id: k.id,
+                                    periodo: 'Histórico',
+                                    medio_verificacion_url: k.links.v,
+                                    trazabilidad_url: k.links.t
+                                }]);
+                            } catch(err) { console.warn("Fallo subiendo rescate", err); }
+                        }
                     }
                 });
+                if(clienteDB) localStorage.setItem('rescate_nube_completado', 'true');
 
                 renderKpiList();
                 renderTablaPlanificacion();
@@ -363,10 +357,13 @@
                 if(clienteDB) cargarEnlacesDesdeNube();
 
             } catch (err) {
-                console.error("Fallo crítico:", err);
+                console.error("Fallo crítico en la UI:", err);
+                const title = document.getElementById('kpi-title');
+                if(title) title.innerText = "Error cargando la aplicación.";
             }
         });
 
+        // 4. FUNCIONES DE LÓGICA
         function initLTI() {
             const start = new Date('2025-01-01T00:00:00');
             const diffDays = Math.floor((new Date().getTime() - start.getTime()) / (1000 * 60 * 60 * 24)); 
@@ -379,7 +376,8 @@
                 const ltiElem = document.getElementById('diasSinAccidentes');
                 if(ltiElem) {
                     ltiElem.innerText = "0";
-                    ltiElem.className = "text-5xl md:text-7xl font-black text-rose-600 dark:text-rose-400 font-mono tracking-tighter";
+                    ltiElem.classList.replace('text-emerald-600', 'text-rose-600');
+                    ltiElem.classList.replace('dark:text-emerald-400', 'dark:text-rose-400');
                 }
             }
         }
@@ -423,13 +421,13 @@
                 if(clienteDB) {
                     const centroSelect = document.getElementById('centro-trabajo-select');
                     const periodoSelect = document.getElementById('entry-month');
-                    await clienteDB.from('evidencias_kpi').insert([{
+                    const { error } = await clienteDB.from('evidencias_kpi').insert([{
                         centro_trabajo: centroSelect ? centroSelect.value : 'General',
                         kpi_id: kpi.id, periodo: periodoSelect ? periodoSelect.value : 'N/A',
                         medio_verificacion_url: kpi.links.v, trazabilidad_url: kpi.links.t
                     }]);
+                    if (!error) alert(`¡Enlace guardado en la NUBE exitosamente!`);
                 }
-                alert(`¡Enlace guardado exitosamente!`);
             }
         }
 
