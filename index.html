@@ -96,7 +96,7 @@
 
         <!-- GRID PRINCIPAL -->
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
-            <!-- LISTA DE INDICADORES (Ajustada para mostrar todos los 10 KPI´s cómodamente) -->
+            <!-- LISTA DE INDICADORES -->
             <div class="xl:col-span-1 flex flex-col gap-2 max-h-[920px] overflow-y-auto pr-2" id="kpi-list"></div>
 
             <!-- ZONA DE TRABAJO -->
@@ -140,9 +140,15 @@
                             <div class="w-1/3">
                                 <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Periodo</label>
                                 <select id="entry-month" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
+                                    <option value="Jul 25">Julio 2025</option><option value="Ago 25">Agosto 2025</option>
+                                    <option value="Sep 25">Septiembre 2025</option><option value="Oct 25">Octubre 2025</option>
+                                    <option value="Nov 25">Noviembre 2025</option><option value="Dic 25">Diciembre 2025</option>
+                                    <option value="Ene 26">Enero 2026</option><option value="Feb 26">Febrero 2026</option>
+                                    <option value="Mar 26">Marzo 2026</option><option value="Abr 26">Abril 2026</option>
+                                    <option value="May 26">Mayo 2026</option><option value="Jun 26" selected>Junio 2026</option>
                                     <option value="Jul 26">Julio 2026</option><option value="Ago 26">Agosto 2026</option>
-                                    <option value="Sep 26">Sept. 2026</option><option value="Oct 26">Octubre 2026</option>
-                                    <option value="Nov 26">Nov. 2026</option><option value="Dic 26">Dic. 2026</option>
+                                    <option value="Sep 26">Septiembre 2026</option><option value="Oct 26">Octubre 2026</option>
+                                    <option value="Nov 26">Noviembre 2026</option><option value="Dic 26">Diciembre 2026</option>
                                 </select>
                             </div>
                             <div class="w-2/3 grid grid-cols-1 gap-2" id="entry-inputs-container"></div>
@@ -275,12 +281,11 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO CON LOS 10 KPI´S Y SCROLL CORREGIDO -->
+    <!-- 🟢 SCRIPT MAESTRO CON ACTUALIZACIÓN HISTÓRICA CORREGIDA -->
     <!-- ================================================== -->
     <script>
         const lbl18 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26'];
         
-        // 🟢 LOS 10 INDICADORES OFICIALES DECLARADOS POR FERNANDO
         const BD_HSEQ = [
             {
                 id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Meta Global: 85%", smart: "Garantizar cultura preventiva superior al 85%.", metaVal: 85.0, type: "line-meta", val: "92.7%", links: { v: "", t: "" },
@@ -338,7 +343,6 @@
         let mainChartType = "line";
         let mainChart = null;
 
-        // CONEXIÓN A SUPABASE
         const SUPABASE_URL = 'https://edggnutfoeghocgtidzj.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_ZEvl16Vx5FfUS_qNPary9Q_GKf2tbmx'; 
         
@@ -347,9 +351,7 @@
             if (window.supabase) {
                 clienteDB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
-        } catch(e) {
-            console.error("Modo Local Activado.", e);
-        }
+        } catch(e) { console.error("Modo Local.", e); }
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -375,10 +377,7 @@
                 selectKpi("PREV"); 
                 
                 if(clienteDB) cargarEnlacesDesdeNube();
-
-            } catch (err) {
-                console.error("Fallo crítico:", err);
-            }
+            } catch (err) { console.error(err); }
         });
 
         function initLTI() {
@@ -419,7 +418,7 @@
                         if(activeKpi) renderLinks(activeKpi.links);
                     }
                 }
-            } catch (err) { console.error("Fallo de red:", err); }
+            } catch (err) { console.error(err); }
         }
 
         async function vincularUrl(tipo) {
@@ -602,14 +601,29 @@
             mainChart.render();
         }
 
+        // 🟢 FUNCIÓN CORREGIDA PARA ACTUALIZAR TANTO EL VALOR COMO LA GRÁFICA HISTÓRICA DEL MES SELECCIONADO
         function guardarDatosMensuales() {
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
             if(!kpi) return;
+            
             let vals = []; 
             kpi.inputs.forEach(inp => vals.push(parseFloat(document.getElementById(inp.id).value) || 0));
-            kpi.val = kpi.calc(vals); 
+            
+            const nuevoResultadoCalculado = kpi.calc(vals);
+            kpi.val = nuevoResultadoCalculado; 
+
+            // Detectar el mes seleccionado en el select y actualizar el arreglo histórico
+            const mesSeleccionado = document.getElementById('entry-month').value; // Ej: "Ago 26"
+            const indiceMes = kpi.hist.labels.indexOf(mesSeleccionado);
+            
+            if (indiceMes !== -1) {
+                // Extraer el valor numérico limpio del cálculo (quitando '%' o 'Kg')
+                let valorNumerico = parseFloat(nuevoResultadoCalculado);
+                kpi.hist.series[0].data[indiceMes] = valorNumerico;
+            }
+
             selectKpi(currentKpiId); 
-            alert(`Dato registrado.`);
+            alert(`¡Dato de ${mesSeleccionado} registrado y gráfica actualizada con éxito!`);
         }
         
         let campoInspecciones = [];
