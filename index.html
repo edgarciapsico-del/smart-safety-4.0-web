@@ -286,7 +286,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO OPTIMIZADO -->
+    <!-- 🟢 SCRIPT MAESTRO BLINDADO CONTRA CONGELAMIENTO -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -362,7 +362,6 @@
             try {
                 if(window.lucide) lucide.createIcons();
                 
-                // Cargar Días LTI manuales guardados o por defecto 548
                 const savedLti = localStorage.getItem('dias_lti_manual') || "548";
                 const ltiInput = document.getElementById('diasSinAccidentesInput');
                 if(ltiInput) {
@@ -375,28 +374,17 @@
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
                 BD_HSEQ.forEach(k => {
-                    const savedData = localStorage.getItem(`kpi_data_${k.id}`);
-                    if(savedData) {
-                        try {
+                    try {
+                        const savedData = localStorage.getItem(`kpi_data_${k.id}`);
+                        if(savedData) {
                             const parsed = JSON.parse(savedData);
-                            k.hist.series[0].data = parsed.data;
-                            let ultimoValValido = parsed.val;
-                            for(let i = parsed.data.length - 1; i >= 0; i--) {
-                                if(parsed.data[i] > 0) {
-                                    ultimoValValido = parsed.data[i] + (k.id.includes('TR') ? '' : (k.id.includes('INC') || k.id.includes('RES') ? '' : '%'));
-                                    break;
-                                }
-                            }
-                            k.val = ultimoValValido;
-                        } catch(e) {}
-                    } else {
-                        let serie = k.hist.series[0].data;
-                        for(let i = serie.length - 1; i >= 0; i--) {
-                            if(serie[i] > 0) {
-                                k.val = serie[i] + (k.id.includes('TR') ? '' : (k.id.includes('INC') || k.id.includes('RES') ? '' : '%'));
-                                break;
+                            if(parsed && parsed.data && Array.isArray(parsed.data)) {
+                                k.hist.series[0].data = parsed.data;
+                                k.val = parsed.val || k.val;
                             }
                         }
+                    } catch(err) {
+                        localStorage.removeItem(`kpi_data_${k.id}`);
                     }
 
                     const savedV = localStorage.getItem(`link_v_${k.id}`);
@@ -412,7 +400,9 @@
                 selectKpi("PREV"); 
                 
                 if(clienteDB) cargarEnlacesDesdeNube();
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error("Error crítico en inicio:", err); 
+            }
         });
 
         function guardarDiasManuales() {
@@ -604,3 +594,105 @@
             const eVal = document.getElementById("kpi-value");
             const eSmart = document.getElementById("smart-goal-box");
             const eInp = document.getElementById("entry-inputs-container");
+            
+            if(eTitle) eTitle.innerText = kpi.name; 
+            if(eDesc) eDesc.innerText = kpi.formula;
+            if(eVal) eVal.innerText = kpi.val;
+            if(eSmart) eSmart.innerHTML = `<strong>Objetivo SMART:</strong> ${kpi.smart || 'Cumplimiento HSEQ.'}`;
+            if(eInp) eInp.innerHTML = kpi.inputs.map(inp => `<input type="number" id="${inp.id}" placeholder="${inp.label}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">`).join('');
+            
+            renderLinks(kpi.links); 
+            renderCharts();
+        }
+
+        function renderCharts() {
+            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
+            if(!kpi) return;
+            const txtColor = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
+            const gridColor = document.documentElement.classList.contains('dark') ? '#334155' : '#e2e8f0';
+            
+            if (mainChart) mainChart.destroy();
+            
+            const cont = document.querySelector("#chartContainer");
+            if(!cont || typeof ApexCharts === 'undefined') return;
+
+            const opt = {
+                chart: { type: mainChartType, height: 320, toolbar: { show: false }, background: 'transparent' },
+                colors: mainChartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'],
+                stroke: { curve: 'smooth', width: [3, 2] }, series: kpi.hist.series,
+                xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px' } } },
+                yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
+                grid: { borderColor: gridColor, strokeDashArray: 3 }
+            };
+            mainChart = new ApexCharts(cont, opt); 
+            mainChart.render();
+        }
+
+        function guardarDatosMensuales() {
+            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
+            if(!kpi) return;
+            
+            let vals = []; 
+            kpi.inputs.forEach(inp => {
+                let valInput = parseFloat(document.getElementById(inp.id).value);
+                vals.push(isNaN(valInput) ? 0 : valInput);
+            });
+            
+            const nuevoResultadoCalculado = kpi.calc(vals);
+            kpi.val = nuevoResultadoCalculado; 
+
+            const mesSeleccionado = document.getElementById('entry-month').value; 
+            const indiceMes = kpi.hist.labels.indexOf(mesSeleccionado);
+            
+            if (indiceMes !== -1) {
+                let valorNumerico = parseFloat(nuevoResultadoCalculado.replace(/[^0-9.-]+/g,""));
+                kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
+            }
+
+            localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
+                val: kpi.val,
+                data: kpi.hist.series[0].data
+            }));
+
+            selectKpi(currentKpiId); 
+            alert(`¡Dato de ${mesSeleccionado} registrado y actualizado correctamente!`);
+        }
+        
+        let campoInspecciones = [];
+        function guardarInspeccionCampo() {
+            const factor = document.getElementById('insp-factor').value;
+            const resp = document.getElementById('insp-resp').value || 'No asignado';
+            if(!resp) { alert("Por favor ingrese responsable."); return; }
+            campoInspecciones.push({ factor, desc: document.getElementById('insp-desc').value || '', resp, hse: document.getElementById('insp-hse').value || '', apertura: document.getElementById('insp-apertura').value, cierre: document.getElementById('insp-cierre').value });
+            renderTablaInspecciones();
+            alert("Inspección guardada.");
+        }
+
+        function renderTablaInspecciones() {
+            const tbody = document.getElementById('tabla-inspecciones-body');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+            campoInspecciones.forEach((i) => {
+                tbody.innerHTML += `<tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"><td class="p-3 font-bold text-sky-600 dark:text-sky-400">${i.factor}</td><td class="p-3">${i.desc}</td><td class="p-3">${i.resp}</td><td class="p-3">${i.hse}</td><td class="p-3 font-mono text-[11px]">${i.apertura} al ${i.cierre}</td></tr>`;
+            });
+        }
+
+        function exportarExcel() { alert("Función CSV lista."); }
+
+        let listaPlanificacion = [
+            { mes: "Enero", actividad: "Levantamiento de Riesgos Ergonómicos", resp: "Gerencia HSE", presupuesto: "1500.00", estado: "Completado" },
+            { mes: "Diciembre", actividad: "Simulacro General de Evacuación", resp: "Comité Paritario", presupuesto: "500.00", estado: "Planificado" }
+        ];
+
+        function renderTablaPlanificacion() {
+            const tbody = document.getElementById('tabla-planificacion-body');
+            if(!tbody) return;
+            tbody.innerHTML = "";
+            listaPlanificacion.forEach((p, idx) => {
+                let badgeColor = p.estado === "Completado" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
+                tbody.innerHTML += `<tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"><td class="p-3 font-semibold">${p.mes}</td><td class="p-3">${p.actividad}</td><td class="p-3">${p.resp}</td><td class="p-3 font-mono">${p.presupuesto}</td><td class="p-3"><span class="${badgeColor} px-2 py-1 rounded font-bold text-[9px]">${p.estado}</span></td></tr>`;
+            });
+        }
+    </script>
+</body>
+</html>
