@@ -150,9 +150,9 @@
                                     <option value="Nov 25">Noviembre 2025</option><option value="Dic 25">Diciembre 2025</option>
                                     <option value="Ene 26">Enero 2026</option><option value="Feb 26">Febrero 2026</option>
                                     <option value="Mar 26">Marzo 2026</option><option value="Abr 26">Abril 2026</option>
-                                    <option value="May 26">Mayo 2026</option><option value="Jun 26" selected>Junio 2026</option>
+                                    <option value="May 26">Mayo 2026</option><option value="Jun 26">Junio 2026</option>
                                     <option value="Jul 26">Julio 2026</option><option value="Ago 26">Agosto 2026</option>
-                                    <option value="Sep 26">Septiembre 2026</option><option value="Oct 26">Octubre 2026</option>
+                                    <option value="Sep 26">Septiembre 2026</option><option value="Oct 26" selected>Octubre 2026</option>
                                     <option value="Nov 26">Noviembre 2026</option><option value="Dic 26">Diciembre 2026</option>
                                 </select>
                             </div>
@@ -286,7 +286,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO CORREGIDO Y BLINDADO -->
+    <!-- 🟢 SCRIPT MAESTRO OPTIMIZADO -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -295,7 +295,7 @@
             {
                 id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Meta Global: 85%", smart: "Garantizar cultura preventiva superior al 85%.", metaVal: 85.0, type: "line-meta", val: "92.7%", links: { v: "", t: "" },
                 inputs: [ { id: "in_p", label: "Resultado %" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + "%",
-                hist: { labels: [...lbl24], series: [ { name: "Resultado (%)", data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7, 90, 92, 91, 93, 94, 95] }, { name: "Meta (%)", data: Array(24).fill(85.0) } ]}
+                hist: { labels: [...lbl24], series: [ { name: "Resultado (%)", data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7, 90, 92, 91, 92.7, 0, 0] }, { name: "Meta (%)", data: Array(24).fill(85.0) } ]}
             },
             {
                 id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", smart: "Mantener la tasa de riesgo por debajo de 5.27.", metaVal: 5.27, type: "bar", val: "0.00", links: { v: "", t: "" },
@@ -362,7 +362,6 @@
             try {
                 if(window.lucide) lucide.createIcons();
                 
-                // Cargar Días LTI manuales guardados
                 const savedLti = localStorage.getItem('dias_lti_manual');
                 const ltiInput = document.getElementById('diasSinAccidentesInput');
                 if(savedLti && ltiInput) {
@@ -380,9 +379,27 @@
                         try {
                             const parsed = JSON.parse(savedData);
                             k.hist.series[0].data = parsed.data;
-                            k.val = parsed.val;
+                            // Buscar el último valor mayor a 0 para mostrarlo como desempeño actual
+                            let ultimoValValido = parsed.val;
+                            for(let i = parsed.data.length - 1; i >= 0; i--) {
+                                if(parsed.data[i] > 0) {
+                                    ultimoValValido = parsed.data[i] + (k.id.includes('TR') ? '' : (k.id.includes('INC') || k.id.includes('RES') ? '' : '%'));
+                                    break;
+                                }
+                            }
+                            k.val = ultimoValValido;
                         } catch(e) {}
+                    } else {
+                        // Si no hay localStorage, buscar el último mes con dato mayor a 0 en la serie inicial
+                        let serie = k.hist.series[0].data;
+                        for(let i = serie.length - 1; i >= 0; i--) {
+                            if(serie[i] > 0) {
+                                k.val = serie[i] + (k.id.includes('TR') ? '' : (k.id.includes('INC') || k.id.includes('RES') ? '' : '%'));
+                                break;
+                            }
+                        }
                     }
+
                     const savedV = localStorage.getItem(`link_v_${k.id}`);
                     const savedT = localStorage.getItem(`link_t_${k.id}`);
                     if(savedV || savedT) {
@@ -639,10 +656,20 @@
             const indiceMes = kpi.hist.labels.indexOf(mesSeleccionado);
             
             if (indiceMes !== -1) {
-                // Limpiar caracteres no numéricos para guardar en la gráfica
                 let valorNumerico = parseFloat(nuevoResultadoCalculado.replace(/[^0-9.-]+/g,""));
                 kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
             }
+
+            // Encontrar el último valor válido ingresado para el desempeño actual
+            let serieDatos = kpi.hist.series[0].data;
+            let ultimoValValido = kpi.val;
+            for(let i = serieDatos.length - 1; i >= 0; i--) {
+                if(serieDatos[i] > 0) {
+                    ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : (kpi.id.includes('INC') || kpi.id.includes('RES') ? '' : '%'));
+                    break;
+                }
+            }
+            kpi.val = ultimoValValido;
 
             localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
                 val: kpi.val,
