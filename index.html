@@ -286,7 +286,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO BLINDADO CONTRA CONGELAMIENTO -->
+    <!-- 🟢 SCRIPT MAESTRO INTELIGENTE (ÚLTIMO VALOR REAL) -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -380,11 +380,25 @@
                             const parsed = JSON.parse(savedData);
                             if(parsed && parsed.data && Array.isArray(parsed.data)) {
                                 k.hist.series[0].data = parsed.data;
-                                k.val = parsed.val || k.val;
                             }
                         }
                     } catch(err) {
                         localStorage.removeItem(`kpi_data_${k.id}`);
+                    }
+
+                    // Búsqueda inteligente del último mes con datos reales mayores a 0 (o el último valor válido)
+                    let serie = k.hist.series[0].data;
+                    let encontrado = false;
+                    for(let i = serie.length - 1; i >= 0; i--) {
+                        if(serie[i] !== 0) {
+                            let sufijo = k.id.includes('TR') ? '' : (k.id.includes('INC') ? '' : (k.id.includes('RES') ? ' Kg' : '%'));
+                            k.val = serie[i] + sufijo;
+                            encontrado = true;
+                            break;
+                        }
+                    }
+                    if(!encontrado && serie.length > 0) {
+                        k.val = serie[serie.length - 1] + '%';
                     }
 
                     const savedV = localStorage.getItem(`link_v_${k.id}`);
