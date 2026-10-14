@@ -76,19 +76,21 @@
 
     <!-- VISTA 1: DASHBOARD -->
     <main id="view-dashboard" class="flex-1 w-full max-w-[1600px] mx-auto">
-        <!-- 1. CONTADOR LTI -->
+        <!-- 1. CONTADOR LTI EDITABLE MANUALMENTE -->
         <section class="mb-4 bg-white dark:bg-darkcard p-4 md:p-6 rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between border-l-[6px] border-emerald-500 border border-slate-200 dark:border-slate-700 relative overflow-hidden">
             <div class="z-10 text-center md:text-left mb-4 md:mb-0">
                 <h2 class="text-sm font-black uppercase tracking-widest mb-1">1. Días sin accidentes con tiempo perdido (LTI)</h2>
-                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Eficiencia global del sistema de seguridad</p>
-                <p class="text-[9px] text-sky-600 dark:text-sky-400 font-bold mt-1">Contabilizado automáticamente desde: 01 Enero 2025</p>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Eficiencia global del sistema de seguridad (Editable manual)</p>
             </div>
-            <div class="flex items-center gap-6 z-10">
-                <div class="flex items-baseline gap-2">
-                    <span id="diasSinAccidentes" class="text-5xl md:text-7xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tighter">0</span>
+            <div class="flex items-center gap-4 z-10 flex-wrap justify-center">
+                <div class="flex items-center gap-2">
+                    <input type="number" id="diasSinAccidentesInput" class="text-4xl md:text-5xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tighter bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-1 w-44 text-center outline-none focus:border-sky-500" value="651">
                     <span class="text-sm font-bold text-slate-500 dark:text-slate-400">DÍAS</span>
                 </div>
-                <button onclick="reiniciarDias()" class="px-4 py-3 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg text-[10px] font-black uppercase hover:bg-rose-600 hover:text-white transition-all">
+                <button onclick="guardarDiasManuales()" class="px-3 py-3 bg-sky-600 text-white rounded-lg text-[10px] font-black uppercase hover:bg-sky-500 transition-all">
+                    Guardar Días
+                </button>
+                <button onclick="reiniciarDias()" class="px-3 py-3 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg text-[10px] font-black uppercase hover:bg-rose-600 hover:text-white transition-all">
                     ⚠ Reportar Accidente
                 </button>
             </div>
@@ -139,32 +141,19 @@
                         <div class="flex gap-2 mb-3">
                             <div class="w-1/3">
                                 <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Periodo</label>
-                                <!-- 🟢 VALORES SINCRONIZADOS EXACTAMENTE CON EL HISTÓRICO -->
                                 <select id="entry-month" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
-                                    <option value="Ene 25">Enero 2025</option>
-                                    <option value="Feb 25">Febrero 2025</option>
-                                    <option value="Mar 25">Marzo 2025</option>
-                                    <option value="Abr 25">Abril 2025</option>
-                                    <option value="May 25">Mayo 2025</option>
-                                    <option value="Jun 25">Junio 2025</option>
-                                    <option value="Jul 25">Julio 2025</option>
-                                    <option value="Ago 25">Agosto 2025</option>
-                                    <option value="Sep 25">Septiembre 2025</option>
-                                    <option value="Oct 25">Octubre 2025</option>
-                                    <option value="Nov 25">Noviembre 2025</option>
-                                    <option value="Dic 25">Diciembre 2025</option>
-                                    <option value="Ene 26">Enero 2026</option>
-                                    <option value="Feb 26">Febrero 2026</option>
-                                    <option value="Mar 26">Marzo 2026</option>
-                                    <option value="Abr 26">Abril 2026</option>
-                                    <option value="May 26">Mayo 2026</option>
-                                    <option value="Jun 26" selected>Junio 2026</option>
-                                    <option value="Jul 26">Julio 2026</option>
-                                    <option value="Ago 26">Agosto 2026</option>
-                                    <option value="Sep 26">Septiembre 2026</option>
-                                    <option value="Oct 26">Octubre 2026</option>
-                                    <option value="Nov 26">Noviembre 2026</option>
-                                    <option value="Dic 26">Diciembre 2026</option>
+                                    <option value="Ene 25">Enero 2025</option><option value="Feb 25">Febrero 2025</option>
+                                    <option value="Mar 25">Marzo 2025</option><option value="Abr 25">Abril 2025</option>
+                                    <option value="May 25">Mayo 2025</option><option value="Jun 25">Junio 2025</option>
+                                    <option value="Jul 25">Julio 2025</option><option value="Ago 25">Agosto 2025</option>
+                                    <option value="Sep 25">Septiembre 2025</option><option value="Oct 25">Octubre 2025</option>
+                                    <option value="Nov 25">Noviembre 2025</option><option value="Dic 25">Diciembre 2025</option>
+                                    <option value="Ene 26">Enero 2026</option><option value="Feb 26">Febrero 2026</option>
+                                    <option value="Mar 26">Marzo 2026</option><option value="Abr 26">Abril 2026</option>
+                                    <option value="May 26">Mayo 2026</option><option value="Jun 26" selected>Junio 2026</option>
+                                    <option value="Jul 26">Julio 2026</option><option value="Ago 26">Agosto 2026</option>
+                                    <option value="Sep 26">Septiembre 2026</option><option value="Oct 26">Octubre 2026</option>
+                                    <option value="Nov 26">Noviembre 2026</option><option value="Dic 26">Diciembre 2026</option>
                                 </select>
                             </div>
                             <div class="w-2/3 grid grid-cols-1 gap-2" id="entry-inputs-container"></div>
@@ -297,7 +286,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO CON LOCALSTORAGE Y SELECTORES SINCRONIZADOS -->
+    <!-- 🟢 SCRIPT MAESTRO CORREGIDO Y BLINDADO -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -305,52 +294,52 @@
         const BD_HSEQ = [
             {
                 id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Meta Global: 85%", smart: "Garantizar cultura preventiva superior al 85%.", metaVal: 85.0, type: "line-meta", val: "92.7%", links: { v: "", t: "" },
-                inputs: [ { id: "in_p", label: "Resultado %" } ], calc: (v) => v[0] + "%",
+                inputs: [ { id: "in_p", label: "Resultado %" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Resultado (%)", data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7, 90, 92, 91, 93, 94, 95] }, { name: "Meta (%)", data: Array(24).fill(85.0) } ]}
             },
             {
                 id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", smart: "Mantener la tasa de riesgo por debajo de 5.27.", metaVal: 5.27, type: "bar", val: "0.00", links: { v: "", t: "" },
-                inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ], calc: (v) => v[1] === 0 ? 0 : (v[0] / v[1]).toFixed(2),
+                inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0.00" : (v[0] / v[1]).toFixed(2),
                 hist: { labels: [...lbl24], series: [ { name: "TR Obtenido", data: Array(24).fill(0) }, { name: "Meta TR", data: Array(24).fill(5.27) } ]}
             },
             {
                 id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "5", links: { v: "", t: "" },
-                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => v[0],
+                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => isNaN(v[0]) ? "0" : v[0],
                 hist: { labels: [...lbl24], series: [ { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,5,0,0,0,0,0,0] } ]}
             },
             {
                 id: "CAI", name: "4. CONTROL DE ACCIDENTES / INCIDENTES (CAI)", formula: "(Cerrados / Ocurridos) * 100", smart: "Controlar y cerrar el 100% de incidentes reportados.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_cer", label: "Cerrados" }, { id: "in_ocur", label: "Ocurridos" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_cer", label: "Cerrados" }, { id: "in_ocur", label: "Ocurridos" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "CAI (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
                 id: "RES", name: "5. GESTIÓN DE RESIDUOS 2025-2026", formula: "Suma de Kg Reciclados", smart: "Optimizar la gestión y valorización de residuos sólidos.", metaVal: 5000, type: "bar", val: "5,536.5 Kg", links: { v: "", t: "" },
-                inputs: [ { id: "in_kg", label: "Kg Reciclados" } ], calc: (v) => v[0] + " Kg",
+                inputs: [ { id: "in_kg", label: "Kg Reciclados" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + " Kg",
                 hist: { labels: [...lbl24], series: [ { name: "Kg Reciclados", data: [200, 250, 300, 280, 310, 350, 400, 380, 390, 420, 450, 480, 500, 520, 536.5, 0, 0, 0, 0, 0, 0, 0, 0, 0] } ]}
             },
             {
                 id: "PMA", name: "6. CUMPLIMIENTO PMA", formula: "(Acciones Ejecutadas / Programadas) * 100", smart: "Cumplimiento estricto del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_pej", label: "Ejecutadas" }, { id: "in_pprog", label: "Programadas" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_pej", label: "Ejecutadas" }, { id: "in_pprog", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "PMA (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
                 id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "(Horas Dictadas / Programadas) * 100", smart: "Superar el cumplimiento de horas de capacitación HSEQ.", metaVal: 100.0, type: "line-meta", val: "119%", links: { v: "", t: "" },
-                inputs: [ { id: "in_cdict", label: "Dictadas" }, { id: "in_cprog", label: "Programadas" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_cdict", label: "Dictadas" }, { id: "in_cprog", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Capacitación (%)", data: Array(24).fill(119) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
                 id: "COM", name: "8. RELAC. COMUNITARIO", formula: "(Actividades / Programadas) * 100", smart: "Ejecución oportuna de los programas de relación con la comunidad.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
-                inputs: [ { id: "in_comd", label: "Ejecutadas" }, { id: "in_comp", label: "Programadas" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_comd", label: "Ejecutadas" }, { id: "in_comp", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Comunitario (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
                 id: "QEXT", name: "9. QUEJAS EXTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Atención y resolución oportuna de peticiones externas.", metaVal: 90.0, type: "line-meta", val: "75%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qexres", label: "Resueltas" }, { id: "in_qexrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_qexres", label: "Resueltas" }, { id: "in_qexrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Quejas Externas (%)", data: Array(24).fill(75) }, { name: "Meta (%)", data: Array(24).fill(90) } ]}
             },
             {
                 id: "QINT", name: "10. QUEJAS INTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "95.8%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qinres", label: "Resueltas" }, { id: "in_qinrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_qinres", label: "Resueltas" }, { id: "in_qinrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Quejas Internas (%)", data: Array(24).fill(95.8) }, { name: "Meta (%)", data: Array(24).fill(95) } ]}
             }
         ];
@@ -372,14 +361,19 @@
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 if(window.lucide) lucide.createIcons();
-                initLTI();
                 
+                // Cargar Días LTI manuales guardados
+                const savedLti = localStorage.getItem('dias_lti_manual');
+                const ltiInput = document.getElementById('diasSinAccidentesInput');
+                if(savedLti && ltiInput) {
+                    ltiInput.value = savedLti;
+                }
+
                 const inpApertura = document.getElementById('insp-apertura');
                 const inpCierre = document.getElementById('insp-cierre');
                 if(inpApertura) inpApertura.valueAsDate = new Date();
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
-                // Recuperar datos guardados de localStorage si existen
                 BD_HSEQ.forEach(k => {
                     const savedData = localStorage.getItem(`kpi_data_${k.id}`);
                     if(savedData) {
@@ -405,19 +399,21 @@
             } catch (err) { console.error(err); }
         });
 
-        function initLTI() {
-            const start = new Date('2025-01-01T00:00:00');
-            const diffDays = Math.floor((new Date().getTime() - start.getTime()) / (1000 * 60 * 60 * 24)); 
-            const ltiElem = document.getElementById('diasSinAccidentes');
-            if(ltiElem) ltiElem.innerText = diffDays;
+        function guardarDiasManuales() {
+            const ltiInput = document.getElementById('diasSinAccidentesInput');
+            if(ltiInput) {
+                const dias = ltiInput.value;
+                localStorage.setItem('dias_lti_manual', dias);
+                alert(`¡Días sin accidentes actualizados manualmente a ${dias} días!`);
+            }
         }
 
         function reiniciarDias() {
-            if(confirm("⚠ ALERTA: ¿Reportar Accidente LTI?")) {
-                const ltiElem = document.getElementById('diasSinAccidentes');
-                if(ltiElem) {
-                    ltiElem.innerText = "0";
-                    ltiElem.className = "text-5xl md:text-7xl font-black text-rose-600 dark:text-rose-400 font-mono tracking-tighter";
+            if(confirm("⚠ ALERTA: ¿Reportar Accidente LTI y reiniciar a 0 días?")) {
+                const ltiInput = document.getElementById('diasSinAccidentesInput');
+                if(ltiInput) {
+                    ltiInput.value = "0";
+                    localStorage.setItem('dias_lti_manual', "0");
                 }
             }
         }
@@ -563,7 +559,7 @@
             const newId = "SMART_" + (BD_HSEQ.length + 1);
             BD_HSEQ.push({
                 id: newId, name: nombre.toUpperCase(), formula: formula, smart: "Nuevo KPI SMART", metaVal: 90, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_val", label: "Resultado %" } ], calc: (v) => v[0] + "%",
+                inputs: [ { id: "in_val", label: "Resultado %" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Resultado", data: Array(24).fill(0) }, { name: "Meta", data: Array(24).fill(90) } ] }
             });
             alert(`KPI Creado exitosamente!`); 
@@ -631,27 +627,30 @@
             if(!kpi) return;
             
             let vals = []; 
-            kpi.inputs.forEach(inp => vals.push(parseFloat(document.getElementById(inp.id).value) || 0));
+            kpi.inputs.forEach(inp => {
+                let valInput = parseFloat(document.getElementById(inp.id).value);
+                vals.push(isNaN(valInput) ? 0 : valInput);
+            });
             
             const nuevoResultadoCalculado = kpi.calc(vals);
             kpi.val = nuevoResultadoCalculado; 
 
-            const mesSeleccionado = document.getElementById('entry-month').value; // Ej: "Ago 26"
+            const mesSeleccionado = document.getElementById('entry-month').value; 
             const indiceMes = kpi.hist.labels.indexOf(mesSeleccionado);
             
             if (indiceMes !== -1) {
-                let valorNumerico = parseFloat(nuevoResultadoCalculado);
-                kpi.hist.series[0].data[indiceMes] = valorNumerico;
+                // Limpiar caracteres no numéricos para guardar en la gráfica
+                let valorNumerico = parseFloat(nuevoResultadoCalculado.replace(/[^0-9.-]+/g,""));
+                kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
             }
 
-            // Guardar cambios en el navegador (LocalStorage)
             localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
                 val: kpi.val,
                 data: kpi.hist.series[0].data
             }));
 
             selectKpi(currentKpiId); 
-            alert(`¡Dato de ${mesSeleccionado} registrado y gráfica actualizada con éxito!`);
+            alert(`¡Dato de ${mesSeleccionado} registrado y actualizado correctamente!`);
         }
         
         let campoInspecciones = [];
