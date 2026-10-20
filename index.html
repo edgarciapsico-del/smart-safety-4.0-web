@@ -18,9 +18,6 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- 🟢 SDK DE SUPABASE -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
         body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -286,7 +283,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO CORREGIDO (MAPEO EXACTO DE MESES) -->
+    <!-- 🟢 SCRIPT MAESTRO OPTIMIZADO (LOCALSTORAGE DIRECTO) -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -348,16 +345,6 @@
         let mainChartType = "line";
         let mainChart = null;
 
-        const SUPABASE_URL = 'https://edggnutfoeghocgtidzj.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_ZEvl16Vx5FfUS_qNPary9Q_GKf2tbmx'; 
-        
-        let clienteDB = null;
-        try {
-            if (window.supabase) {
-                clienteDB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-        } catch(e) { console.error("Modo Local.", e); }
-
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 if(window.lucide) lucide.createIcons();
@@ -390,148 +377,4 @@
                     let encontrado = false;
                     for(let i = serie.length - 1; i >= 0; i--) {
                         if(serie[i] !== 0) {
-                            let sufijo = k.id.includes('TR') ? '' : (k.id.includes('INC') ? '' : (k.id.includes('RES') ? ' Kg' : '%'));
-                            k.val = serie[i] + sufijo;
-                            encontrado = true;
-                            break;
-                        }
-                    }
-                    if(!encontrado && serie.length > 0) {
-                        k.val = serie[serie.length - 1] + (k.id.includes('INC') || k.id.includes('TR') ? '' : '%');
-                    }
-
-                    const savedV = localStorage.getItem(`link_v_${k.id}`);
-                    const savedT = localStorage.getItem(`link_t_${k.id}`);
-                    if(savedV || savedT) {
-                        k.links.v = savedV || "";
-                        k.links.t = savedT || "";
-                    }
-                });
-
-                renderKpiList();
-                renderTablaPlanificacion();
-                selectKpi("PREV"); 
-                
-                if(clienteDB) {
-                    Promise.race([
-                        cargarEnlacesDesdeNube(),
-                        new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
-                    ]).catch(e => console.log("Modo local activo."));
-                }
-            } catch (err) { 
-                console.error("Error crítico en inicio:", err); 
-            }
-        });
-
-        function guardarDiasManuales() {
-            const ltiInput = document.getElementById('diasSinAccidentesInput');
-            if(ltiInput) {
-                const dias = ltiInput.value;
-                localStorage.setItem('dias_lti_manual', dias);
-                alert(`¡Días sin accidentes actualizados a ${dias} días!`);
-            }
-        }
-
-        function reiniciarDias() {
-            if(confirm("⚠ ALERTA: ¿Reportar Accidente LTI y reiniciar a 0 días?")) {
-                const ltiInput = document.getElementById('diasSinAccidentesInput');
-                if(ltiInput) {
-                    ltiInput.value = "0";
-                    localStorage.setItem('dias_lti_manual', "0");
-                }
-            }
-        }
-
-        async function cargarEnlacesDesdeNube() {
-            if(!clienteDB) return;
-            try {
-                const { data, error } = await clienteDB.from('evidencias_kpi').select('*').order('created_at', { ascending: false });
-                if (!error && data) {
-                    let kpisVistos = [];
-                    data.forEach(row => {
-                        if (!kpisVistos.includes(row.kpi_id)) {
-                            const kpi = BD_HSEQ.find(k => k.id === row.kpi_id);
-                            if (kpi) {
-                                if (row.medio_verificacion_url) kpi.links.v = row.medio_verificacion_url;
-                                if (row.trazabilidad_url) kpi.links.t = row.trazabilidad_url;
-                                kpisVistos.push(row.kpi_id);
-                            }
-                        }
-                    });
-                    if (currentKpiId) {
-                        const activeKpi = BD_HSEQ.find(k => k.id === currentKpiId);
-                        if(activeKpi) renderLinks(activeKpi.links);
-                    }
-                }
-            } catch (err) { console.error(err); }
-        }
-
-        async function vincularUrl(tipo) {
-            const url = prompt(`Ingrese la URL directa o nombre del archivo para ${tipo.toUpperCase()}:`);
-            if (url && url.trim() !== "") {
-                const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-                if(!kpi) return;
-                
-                const cleanUrl = url.trim();
-                kpi.links[tipo === 'verificacion' ? 'v' : 't'] = cleanUrl;
-                
-                localStorage.setItem(`link_${tipo === 'verificacion' ? 'v' : 't'}_${kpi.id}`, cleanUrl);
-                renderLinks(kpi.links);
-                
-                if(clienteDB) {
-                    try {
-                        const centroSelect = document.getElementById('centro-trabajo-select');
-                        const periodoSelect = document.getElementById('entry-month');
-                        await clienteDB.from('evidencias_kpi').insert([{
-                            centro_trabajo: centroSelect ? centroSelect.value : 'General',
-                            kpi_id: kpi.id, periodo: periodoSelect ? periodoSelect.value : 'N/A',
-                            medio_verificacion_url: kpi.links.v, trazabilidad_url: kpi.links.t
-                        }]);
-                    } catch(err) {}
-                }
-                alert(`¡Enlace guardado exitosamente!`);
-            }
-        }
-
-        async function eliminarUrl(tipo) {
-            if(confirm(`¿Eliminar enlace de ${tipo.toUpperCase()}?`)) {
-                const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-                if(!kpi) return;
-
-                kpi.links[tipo === 'verificacion' ? 'v' : 't'] = "";
-                localStorage.removeItem(`link_${tipo === 'verificacion' ? 'v' : 't'}_${kpi.id}`);
-                renderLinks(kpi.links);
-
-                if(clienteDB) {
-                    try {
-                        const centroSelect = document.getElementById('centro-trabajo-select');
-                        const periodoSelect = document.getElementById('entry-month');
-                        await clienteDB.from('evidencias_kpi').insert([{
-                            centro_trabajo: centroSelect ? centroSelect.value : 'General',
-                            kpi_id: kpi.id, periodo: periodoSelect ? periodoSelect.value : 'N/A',
-                            medio_verificacion_url: kpi.links.v, trazabilidad_url: kpi.links.t
-                        }]);
-                    } catch(err) {}
-                }
-                alert("Enlace eliminado.");
-            }
-        }
-
-        function renderLinks(links) {
-            const boxV = document.getElementById("link-verificacion");
-            if (boxV) {
-                if (links.v && links.v !== "") {
-                    boxV.innerHTML = `<a href="${links.v}" target="_blank" class="text-sky-600 dark:text-sky-400 font-bold uppercase hover:underline">🔗 Abrir Enlace</a><br><span class="text-[10px] text-slate-500 dark:text-slate-400 truncate block mt-1">${links.v}</span>`;
-                } else { boxV.innerHTML = "Sin Enlace Configurado"; }
-            }
-
-            const boxT = document.getElementById("link-trazabilidad");
-            if (boxT) {
-                if (links.t && links.t !== "") {
-                    boxT.innerHTML = `<a href="${links.t}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold uppercase hover:underline">🔗 Abrir Enlace</a><br><span class="text-[10px] text-slate-500 dark:text-slate-400 truncate block mt-1">${links.t}</span>`;
-                } else { boxT.innerHTML = "Sin Enlace Configurado"; }
-            }
-        }
-
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
+                            let sufijo = k.id.includes('TR') ? '' : (k.id.includes('INC') ?
