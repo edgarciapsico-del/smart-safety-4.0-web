@@ -147,8 +147,8 @@
                                     <option value="Nov 25">Noviembre 2025</option><option value="Dic 25">Diciembre 2025</option>
                                     <option value="Ene 26">Enero 2026</option><option value="Feb 26">Febrero 2026</option>
                                     <option value="Mar 26">Marzo 2026</option><option value="Abr 26">Abril 2026</option>
-                                    <option value="May 26">Mayo 2026</option><option value="Jun 26">Junio 2026</option>
-                                    <option value="Jul 26">Julio 2026</option><option value="Ago 26" selected>Agosto 2026</option>
+                                    <option value="May 26">Mayo 2026</option><option value="Jun 26" selected>Junio 2026</option>
+                                    <option value="Jul 26">Julio 2026</option><option value="Ago 26">Agosto 2026</option>
                                     <option value="Sep 26">Septiembre 2026</option><option value="Oct 26">Octubre 2026</option>
                                     <option value="Nov 26">Noviembre 2026</option><option value="Dic 26">Diciembre 2026</option>
                                 </select>
@@ -283,7 +283,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO OPTIMIZADO PARA INCIDENTES -->
+    <!-- 🟢 SCRIPT MAESTRO CORREGIDO PARA MESES E INCIDENTES -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -301,7 +301,7 @@
             },
             {
                 id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "1", links: { v: "", t: "" },
-                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => isNaN(v[0]) ? "0" : v[0],
+                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => isNaN(v[0]) ? 0 : v[0],
                 hist: { labels: [...lbl24], series: [ { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,5,0,1,0,0,0,0] } ]}
             },
             {
@@ -598,20 +598,17 @@
             const nuevoResultadoCalculado = kpi.calc(vals);
             kpi.val = nuevoResultadoCalculado; 
 
+            // LA CORRECCIÓN CLAVE ESTÁ AQUÍ
             const selectMes = document.getElementById('entry-month');
-            const mesTexto = selectMes.options[selectMes.selectedIndex].text;
+            const mesValue = selectMes.value; // Toma "Jun 26" directamente
+            const mesTexto = selectMes.options[selectMes.selectedIndex].text; // Solo para la alerta visual
             
-            let indiceMes = -1;
-            if (mesTexto.includes("Agosto") && mesTexto.includes("2026")) {
-                indiceMes = 19; 
-            } else {
-                const partes = mesTexto.split(' ');
-                const claveBuscada = `${partes[0].substring(0, 3)} ${partes[1].substring(2, 4)}`;
-                indiceMes = kpi.hist.labels.indexOf(claveBuscada);
-            }
+            const indiceMes = kpi.hist.labels.indexOf(mesValue);
             
             if (indiceMes !== -1) {
-                let valorNumerico = parseFloat(nuevoResultadoCalculado.replace(/[^0-9.-]+/g,""));
+                // Convertir a texto por seguridad antes de limpiar caracteres (evita el error que bloqueaba todo)
+                let valStr = String(nuevoResultadoCalculado);
+                let valorNumerico = parseFloat(valStr.replace(/[^0-9.-]+/g,""));
                 kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
             }
 
