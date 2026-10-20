@@ -151,8 +151,8 @@
                                     <option value="Ene 26">Enero 2026</option><option value="Feb 26">Febrero 2026</option>
                                     <option value="Mar 26">Marzo 2026</option><option value="Abr 26">Abril 2026</option>
                                     <option value="May 26">Mayo 2026</option><option value="Jun 26">Junio 2026</option>
-                                    <option value="Jul 26">Julio 2026</option><option value="Ago 26">Agosto 2026</option>
-                                    <option value="Sep 26">Septiembre 2026</option><option value="Oct 26" selected>Octubre 2026</option>
+                                    <option value="Jul 26">Julio 2026</option><option value="Ago 26" selected>Agosto 2026</option>
+                                    <option value="Sep 26">Septiembre 2026</option><option value="Oct 26">Octubre 2026</option>
                                     <option value="Nov 26">Noviembre 2026</option><option value="Dic 26">Diciembre 2026</option>
                                 </select>
                             </div>
@@ -286,7 +286,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO INTELIGENTE (ÚLTIMO VALOR REAL) -->
+    <!-- 🟢 SCRIPT MAESTRO CORREGIDO (ÍNDICES DE MESES) -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -386,7 +386,6 @@
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     }
 
-                    // Búsqueda inteligente del último mes con datos reales mayores a 0 (o el último valor válido)
                     let serie = k.hist.series[0].data;
                     let encontrado = false;
                     for(let i = serie.length - 1; i >= 0; i--) {
@@ -655,13 +654,31 @@
             const nuevoResultadoCalculado = kpi.calc(vals);
             kpi.val = nuevoResultadoCalculado; 
 
-            const mesSeleccionado = document.getElementById('entry-month').value; 
-            const indiceMes = kpi.hist.labels.indexOf(mesSeleccionado);
+            // Mapeo exacto del texto del select al formato de etiqueta lbl24
+            const mesSeleccionadoText = document.getElementById('entry-month').options[document.getElementById('entry-month').selectedIndex].text;
+            // Ejemplo: "Agosto 2026" -> "Ago 26"
+            const partes = mesSeleccionadoText.split(' ');
+            const mesAbrev = partes[0].substring(0, 3);
+            const anioAbrev = partes[1].substring(2, 4);
+            const claveMesBuscada = `${mesAbrev} ${anioAbrev}`;
+
+            const indiceMes = kpi.hist.labels.indexOf(claveMesBuscada);
             
             if (indiceMes !== -1) {
                 let valorNumerico = parseFloat(nuevoResultadoCalculado.replace(/[^0-9.-]+/g,""));
                 kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
             }
+
+            // Actualizar el valor actual mostrado en la tarjeta basándose en el último valor real mayor a 0
+            let serieDatos = kpi.hist.series[0].data;
+            let ultimoValValido = kpi.val;
+            for(let i = serieDatos.length - 1; i >= 0; i--) {
+                if(serieDatos[i] > 0 || i === serieDatos.length - 1) {
+                    ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : (kpi.id.includes('INC') ? '' : (kpi.id.includes('RES') ? ' Kg' : '%')));
+                    if(serieDatos[i] > 0) break;
+                }
+            }
+            kpi.val = ultimoValValido;
 
             localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
                 val: kpi.val,
@@ -669,44 +686,9 @@
             }));
 
             selectKpi(currentKpiId); 
-            alert(`¡Dato de ${mesSeleccionado} registrado y actualizado correctamente!`);
+            alert(`¡Dato de ${mesSeleccionadoText} registrado y actualizado correctamente en la gráfica!`);
         }
         
         let campoInspecciones = [];
         function guardarInspeccionCampo() {
-            const factor = document.getElementById('insp-factor').value;
-            const resp = document.getElementById('insp-resp').value || 'No asignado';
-            if(!resp) { alert("Por favor ingrese responsable."); return; }
-            campoInspecciones.push({ factor, desc: document.getElementById('insp-desc').value || '', resp, hse: document.getElementById('insp-hse').value || '', apertura: document.getElementById('insp-apertura').value, cierre: document.getElementById('insp-cierre').value });
-            renderTablaInspecciones();
-            alert("Inspección guardada.");
-        }
-
-        function renderTablaInspecciones() {
-            const tbody = document.getElementById('tabla-inspecciones-body');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-            campoInspecciones.forEach((i) => {
-                tbody.innerHTML += `<tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"><td class="p-3 font-bold text-sky-600 dark:text-sky-400">${i.factor}</td><td class="p-3">${i.desc}</td><td class="p-3">${i.resp}</td><td class="p-3">${i.hse}</td><td class="p-3 font-mono text-[11px]">${i.apertura} al ${i.cierre}</td></tr>`;
-            });
-        }
-
-        function exportarExcel() { alert("Función CSV lista."); }
-
-        let listaPlanificacion = [
-            { mes: "Enero", actividad: "Levantamiento de Riesgos Ergonómicos", resp: "Gerencia HSE", presupuesto: "1500.00", estado: "Completado" },
-            { mes: "Diciembre", actividad: "Simulacro General de Evacuación", resp: "Comité Paritario", presupuesto: "500.00", estado: "Planificado" }
-        ];
-
-        function renderTablaPlanificacion() {
-            const tbody = document.getElementById('tabla-planificacion-body');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-            listaPlanificacion.forEach((p, idx) => {
-                let badgeColor = p.estado === "Completado" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
-                tbody.innerHTML += `<tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"><td class="p-3 font-semibold">${p.mes}</td><td class="p-3">${p.actividad}</td><td class="p-3">${p.resp}</td><td class="p-3 font-mono">${p.presupuesto}</td><td class="p-3"><span class="${badgeColor} px-2 py-1 rounded font-bold text-[9px]">${p.estado}</span></td></tr>`;
-            });
-        }
-    </script>
-</body>
-</html>
+            const factor = document.getElementById('insp-factor').
