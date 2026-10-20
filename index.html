@@ -283,7 +283,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO OPTIMIZADO (CARGA INSTANTÁNEA) -->
+    <!-- 🟢 SCRIPT MAESTRO OPTIMIZADO PARA INCIDENTES -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -300,9 +300,9 @@
                 hist: { labels: [...lbl24], series: [ { name: "TR Obtenido", data: Array(24).fill(0) }, { name: "Meta TR", data: Array(24).fill(5.27) } ]}
             },
             {
-                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "5", links: { v: "", t: "" },
+                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "1", links: { v: "", t: "" },
                 inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => isNaN(v[0]) ? "0" : v[0],
-                hist: { labels: [...lbl24], series: [ { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,5,0,0,0,0,0,0] } ]}
+                hist: { labels: [...lbl24], series: [ { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,5,0,1,0,0,0,0] } ]}
             },
             {
                 id: "CAI", name: "4. CONTROL DE ACCIDENTES / INCIDENTES (CAI)", formula: "(Cerrados / Ocurridos) * 100", smart: "Controlar y cerrar el 100% de incidentes reportados.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
@@ -371,18 +371,23 @@
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     }
 
-                    let serie = k.hist.series[0].data;
-                    let encontrado = false;
-                    for(let i = serie.length - 1; i >= 0; i--) {
-                        if(serie[i] !== 0) {
-                            let sufijo = k.id.includes('TR') ? '' : (k.id.includes('INC') ? '' : (k.id.includes('RES') ? ' Kg' : '%'));
-                            k.val = serie[i] + sufijo;
-                            encontrado = true;
-                            break;
+                    if(k.id === 'INC') {
+                        let sumaTotal = k.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
+                        k.val = sumaTotal.toString();
+                    } else {
+                        let serie = k.hist.series[0].data;
+                        let encontrado = false;
+                        for(let i = serie.length - 1; i >= 0; i--) {
+                            if(serie[i] !== 0) {
+                                let sufijo = k.id.includes('TR') ? '' : (k.id.includes('RES') ? ' Kg' : '%');
+                                k.val = serie[i] + sufijo;
+                                encontrado = true;
+                                break;
+                            }
                         }
-                    }
-                    if(!encontrado && serie.length > 0) {
-                        k.val = serie[serie.length - 1] + (k.id.includes('INC') || k.id.includes('TR') ? '' : '%');
+                        if(!encontrado && serie.length > 0) {
+                            k.val = serie[serie.length - 1] + (k.id.includes('TR') ? '' : '%');
+                        }
                     }
 
                     const savedV = localStorage.getItem(`link_v_${k.id}`);
@@ -594,11 +599,11 @@
             kpi.val = nuevoResultadoCalculado; 
 
             const selectMes = document.getElementById('entry-month');
-            const mesTexto = selectMes.options[selectMes.selectedIndex].text; // Ej: "Agosto 2026"
+            const mesTexto = selectMes.options[selectMes.selectedIndex].text;
             
             let indiceMes = -1;
             if (mesTexto.includes("Agosto") && mesTexto.includes("2026")) {
-                indiceMes = 19; // Posición exacta de 'Ago 26' en lbl24
+                indiceMes = 19; 
             } else {
                 const partes = mesTexto.split(' ');
                 const claveBuscada = `${partes[0].substring(0, 3)} ${partes[1].substring(2, 4)}`;
@@ -610,15 +615,20 @@
                 kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
             }
 
-            let serieDatos = kpi.hist.series[0].data;
-            let ultimoValValido = kpi.val;
-            for(let i = serieDatos.length - 1; i >= 0; i--) {
-                if(serieDatos[i] > 0 || i === serieDatos.length - 1) {
-                    ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : (kpi.id.includes('INC') ? '' : (kpi.id.includes('RES') ? ' Kg' : '%')));
-                    if(serieDatos[i] > 0) break;
+            if(kpi.id === 'INC') {
+                let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
+                kpi.val = sumaTotal.toString();
+            } else {
+                let serieDatos = kpi.hist.series[0].data;
+                let ultimoValValido = kpi.val;
+                for(let i = serieDatos.length - 1; i >= 0; i--) {
+                    if(serieDatos[i] > 0 || i === serieDatos.length - 1) {
+                        ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : (kpi.id.includes('RES') ? ' Kg' : '%'));
+                        if(serieDatos[i] > 0) break;
+                    }
                 }
+                kpi.val = ultimoValValido;
             }
-            kpi.val = ultimoValValido;
 
             localStorage.removeItem(`kpi_data_${kpi.id}`);
             localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
