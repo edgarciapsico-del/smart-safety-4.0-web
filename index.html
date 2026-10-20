@@ -286,7 +286,7 @@
     </main>
 
     <!-- ================================================== -->
-    <!-- 🟢 SCRIPT MAESTRO CON TIMEOUT Y PROTECCIÓN ASÍNCRONA -->
+    <!-- 🟢 SCRIPT MAESTRO CORREGIDO (MAPEO EXACTO DE MESES) -->
     <!-- ================================================== -->
     <script>
         const lbl24 = ['Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25','Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25','Ene 26','Feb 26','Mar 26','Abr 26','May 26','Jun 26','Jul 26','Ago 26','Sep 26','Oct 26','Nov 26','Dic 26'];
@@ -412,12 +412,11 @@
                 renderTablaPlanificacion();
                 selectKpi("PREV"); 
                 
-                // Conexión no bloqueante con timeout de seguridad (3 segundos)
                 if(clienteDB) {
                     Promise.race([
                         cargarEnlacesDesdeNube(),
-                        new Promise((_, reject) => setTimeout(() => reject(timeout), 3000))
-                    ]).catch(e => console.log("Modo offline o Supabase pausado. Operando localmente."));
+                        new Promise((_, reject) => setTimeout(() => reject('timeout'), 3000))
+                    ]).catch(e => console.log("Modo local activo."));
                 }
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
@@ -536,201 +535,3 @@
 
         function toggleTheme() {
             document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            const icon = document.getElementById('theme-icon');
-            if(icon) {
-                icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-                icon.className = isDark ? "w-5 h-5 text-yellow-400" : "w-5 h-5 text-slate-600";
-            }
-            if(window.lucide) lucide.createIcons();
-            const dash = document.getElementById('view-dashboard');
-            if(dash && !dash.classList.contains('hidden')) renderCharts(); 
-        }
-
-        function switchView(viewName) {
-            ['dashboard', 'inspecciones', 'planificacion', 'config-kpi'].forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if(el) el.classList.add('hidden');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            const targetView = document.getElementById(`view-${viewName}`);
-            const targetBtn = document.getElementById(`btn-${viewName}`);
-            
-            if(targetView) targetView.classList.remove('hidden');
-            if(targetBtn) targetBtn.classList.add('active');
-            
-            if(viewName === 'dashboard' && currentKpiId) renderCharts();
-        }
-
-        function agregarCentroTrabajo() {
-            const nuevoCentro = prompt("Ingrese el nuevo Centro de Trabajo:");
-            if(nuevoCentro) {
-                const select = document.getElementById('centro-trabajo-select');
-                if(select) {
-                    const opt = document.createElement('option');
-                    opt.value = opt.text = nuevoCentro.toUpperCase();
-                    select.appendChild(opt); select.value = nuevoCentro.toUpperCase();
-                }
-            }
-        }
-
-        function setChartType(type) { 
-            mainChartType = type; 
-            renderCharts(); 
-        }
-
-        function crearNuevoKpiSmart() {
-            const nombre = document.getElementById('new-kpi-name').value.trim();
-            const formula = document.getElementById('new-kpi-formula').value.trim();
-            if(!nombre || !formula) { alert("Complete campos."); return; }
-            
-            const newId = "SMART_" + (BD_HSEQ.length + 1);
-            BD_HSEQ.push({
-                id: newId, name: nombre.toUpperCase(), formula: formula, smart: "Nuevo KPI SMART", metaVal: 90, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_val", label: "Resultado %" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + "%",
-                hist: { labels: [...lbl24], series: [ { name: "Resultado", data: Array(24).fill(0) }, { name: "Meta", data: Array(24).fill(90) } ] }
-            });
-            alert(`KPI Creado exitosamente!`); 
-            switchView('dashboard'); 
-            selectKpi(newId);
-        }
-
-        function renderKpiList() {
-            const list = document.getElementById("kpi-list"); 
-            if(!list) return;
-            list.innerHTML = "";
-            BD_HSEQ.forEach(k => {
-                const actStyle = k.id === currentKpiId ? "border-sky-500 bg-sky-50 dark:bg-slate-800/80 shadow-md ring-1 ring-sky-400" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-darkcard";
-                list.innerHTML += `<div onclick="selectKpi('${k.id}')" class="p-3.5 rounded-xl cursor-pointer border-l-[5px] border ${actStyle} hover:border-sky-400 transition-all"><div class="text-[10px] font-black text-slate-500 uppercase">${k.name}</div><div class="text-lg font-black font-mono mt-1">${k.val}</div></div>`;
-            });
-        }
-
-        function selectKpi(id) {
-            currentKpiId = id; 
-            renderKpiList(); 
-            const kpi = BD_HSEQ.find(k => k.id === id);
-            if(!kpi) return;
-            
-            const eTitle = document.getElementById("kpi-title");
-            const eDesc = document.getElementById("kpi-desc");
-            const eVal = document.getElementById("kpi-value");
-            const eSmart = document.getElementById("smart-goal-box");
-            const eInp = document.getElementById("entry-inputs-container");
-            
-            if(eTitle) eTitle.innerText = kpi.name; 
-            if(eDesc) eDesc.innerText = kpi.formula;
-            if(eVal) eVal.innerText = kpi.val;
-            if(eSmart) eSmart.innerHTML = `<strong>Objetivo SMART:</strong> ${kpi.smart || 'Cumplimiento HSEQ.'}`;
-            if(eInp) eInp.innerHTML = kpi.inputs.map(inp => `<input type="number" id="${inp.id}" placeholder="${inp.label}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">`).join('');
-            
-            renderLinks(kpi.links); 
-            renderCharts();
-        }
-
-        function renderCharts() {
-            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-            if(!kpi) return;
-            const txtColor = document.documentElement.classList.contains('dark') ? '#94a3b8' : '#64748b';
-            const gridColor = document.documentElement.classList.contains('dark') ? '#334155' : '#e2e8f0';
-            
-            if (mainChart) mainChart.destroy();
-            
-            const cont = document.querySelector("#chartContainer");
-            if(!cont || typeof ApexCharts === 'undefined') return;
-
-            const opt = {
-                chart: { type: mainChartType, height: 320, toolbar: { show: false }, background: 'transparent' },
-                colors: mainChartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'],
-                stroke: { curve: 'smooth', width: [3, 2] }, series: kpi.hist.series,
-                xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px' } } },
-                yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
-                grid: { borderColor: gridColor, strokeDashArray: 3 }
-            };
-            mainChart = new ApexCharts(cont, opt); 
-            mainChart.render();
-        }
-
-        function guardarDatosMensuales() {
-            const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
-            if(!kpi) return;
-            
-            let vals = []; 
-            kpi.inputs.forEach(inp => {
-                let valInput = parseFloat(document.getElementById(inp.id).value);
-                vals.push(isNaN(valInput) ? 0 : valInput);
-            });
-            
-            const nuevoResultadoCalculado = kpi.calc(vals);
-            kpi.val = nuevoResultadoCalculado; 
-
-            const mesSeleccionadoText = document.getElementById('entry-month').options[document.getElementById('entry-month').selectedIndex].text;
-            const partes = mesSeleccionadoText.split(' ');
-            const mesAbrev = partes[0].substring(0, 3);
-            const anioAbrev = partes[1].substring(2, 4);
-            const claveMesBuscada = `${mesAbrev} ${anioAbrev}`;
-
-            const indiceMes = kpi.hist.labels.indexOf(claveMesBuscada);
-            
-            if (indiceMes !== -1) {
-                let valorNumerico = parseFloat(nuevoResultadoCalculado.replace(/[^0-9.-]+/g,""));
-                kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
-            }
-
-            let serieDatos = kpi.hist.series[0].data;
-            let ultimoValValido = kpi.val;
-            for(let i = serieDatos.length - 1; i >= 0; i--) {
-                if(serieDatos[i] > 0 || i === serieDatos.length - 1) {
-                    ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : (kpi.id.includes('INC') ? '' : (kpi.id.includes('RES') ? ' Kg' : '%')));
-                    if(serieDatos[i] > 0) break;
-                }
-            }
-            kpi.val = ultimoValValido;
-
-            localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
-                val: kpi.val,
-                data: kpi.hist.series[0].data
-            }));
-
-            selectKpi(currentKpiId); 
-            alert(`¡Dato de ${mesSeleccionadoText} registrado y actualizado correctamente!`);
-        }
-        
-        let campoInspecciones = [];
-        function guardarInspeccionCampo() {
-            const factor = document.getElementById('insp-factor').value;
-            const resp = document.getElementById('insp-resp').value || 'No asignado';
-            if(!resp) { alert("Por favor ingrese responsable."); return; }
-            campoInspecciones.push({ factor, desc: document.getElementById('insp-desc').value || '', resp, hse: document.getElementById('insp-hse').value || '', apertura: document.getElementById('insp-apertura').value, cierre: document.getElementById('insp-cierre').value });
-            renderTablaInspecciones();
-            alert("Inspección guardada.");
-        }
-
-        function renderTablaInspecciones() {
-            const tbody = document.getElementById('tabla-inspecciones-body');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-            campoInspecciones.forEach((i) => {
-                tbody.innerHTML += `<tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"><td class="p-3 font-bold text-sky-600 dark:text-sky-400">${i.factor}</td><td class="p-3">${i.desc}</td><td class="p-3">${i.resp}</td><td class="p-3">${i.hse}</td><td class="p-3 font-mono text-[11px]">${i.apertura} al ${i.cierre}</td></tr>`;
-            });
-        }
-
-        function exportarExcel() { alert("Función CSV lista."); }
-
-        let listaPlanificacion = [
-            { mes: "Enero", actividad: "Levantamiento de Riesgos Ergonómicos", resp: "Gerencia HSE", presupuesto: "1500.00", estado: "Completado" },
-            { mes: "Diciembre", actividad: "Simulacro General de Evacuación", resp: "Comité Paritario", presupuesto: "500.00", estado: "Planificado" }
-        ];
-
-        function renderTablaPlanificacion() {
-            const tbody = document.getElementById('tabla-planificacion-body');
-            if(!tbody) return;
-            tbody.innerHTML = "";
-            listaPlanificacion.forEach((p, idx) => {
-                let badgeColor = p.estado === "Completado" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
-                tbody.innerHTML += `<tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"><td class="p-3 font-semibold">${p.mes}</td><td class="p-3">${p.actividad}</td><td class="p-3">${p.resp}</td><td class="p-3 font-mono">${p.presupuesto}</td><td class="p-3"><span class="${badgeColor} px-2 py-1 rounded font-bold text-[9px]">${p.estado}</span></td></tr>`;
-            });
-        }
-    </script>
-</body>
-</html>
