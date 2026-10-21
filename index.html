@@ -288,22 +288,22 @@
         const BD_HSEQ = [
             {
                 id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Meta Global: 85%", smart: "Garantizar cultura preventiva superior al 85%.", metaVal: 85.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_p", label: "Resultado %" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + "%",
+                inputs: [ { id: "in_p", label: "Resultado %" } ],
                 hist: { labels: [...lbl24], series: [ { name: "Resultado (%)", data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7, 90, 92, 91, 92.7, 0, 0] }, { name: "Meta (%)", data: Array(24).fill(85.0) } ]}
             },
             {
                 id: "TR", name: "2. TASA DE RIESGO", formula: "TR = TG / TF | Meta: 5.27", smart: "Mantener la tasa de riesgo por debajo de 5.27.", metaVal: 5.27, type: "bar", val: "0.00", links: { v: "", t: "" },
-                inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0.00" : (v[0] / v[1]).toFixed(2),
+                inputs: [ { id: "in_tg", label: "TG" }, { id: "in_tf", label: "TF" } ],
                 hist: { labels: [...lbl24], series: [ { name: "TR Obtenido", data: Array(24).fill(0) }, { name: "Meta TR", data: Array(24).fill(5.27) } ]}
             },
             {
                 id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "0", links: { v: "", t: "" },
-                inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => isNaN(v[0]) ? 0 : v[0],
+                inputs: [ { id: "in_inc", label: "N° Incidentes" } ],
                 hist: { labels: [...lbl24], series: [ { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,5,0,1,0,0,0,0] } ]}
             },
             {
                 id: "CAI", name: "4. CONTROL DE ACCIDENTES / INCIDENTES (CAI)", formula: "(Cerrados / Ocurridos) * 100", smart: "Controlar y cerrar el 100% de incidentes reportados.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_cer", label: "Cerrados" }, { id: "in_ocur", label: "Ocurridos" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_cer", label: "Cerrados" }, { id: "in_ocur", label: "Ocurridos" } ],
                 hist: { labels: [...lbl24], series: [ { name: "CAI (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
@@ -312,7 +312,7 @@
                     { id: "in_rec", label: "Reciclables (Kg)" },
                     { id: "in_nopel", label: "No Peligrosos (Kg)" },
                     { id: "in_pel", label: "Peligrosos (Kg)" }
-                ], calc: (v) => { let s = (isNaN(v[0])?0:v[0])+(isNaN(v[1])?0:v[1])+(isNaN(v[2])?0:v[2]); return s.toFixed(2) + " Kg"; },
+                ],
                 hist: { 
                     labels: [...lbl24], 
                     series: [ 
@@ -323,21 +323,22 @@
                 }
             },
             {
-                id: "MONIT", name: "6. MONITOREO AMBIENTAL", formula: "(Parámetros CUMPLEN / Total Medidos) * 100", smart: "Asegurar que las emisiones y ruido no superen el Límite Máximo Permisible.", metaVal: 90.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_cumple", label: "Cumplen (SI)" }, { id: "in_total", label: "Total Medidos" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                // KPI DE MONITOREO AMBIENTAL CORREGIDO: Usando 'null' en los meses sin reporte
+                id: "MONIT", name: "6. MONITOREO AMBIENTAL", formula: "(Parámetros CUMPLEN / Total Medidos) * 100", smart: "Asegurar que las emisiones y ruido no superen el Límite Máximo Permisible.", metaVal: 90.0, type: "bar", val: "0%", links: { v: "", t: "" },
+                inputs: [ { id: "in_cumple", label: "Cumplen (SI)" }, { id: "in_total", label: "Total Medidos" } ],
                 hist: { labels: [...lbl24], series: [ 
-                    { name: "Cumplimiento (%)", data: [0, 0, 0, 100, 0, 0, 0, 0, 0, 66.67, 0, 0, 100, 0, 0, 55.56, 0, 0, 0, 0, 42.86, 0, 0, 0] }, 
-                    { name: "Meta (%)", data: Array(24).fill(90) } 
+                    { name: "Cumplimiento (%)", data: [null, null, null, 100, null, null, null, null, null, 66.67, null, null, 100, null, null, 55.56, null, null, null, null, 42.86, null, null, null] }, 
+                    { name: "Meta (%)", data: [null, null, null, 90, null, null, null, null, null, 90, null, null, 90, null, null, 90, null, null, null, null, 90, null, null, null] } 
                 ]}
             },
             {
                 id: "PMA", name: "7. CUMPLIMIENTO PMA", formula: "(Acciones Ejecutadas / Programadas) * 100", smart: "Cumplimiento estricto del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_pej", label: "Ejecutadas" }, { id: "in_pprog", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_pej", label: "Ejecutadas" }, { id: "in_pprog", label: "Programadas" } ],
                 hist: { labels: [...lbl24], series: [ { name: "PMA (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
                 id: "CAP", name: "8. PLAN CAPACITACIÓN", formula: "(Horas Dictadas / Programadas) * 100", smart: "Superar el cumplimiento de horas de capacitación HSEQ.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_cdict", label: "Dictadas" }, { id: "in_cprog", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_cdict", label: "Dictadas" }, { id: "in_cprog", label: "Programadas" } ],
                 hist: { labels: [...lbl24], series: [ 
                     { name: "Capacitación (%)", data: [100, 105, 95, 110, 100, 90, 105, 100, 115, 100, 105, 110, 100, 105, 95, 110, 100, 105, 115, 110, 119, 0, 0, 0] }, 
                     { name: "Meta (%)", data: Array(24).fill(100) } 
@@ -345,46 +346,58 @@
             },
             {
                 id: "COM", name: "9. RELAC. COMUNITARIO", formula: "(Actividades / Programadas) * 100", smart: "Ejecución oportuna de los programas de relación con la comunidad.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_comd", label: "Ejecutadas" }, { id: "in_comp", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_comd", label: "Ejecutadas" }, { id: "in_comp", label: "Programadas" } ],
                 hist: { labels: [...lbl24], series: [ { name: "Comunitario (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
                 id: "QEXT", name: "10. QUEJAS EXTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Atención y resolución oportuna de peticiones externas.", metaVal: 90.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qexres", label: "Resueltas" }, { id: "in_qexrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_qexres", label: "Resueltas" }, { id: "in_qexrec", label: "Recibidas" } ],
                 hist: { labels: [...lbl24], series: [ { name: "Quejas Externas (%)", data: Array(24).fill(75) }, { name: "Meta (%)", data: Array(24).fill(90) } ]}
             },
             {
                 id: "QINT", name: "11. QUEJAS INTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qinres", label: "Resueltas" }, { id: "in_qinrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
+                inputs: [ { id: "in_qinres", label: "Resueltas" }, { id: "in_qinrec", label: "Recibidas" } ],
                 hist: { labels: [...lbl24], series: [ { name: "Quejas Internas (%)", data: Array(24).fill(95.8) }, { name: "Meta (%)", data: Array(24).fill(95) } ]}
             }
         ];
 
         let currentKpiId = "PREV";
-        let mainChartType = "line";
+        let mainChartType = "bar";
         let mainChart = null;
 
+        // Función ajustada para soportar valores nulos (ignorándolos del promedio)
         function recalcularValorTarjeta(kpi) {
             if(kpi.id === 'INC') {
-                let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
+                let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) || b === null ? 0 : b), 0);
                 kpi.val = sumaTotal.toString();
             } else if(kpi.id === 'RES') {
                 let sumaTotal = 0;
-                kpi.hist.series.forEach(serie => { sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0); });
+                kpi.hist.series.forEach(serie => { 
+                    sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) || b === null ? 0 : b), 0); 
+                });
                 kpi.val = sumaTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Kg";
             } else if (kpi.id === 'TR') {
                 let serie = kpi.hist.series[0].data;
                 let encontrado = false;
                 for(let i = serie.length - 1; i >= 0; i--) {
-                    if(serie[i] !== 0) { kpi.val = serie[i]; encontrado = true; break; }
+                    if(serie[i] !== 0 && serie[i] !== null) { kpi.val = serie[i]; encontrado = true; break; }
                 }
-                if(!encontrado && serie.length > 0) kpi.val = serie[serie.length - 1];
+                if(!encontrado && serie.length > 0) kpi.val = "0.00";
             } else {
                 let serie = kpi.hist.series[0].data;
                 let suma = 0;
                 let contador = 0;
                 serie.forEach(v => {
-                    if(v > 0) { suma += v; contador++; }
+                    // Ignora todo lo que sea null o estrictamente vacío
+                    if(v !== null && v !== undefined && v !== '') {
+                        if (kpi.id === 'MONIT') {
+                            // En Monitoreo, si es 0 real, sí debe contar para el promedio
+                            suma += v; contador++;
+                        } else {
+                            // En los otros KPIs heredados, ignoramos los 0 porque eran usados como "vacío"
+                            if (v > 0) { suma += v; contador++; }
+                        }
+                    }
                 });
                 kpi.val = contador > 0 ? (suma / contador).toFixed(1) + "%" : "0%";
             }
@@ -403,17 +416,9 @@
                 if(inpApertura) inpApertura.valueAsDate = new Date();
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
-                // Forzar limpieza general para asegurar que la reestructuración de los 11 KPIs funcione limpia
-                const limpiarNombresActuales = BD_HSEQ.map(k => `kpi_data_${k.id}`);
-                Object.keys(localStorage).forEach(key => {
-                    if (key.startsWith('kpi_data_') && !limpiarNombresActuales.includes(key)) {
-                        localStorage.removeItem(key);
-                    }
-                });
-
                 BD_HSEQ.forEach(k => {
-                    // LIMPIAR FORZADAMENTE MONITOREO Y LOS QUE SE MOVIERON PARA EVITAR DATOS CRUZADOS
-                    if(k.id === 'MONIT' || k.id === 'PMA' || k.id === 'CAP' || k.id === 'COM' || k.id === 'QEXT' || k.id === 'QINT') {
+                    // LIMPIAR CACHÉ DE MONIT PARA QUE TOMEN EFECTO LOS VALORES NULOS
+                    if(k.id === 'MONIT') {
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     } else {
                         try {
@@ -604,11 +609,12 @@
             if(eInp) eInp.innerHTML = kpi.inputs.map(inp => `
                 <div>
                     <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">${inp.label}</label>
-                    <input type="number" id="${inp.id}" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
+                    <input type="number" id="${inp.id}" placeholder="Vacio" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
                 </div>
             `).join('');
             
-            mainChartType = kpi.type.includes('bar') ? 'bar' : 'line';
+            // Preferir barras por defecto si el KPI es Monitoreo o TR
+            mainChartType = kpi.type === 'bar' ? 'bar' : 'line';
             
             renderLinks(kpi.links); 
             renderCharts();
@@ -650,6 +656,7 @@
             mainChart.render();
         }
 
+        // FUNCION MEJORADA: Calcula el dato correctamente en lugar de sobrescribir arrays a ciegas y respeta los valores nulos (vacíos)
         function guardarDatosMensuales() {
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
             if(!kpi) return;
@@ -660,12 +667,39 @@
             const indiceMes = kpi.hist.labels.indexOf(mesValue);
             
             if (indiceMes !== -1) {
-                kpi.inputs.forEach((inp, idx) => {
-                    let valInput = parseFloat(document.getElementById(inp.id).value);
-                    if(kpi.hist.series[idx]) {
-                        kpi.hist.series[idx].data[indiceMes] = isNaN(valInput) ? 0 : valInput;
+                if (kpi.id === 'RES') {
+                    kpi.inputs.forEach((inp, idx) => {
+                        let val = parseFloat(document.getElementById(inp.id).value);
+                        if(kpi.hist.series[idx]) kpi.hist.series[idx].data[indiceMes] = isNaN(val) ? 0 : val;
+                    });
+                } else if (kpi.id === 'INC') {
+                    let val = parseFloat(document.getElementById(kpi.inputs[0].id).value);
+                    kpi.hist.series[0].data[indiceMes] = isNaN(val) ? 0 : val;
+                } else {
+                    // Para indicadores calculados (porcentajes, tasas, monitoreo)
+                    let vals = kpi.inputs.map(inp => parseFloat(document.getElementById(inp.id).value));
+                    
+                    // Si el usuario deja los campos en blanco o pone 0 medidos, se considera un mes "Sin Datos" (Null)
+                    if (vals.some(isNaN) || (vals.length > 1 && vals[1] === 0)) {
+                        kpi.hist.series[0].data[indiceMes] = null;
+                        if (kpi.id === 'MONIT' && kpi.hist.series[1]) {
+                            kpi.hist.series[1].data[indiceMes] = null; // Quitar también la barra de meta visualmente
+                        }
+                    } else {
+                        // Calcular el resultado
+                        let res = 0;
+                        if(kpi.id === 'PREV' || vals.length === 1) res = vals[0];
+                        else if(kpi.id === 'TR') res = vals[0] / vals[1];
+                        else res = (vals[0] / vals[1]) * 100;
+                        
+                        kpi.hist.series[0].data[indiceMes] = parseFloat(res.toFixed(2));
+                        
+                        // Restaurar la meta en el gráfico por si había sido eliminada antes
+                        if (kpi.hist.series[1]) {
+                            kpi.hist.series[1].data[indiceMes] = kpi.metaVal; 
+                        }
                     }
-                });
+                }
             }
 
             recalcularValorTarjeta(kpi);
@@ -677,7 +711,7 @@
             }));
 
             selectKpi(currentKpiId); 
-            alert(`¡Dato de ${mesTexto} registrado correctamente en la gráfica y promedios actualizados!`);
+            alert(`¡Dato de ${mesTexto} registrado correctamente!`);
         }
         
         let campoInspecciones = [];
