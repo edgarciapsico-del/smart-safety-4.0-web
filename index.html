@@ -135,8 +135,8 @@
                             <i data-lucide="database" class="w-4 h-4 text-sky-500"></i> Tabla de Ingreso (Mensual)
                         </h3>
                         
-                        <div class="flex gap-2 mb-3">
-                            <div class="w-1/3">
+                        <div class="flex flex-col gap-2 mb-3">
+                            <div>
                                 <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Periodo</label>
                                 <select id="entry-month" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
                                     <option value="Ene 25">Enero 2025</option><option value="Feb 25">Febrero 2025</option>
@@ -148,15 +148,15 @@
                                     <option value="Ene 26">Enero 2026</option><option value="Feb 26">Febrero 2026</option>
                                     <option value="Mar 26">Marzo 2026</option><option value="Abr 26">Abril 2026</option>
                                     <option value="May 26">Mayo 2026</option><option value="Jun 26">Junio 2026</option>
-                                    <option value="Jul 26">Julio 2026</option><option value="Ago 26">Agosto 2026</option>
+                                    <option value="Jul 26">Julio 2026</option><option value="Ago 26" selected>Agosto 2026</option>
                                     <option value="Sep 26">Septiembre 2026</option><option value="Oct 26">Octubre 2026</option>
                                     <option value="Nov 26">Noviembre 2026</option><option value="Dic 26">Diciembre 2026</option>
                                 </select>
                             </div>
-                            <div class="w-2/3 grid grid-cols-1 gap-2" id="entry-inputs-container"></div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-2" id="entry-inputs-container"></div>
                         </div>
                         
-                        <button onclick="guardarDatosMensuales()" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 text-white font-black text-[10px] py-2.5 rounded transition-colors uppercase tracking-widest">
+                        <button onclick="guardarDatosMensuales()" class="w-full bg-slate-800 dark:bg-sky-600 hover:bg-slate-700 text-white font-black text-[10px] py-2.5 rounded transition-colors uppercase tracking-widest mt-2">
                             Registrar y Actualizar
                         </button>
                     </div>
@@ -307,9 +307,20 @@
                 hist: { labels: [...lbl24], series: [ { name: "CAI (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
-                id: "RES", name: "5. GESTIÓN DE RESIDUOS 2025-2026", formula: "Suma de Kg Reciclados", smart: "Optimizar la gestión y valorización de residuos sólidos.", metaVal: 5000, type: "bar", val: "0 Kg", links: { v: "", t: "" },
-                inputs: [ { id: "in_kg", label: "Kg Reciclados" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + " Kg",
-                hist: { labels: [...lbl24], series: [ { name: "Kg Reciclados", data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2898.80, 3003.20, 2931.42, 0, 0, 0] } ]}
+                id: "RES", name: "5. GESTIÓN DE RESIDUOS 2025-2026", formula: "Suma Mensual de Residuos por Tipo", smart: "Optimizar la gestión y valorización de residuos sólidos.", metaVal: 5000, type: "bar", val: "0 Kg", links: { v: "", t: "" },
+                inputs: [ 
+                    { id: "in_rec", label: "Reciclables (Kg)" },
+                    { id: "in_nopel", label: "No Peligrosos (Kg)" },
+                    { id: "in_pel", label: "Peligrosos (Kg)" }
+                ], calc: (v) => { let s = (isNaN(v[0])?0:v[0])+(isNaN(v[1])?0:v[1])+(isNaN(v[2])?0:v[2]); return s.toFixed(2) + " Kg"; },
+                hist: { 
+                    labels: [...lbl24], 
+                    series: [ 
+                        { name: "Reciclables", data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 2130, 2530, 2451, 0,0,0] },
+                        { name: "No Peligrosos", data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 310, 473.20, 427.56, 0,0,0] },
+                        { name: "Peligrosos", data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 458.80, 0, 52.86, 0,0,0] }
+                    ]
+                }
             },
             {
                 id: "PMA", name: "6. CUMPLIMIENTO PMA", formula: "(Acciones Ejecutadas / Programadas) * 100", smart: "Cumplimiento estricto del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
@@ -361,7 +372,11 @@
                         if(savedData) {
                             const parsed = JSON.parse(savedData);
                             if(parsed && parsed.data && Array.isArray(parsed.data)) {
-                                k.hist.series[0].data = parsed.data;
+                                if (Array.isArray(parsed.data[0])) {
+                                    parsed.data.forEach((dArr, idx) => { if (k.hist.series[idx]) k.hist.series[idx].data = dArr; });
+                                } else {
+                                    k.hist.series[0].data = parsed.data;
+                                }
                             }
                         }
                     } catch(err) {
@@ -371,12 +386,16 @@
                     if(k.id === 'INC') {
                         let sumaTotal = k.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
                         k.val = sumaTotal.toString();
+                    } else if(k.id === 'RES') {
+                        let sumaTotal = 0;
+                        k.hist.series.forEach(serie => { sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0); });
+                        k.val = sumaTotal.toFixed(2) + " Kg";
                     } else {
                         let serie = k.hist.series[0].data;
                         let encontrado = false;
                         for(let i = serie.length - 1; i >= 0; i--) {
                             if(serie[i] !== 0) {
-                                let sufijo = k.id.includes('TR') ? '' : (k.id.includes('RES') ? ' Kg' : '%');
+                                let sufijo = k.id.includes('TR') ? '' : '%';
                                 k.val = serie[i] + sufijo;
                                 encontrado = true;
                                 break;
@@ -397,7 +416,7 @@
 
                 renderKpiList();
                 renderTablaPlanificacion();
-                selectKpi("PREV"); 
+                selectKpi("RES"); // Inicia mostrando el KPI de residuos
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
             }
@@ -553,8 +572,14 @@
             if(eDesc) eDesc.innerText = kpi.formula;
             if(eVal) eVal.innerText = kpi.val;
             if(eSmart) eSmart.innerHTML = `<strong>Objetivo SMART:</strong> ${kpi.smart || 'Cumplimiento HSEQ.'}`;
-            if(eInp) eInp.innerHTML = kpi.inputs.map(inp => `<input type="number" id="${inp.id}" placeholder="${inp.label}" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">`).join('');
+            if(eInp) eInp.innerHTML = kpi.inputs.map(inp => `
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">${inp.label}</label>
+                    <input type="number" id="${inp.id}" placeholder="0" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2 rounded text-xs font-bold focus:border-sky-500 outline-none">
+                </div>
+            `).join('');
             
+            if (id === 'RES') { mainChartType = 'bar'; } // Forzar tipo barra para Residuos
             renderLinks(kpi.links); 
             renderCharts();
         }
@@ -570,13 +595,25 @@
             const cont = document.querySelector("#chartContainer");
             if(!cont || typeof ApexCharts === 'undefined') return;
 
+            // Colores especiales si es el KPI de residuos en formato barra
+            let palette = mainChartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'];
+            if(kpi.id === 'RES' && mainChartType === 'bar') { palette = ['#54a034', '#1e5b9f', '#e57a14']; }
+
             const opt = {
-                chart: { type: mainChartType, height: 320, toolbar: { show: false }, background: 'transparent' },
-                colors: mainChartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'],
-                stroke: { curve: 'smooth', width: [3, 2] }, series: kpi.hist.series,
+                chart: { 
+                    type: mainChartType, 
+                    height: 320, 
+                    toolbar: { show: false }, 
+                    background: 'transparent',
+                    stacked: mainChartType === 'bar' 
+                },
+                colors: palette,
+                stroke: { curve: 'smooth', width: mainChartType === 'bar' ? 0 : [3, 2] }, 
+                series: kpi.hist.series,
                 xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px' } } },
                 yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
-                grid: { borderColor: gridColor, strokeDashArray: 3 }
+                grid: { borderColor: gridColor, strokeDashArray: 3 },
+                legend: { position: 'top', horizontalAlign: 'left', fontSize: '10px', labels: { colors: txtColor } }
             };
             mainChart = new ApexCharts(cont, opt); 
             mainChart.render();
@@ -602,20 +639,27 @@
             const indiceMes = kpi.hist.labels.indexOf(mesValue);
             
             if (indiceMes !== -1) {
-                let valStr = String(nuevoResultadoCalculado);
-                let valorNumerico = parseFloat(valStr.replace(/[^0-9.-]+/g,""));
-                kpi.hist.series[0].data[indiceMes] = isNaN(valorNumerico) ? 0 : valorNumerico;
+                kpi.inputs.forEach((inp, idx) => {
+                    let valInput = parseFloat(document.getElementById(inp.id).value);
+                    if(kpi.hist.series[idx]) {
+                        kpi.hist.series[idx].data[indiceMes] = isNaN(valInput) ? 0 : valInput;
+                    }
+                });
             }
 
             if(kpi.id === 'INC') {
                 let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
                 kpi.val = sumaTotal.toString();
+            } else if (kpi.id === 'RES') {
+                let sumaTotal = 0;
+                kpi.hist.series.forEach(serie => { sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0); });
+                kpi.val = sumaTotal.toFixed(2) + " Kg";
             } else {
                 let serieDatos = kpi.hist.series[0].data;
                 let ultimoValValido = kpi.val;
                 for(let i = serieDatos.length - 1; i >= 0; i--) {
                     if(serieDatos[i] > 0 || i === serieDatos.length - 1) {
-                        ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : (kpi.id.includes('RES') ? ' Kg' : '%'));
+                        ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : '%');
                         if(serieDatos[i] > 0) break;
                     }
                 }
@@ -625,7 +669,7 @@
             localStorage.removeItem(`kpi_data_${kpi.id}`);
             localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
                 val: kpi.val,
-                data: kpi.hist.series[0].data
+                data: kpi.hist.series.map(s => s.data)
             }));
 
             selectKpi(currentKpiId); 
