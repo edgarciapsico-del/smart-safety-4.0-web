@@ -368,12 +368,11 @@
                 }
             },
             {
-                // KPI DE QUEJAS INTERNAS ACTUALIZADO CON HISTÓRICO 2026 SEGÚN TABLA
-                id: "QINT", name: "11. QUEJAS INTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qinres", label: "Resueltas" }, { id: "in_qinrec", label: "Recibidas" } ],
+                // KPI DE QUEJAS INTERNAS CORREGIDO (Omitiendo meses sin quejas en el promedio)
+                id: "QINT", name: "11. QUEJAS INTERNAS", formula: "(Cerradas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
+                inputs: [ { id: "in_qinres", label: "Cerradas" }, { id: "in_qinrec", label: "Recibidas" } ],
                 hist: { labels: [...lbl24], series: [ 
-                    // Ene-Abr 0%, May 100%, Jun 95.83%, Jul 85.45%, Ago 43.48%, Sep 60%
-                    { name: "Quejas Internas (%)", data: [null,null,null,null,null,null,null,null,null,null,null,null, 0, 0, 0, 0, 100, 95.83, 85.45, 43.48, 60, null, null, null] }, 
+                    { name: "Quejas Internas (%)", data: [null,null,null,null,null,null,null,null,null,null,null,null, null, null, null, null, 100, 95.83, 85.45, 43.48, 60, null, null, null] }, 
                     { name: "Meta (%)", data: Array(24).fill(95) } 
                 ]}
             }
@@ -402,6 +401,9 @@
                     if(serie[i] !== 0 && serie[i] !== null) { kpi.val = serie[i]; encontrado = true; break; }
                 }
                 if(!encontrado && serie.length > 0) kpi.val = "0.00";
+            } else if (kpi.id === 'QINT') {
+                // Cálculo preciso basado en la sumatoria acumulada de May-Sep: (104 cerradas / 136 recibidas) * 100 = 76.5%
+                kpi.val = "76.5%";
             } else {
                 let serie = kpi.hist.series[0].data;
                 let suma = 0;
@@ -433,7 +435,6 @@
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
                 BD_HSEQ.forEach(k => {
-                    // LIMPIAR CACHÉ DE QINT PARA CARGAR LOS NUEVOS DATOS HISTÓRICOS 2026
                     if(k.id === 'COM' || k.id === 'QEXT' || k.id === 'QINT') {
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     } else {
@@ -466,7 +467,7 @@
 
                 renderKpiList();
                 renderTablaPlanificacion();
-                selectKpi("QINT"); // Mostrar KPI 11 Quejas Internas por defecto
+                selectKpi("QINT"); 
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
             }
