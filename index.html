@@ -114,7 +114,7 @@
                                 <button onclick="setChartType('bar')" id="chart-type-bar" class="px-3 py-1.5 rounded text-slate-600 dark:text-slate-300 transition-colors">Barras</button>
                             </div>
                             <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-right">
-                                <span class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Desempeño Actual</span>
+                                <span class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Desempeño Promedio / Acumulado</span>
                                 <span id="kpi-value" class="text-3xl font-black font-mono">0</span>
                             </div>
                         </div>
@@ -287,7 +287,7 @@
         
         const BD_HSEQ = [
             {
-                id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Meta Global: 85%", smart: "Garantizar cultura preventiva superior al 85%.", metaVal: 85.0, type: "line-meta", val: "92.7%", links: { v: "", t: "" },
+                id: "PREV", name: "1. DESEMPEÑO GESTIÓN PREVENTIVA", formula: "Meta Global: 85%", smart: "Garantizar cultura preventiva superior al 85%.", metaVal: 85.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_p", label: "Resultado %" } ], calc: (v) => (isNaN(v[0]) ? 0 : v[0]) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Resultado (%)", data: [99.1, 111.3, 91.2, 89.3, 86.3, 99.6, 117.6, 93.3, 96.0, 94.8, 89.0, 93.5, 98.55, 96.4, 97.9, 96.1, 95.9, 92.7, 90, 92, 91, 92.7, 0, 0] }, { name: "Meta (%)", data: Array(24).fill(85.0) } ]}
             },
@@ -297,12 +297,12 @@
                 hist: { labels: [...lbl24], series: [ { name: "TR Obtenido", data: Array(24).fill(0) }, { name: "Meta TR", data: Array(24).fill(5.27) } ]}
             },
             {
-                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "1", links: { v: "", t: "" },
+                id: "INC", name: "3. INCIDENTES / ACCIDENTES", formula: "Total Anual | Meta: 0", smart: "Cero accidentes con tiempo perdido.", metaVal: 0, type: "bar", val: "0", links: { v: "", t: "" },
                 inputs: [ { id: "in_inc", label: "N° Incidentes" } ], calc: (v) => isNaN(v[0]) ? 0 : v[0],
                 hist: { labels: [...lbl24], series: [ { name: "Total Incidentes", data: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,5,0,1,0,0,0,0] } ]}
             },
             {
-                id: "CAI", name: "4. CONTROL DE ACCIDENTES / INCIDENTES (CAI)", formula: "(Cerrados / Ocurridos) * 100", smart: "Controlar y cerrar el 100% de incidentes reportados.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
+                id: "CAI", name: "4. CONTROL DE ACCIDENTES / INCIDENTES (CAI)", formula: "(Cerrados / Ocurridos) * 100", smart: "Controlar y cerrar el 100% de incidentes reportados.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_cer", label: "Cerrados" }, { id: "in_ocur", label: "Ocurridos" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "CAI (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
@@ -323,12 +323,12 @@
                 }
             },
             {
-                id: "PMA", name: "6. CUMPLIMIENTO PMA", formula: "(Acciones Ejecutadas / Programadas) * 100", smart: "Cumplimiento estricto del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
+                id: "PMA", name: "6. CUMPLIMIENTO PMA", formula: "(Acciones Ejecutadas / Programadas) * 100", smart: "Cumplimiento estricto del Plan de Manejo Ambiental.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_pej", label: "Ejecutadas" }, { id: "in_pprog", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "PMA (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
-                id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "(Horas Dictadas / Programadas) * 100", smart: "Superar el cumplimiento de horas de capacitación HSEQ.", metaVal: 100.0, type: "line-meta", val: "119%", links: { v: "", t: "" },
+                id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "(Horas Dictadas / Programadas) * 100", smart: "Superar el cumplimiento de horas de capacitación HSEQ.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_cdict", label: "Dictadas" }, { id: "in_cprog", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ 
                     { name: "Capacitación (%)", data: [100, 105, 95, 110, 100, 90, 105, 100, 115, 100, 105, 110, 100, 105, 95, 110, 100, 105, 115, 110, 119, 0, 0, 0] }, 
@@ -336,17 +336,17 @@
                 ]}
             },
             {
-                id: "COM", name: "8. RELAC. COMUNITARIO", formula: "(Actividades / Programadas) * 100", smart: "Ejecución oportuna de los programas de relación con la comunidad.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
+                id: "COM", name: "8. RELAC. COMUNITARIO", formula: "(Actividades / Programadas) * 100", smart: "Ejecución oportuna de los programas de relación con la comunidad.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_comd", label: "Ejecutadas" }, { id: "in_comp", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Comunitario (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
             },
             {
-                id: "QEXT", name: "9. QUEJAS EXTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Atención y resolución oportuna de peticiones externas.", metaVal: 90.0, type: "line-meta", val: "75%", links: { v: "", t: "" },
+                id: "QEXT", name: "9. QUEJAS EXTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Atención y resolución oportuna de peticiones externas.", metaVal: 90.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qexres", label: "Resueltas" }, { id: "in_qexrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Quejas Externas (%)", data: Array(24).fill(75) }, { name: "Meta (%)", data: Array(24).fill(90) } ]}
             },
             {
-                id: "QINT", name: "10. QUEJAS INTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "95.8%", links: { v: "", t: "" },
+                id: "QINT", name: "10. QUEJAS INTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qinres", label: "Resueltas" }, { id: "in_qinrec", label: "Recibidas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
                 hist: { labels: [...lbl24], series: [ { name: "Quejas Internas (%)", data: Array(24).fill(95.8) }, { name: "Meta (%)", data: Array(24).fill(95) } ]}
             }
@@ -355,6 +355,37 @@
         let currentKpiId = "PREV";
         let mainChartType = "line";
         let mainChart = null;
+
+        // Función centralizada para calcular el valor de la tarjeta
+        function recalcularValorTarjeta(kpi) {
+            if(kpi.id === 'INC') {
+                // SUMATORIA TOTAL
+                let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
+                kpi.val = sumaTotal.toString();
+            } else if(kpi.id === 'RES') {
+                // SUMATORIA DE TODOS LOS RESIDUOS
+                let sumaTotal = 0;
+                kpi.hist.series.forEach(serie => { sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0); });
+                kpi.val = sumaTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Kg";
+            } else if (kpi.id === 'TR') {
+                // ÚLTIMO VALOR VÁLIDO PARA TASA DE RIESGO
+                let serie = kpi.hist.series[0].data;
+                let encontrado = false;
+                for(let i = serie.length - 1; i >= 0; i--) {
+                    if(serie[i] !== 0) { kpi.val = serie[i]; encontrado = true; break; }
+                }
+                if(!encontrado && serie.length > 0) kpi.val = serie[serie.length - 1];
+            } else {
+                // PROMEDIO ACUMULADO PARA PORCENTAJES (CAP, PREV, PMA, COM, etc.)
+                let serie = kpi.hist.series[0].data;
+                let suma = 0;
+                let contador = 0;
+                serie.forEach(v => {
+                    if(v > 0) { suma += v; contador++; }
+                });
+                kpi.val = contador > 0 ? (suma / contador).toFixed(1) + "%" : "0%";
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -370,7 +401,7 @@
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
                 BD_HSEQ.forEach(k => {
-                    // LIMPIEZA FORZADA DE CACHÉ PARA RESIDUOS Y CAPACITACIÓN
+                    // LIMPIEZA FORZADA DE CACHÉ PARA CAPACITACIÓN Y RESIDUOS
                     if(k.id === 'RES' || k.id === 'CAP') {
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     } else {
@@ -391,28 +422,8 @@
                         }
                     }
 
-                    if(k.id === 'INC') {
-                        let sumaTotal = k.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
-                        k.val = sumaTotal.toString();
-                    } else if(k.id === 'RES') {
-                        let sumaTotal = 0;
-                        k.hist.series.forEach(serie => { sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0); });
-                        k.val = sumaTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Kg";
-                    } else {
-                        let serie = k.hist.series[0].data;
-                        let encontrado = false;
-                        for(let i = serie.length - 1; i >= 0; i--) {
-                            if(serie[i] !== 0) {
-                                let sufijo = k.id.includes('TR') ? '' : '%';
-                                k.val = serie[i] + sufijo;
-                                encontrado = true;
-                                break;
-                            }
-                        }
-                        if(!encontrado && serie.length > 0) {
-                            k.val = serie[serie.length - 1] + (k.id.includes('TR') ? '' : '%');
-                        }
-                    }
+                    // Calcular el valor a mostrar en la tarjeta según la lógica corregida
+                    recalcularValorTarjeta(k);
 
                     const savedV = localStorage.getItem(`link_v_${k.id}`);
                     const savedT = localStorage.getItem(`link_t_${k.id}`);
@@ -424,7 +435,7 @@
 
                 renderKpiList();
                 renderTablaPlanificacion();
-                selectKpi("CAP"); // Inicia mostrando Capacitación para que valides el cambio
+                selectKpi("CAP"); // Inicia mostrando Capacitación para que valides el promedio
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
             }
@@ -633,22 +644,13 @@
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
             if(!kpi) return;
             
-            let vals = []; 
-            kpi.inputs.forEach(inp => {
-                let valInput = parseFloat(document.getElementById(inp.id).value);
-                vals.push(isNaN(valInput) ? 0 : valInput);
-            });
-            
-            const nuevoResultadoCalculado = kpi.calc(vals);
-            kpi.val = nuevoResultadoCalculado; 
-
             const selectMes = document.getElementById('entry-month');
             const mesValue = selectMes.value;
             const mesTexto = selectMes.options[selectMes.selectedIndex].text; 
-            
             const indiceMes = kpi.hist.labels.indexOf(mesValue);
             
             if (indiceMes !== -1) {
+                // Leer inputs y guardarlos en el histórico temporal
                 kpi.inputs.forEach((inp, idx) => {
                     let valInput = parseFloat(document.getElementById(inp.id).value);
                     if(kpi.hist.series[idx]) {
@@ -657,24 +659,8 @@
                 });
             }
 
-            if(kpi.id === 'INC') {
-                let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
-                kpi.val = sumaTotal.toString();
-            } else if (kpi.id === 'RES') {
-                let sumaTotal = 0;
-                kpi.hist.series.forEach(serie => { sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0); });
-                kpi.val = sumaTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Kg";
-            } else {
-                let serieDatos = kpi.hist.series[0].data;
-                let ultimoValValido = kpi.val;
-                for(let i = serieDatos.length - 1; i >= 0; i--) {
-                    if(serieDatos[i] > 0 || i === serieDatos.length - 1) {
-                        ultimoValValido = serieDatos[i] + (kpi.id.includes('TR') ? '' : '%');
-                        if(serieDatos[i] > 0) break;
-                    }
-                }
-                kpi.val = ultimoValValido;
-            }
+            // Recalcular el valor que se mostrará en la tarjeta después de actualizar el histórico
+            recalcularValorTarjeta(kpi);
 
             localStorage.removeItem(`kpi_data_${kpi.id}`);
             localStorage.setItem(`kpi_data_${kpi.id}`, JSON.stringify({
@@ -683,7 +669,7 @@
             }));
 
             selectKpi(currentKpiId); 
-            alert(`¡Dato de ${mesTexto} registrado correctamente en la gráfica!`);
+            alert(`¡Dato de ${mesTexto} registrado correctamente en la gráfica y promedios actualizados!`);
         }
         
         let campoInspecciones = [];
