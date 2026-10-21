@@ -330,7 +330,10 @@
             {
                 id: "CAP", name: "7. PLAN CAPACITACIÓN", formula: "(Horas Dictadas / Programadas) * 100", smart: "Superar el cumplimiento de horas de capacitación HSEQ.", metaVal: 100.0, type: "line-meta", val: "119%", links: { v: "", t: "" },
                 inputs: [ { id: "in_cdict", label: "Dictadas" }, { id: "in_cprog", label: "Programadas" } ], calc: (v) => v[1] === 0 || isNaN(v[1]) ? "0%" : ((v[0]/v[1])*100).toFixed(1) + "%",
-                hist: { labels: [...lbl24], series: [ { name: "Capacitación (%)", data: Array(24).fill(119) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
+                hist: { labels: [...lbl24], series: [ 
+                    { name: "Capacitación (%)", data: [100, 105, 95, 110, 100, 90, 105, 100, 115, 100, 105, 110, 100, 105, 95, 110, 100, 105, 115, 110, 119, 0, 0, 0] }, 
+                    { name: "Meta (%)", data: Array(24).fill(100) } 
+                ]}
             },
             {
                 id: "COM", name: "8. RELAC. COMUNITARIO", formula: "(Actividades / Programadas) * 100", smart: "Ejecución oportuna de los programas de relación con la comunidad.", metaVal: 100.0, type: "line-meta", val: "100%", links: { v: "", t: "" },
@@ -367,8 +370,8 @@
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
                 BD_HSEQ.forEach(k => {
-                    // LIMPIEZA FORZADA DE CACHÉ PARA EL INDICADOR "RES" PARA QUE TOME LA NUEVA DATA PRECARGADA
-                    if(k.id === 'RES') {
+                    // LIMPIEZA FORZADA DE CACHÉ PARA RESIDUOS Y CAPACITACIÓN
+                    if(k.id === 'RES' || k.id === 'CAP') {
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     } else {
                         try {
@@ -421,7 +424,7 @@
 
                 renderKpiList();
                 renderTablaPlanificacion();
-                selectKpi("RES"); // Inicia mostrando el KPI de residuos
+                selectKpi("CAP"); // Inicia mostrando Capacitación para que valides el cambio
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
             }
@@ -584,7 +587,8 @@
                 </div>
             `).join('');
             
-            if (id === 'RES') { mainChartType = 'bar'; } // Forzar tipo barra para Residuos
+            mainChartType = kpi.type.includes('bar') ? 'bar' : 'line';
+            
             renderLinks(kpi.links); 
             renderCharts();
         }
@@ -600,9 +604,10 @@
             const cont = document.querySelector("#chartContainer");
             if(!cont || typeof ApexCharts === 'undefined') return;
 
-            // Colores especiales si es el KPI de residuos en formato barra
             let palette = mainChartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'];
             if(kpi.id === 'RES' && mainChartType === 'bar') { palette = ['#54a034', '#1e5b9f', '#e57a14']; }
+
+            let isStacked = (kpi.id === 'RES' && mainChartType === 'bar');
 
             const opt = {
                 chart: { 
@@ -610,7 +615,7 @@
                     height: 320, 
                     toolbar: { show: false }, 
                     background: 'transparent',
-                    stacked: mainChartType === 'bar' 
+                    stacked: isStacked 
                 },
                 colors: palette,
                 stroke: { curve: 'smooth', width: mainChartType === 'bar' ? 0 : [3, 2] }, 
