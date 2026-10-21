@@ -344,7 +344,6 @@
                 ]}
             },
             {
-                // KPI DE RELACIONAMIENTO COMUNITARIO ACTUALIZADO (DATA 2025 COMPLETA Y 2026 CALCULADA)
                 id: "COM", name: "9. RELAC. COMUNITARIO", formula: "(Actividades / Programadas) * 100", smart: "Ejecución oportuna de los programas de relación con la comunidad.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_comd", label: "Ejecutadas" }, { id: "in_comp", label: "Programadas" } ],
                 hist: { labels: [...lbl24], series: [ 
@@ -353,9 +352,24 @@
                 ]}
             },
             {
-                id: "QEXT", name: "10. QUEJAS EXTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Atención y resolución oportuna de peticiones externas.", metaVal: 90.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
-                inputs: [ { id: "in_qexres", label: "Resueltas" }, { id: "in_qexrec", label: "Recibidas" } ],
-                hist: { labels: [...lbl24], series: [ { name: "Quejas Externas (%)", data: Array(24).fill(75) }, { name: "Meta (%)", data: Array(24).fill(90) } ]}
+                // KPI DE QUEJAS EXTERNAS ACTUALIZADO A BARRAS APILADAS POR TIPO (Igual a la Imagen 2)
+                id: "QEXT", name: "10. QUEJAS Y PETICIONES EXTERNAS", formula: "Registro Mensual de Casos por Tipo (Resolución: 100% Casos Cerrados)", smart: "Atención y resolución oportuna de peticiones externas garantizando el 100% de cumplimiento.", metaVal: 0, type: "bar", val: "0 Casos", links: { v: "", t: "" },
+                inputs: [ 
+                    { id: "in_qex_obs", label: "Observaciones / Inquietudes" }, 
+                    { id: "in_qex_req", label: "Requerimientos" },
+                    { id: "in_qex_que", label: "Quejas / Reclamos / Denuncias" }
+                ],
+                hist: { 
+                    labels: [...lbl24], 
+                    series: [ 
+                        // Verdes (Observaciones)
+                        { name: "Observaciones / Inquietudes", data: [null,null,null,null,null,null,null,null,null,null, 1, 0, 0, 1, 1, 0, null, 1, 1, 1, 0, null,null,null] },
+                        // Amarillos (Requerimientos)
+                        { name: "Requerimientos", data: [null,null,null,null,null,null,null,null,null,null, 1, 1, 1, 0, 0, 4, null, 3, 0, 0, 1, null,null,null] },
+                        // Azules (Quejas/Reclamos)
+                        { name: "Quejas / Reclamos / Denuncias", data: [null,null,null,null,null,null,null,null,null,null, 1, 0, 0, 0, 0, 0, null, 0, 1, 0, 0, null,null,null] }
+                    ]
+                }
             },
             {
                 id: "QINT", name: "11. QUEJAS INTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
@@ -372,12 +386,14 @@
             if(kpi.id === 'INC') {
                 let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) || b === null ? 0 : b), 0);
                 kpi.val = sumaTotal.toString();
-            } else if(kpi.id === 'RES') {
+            } else if(kpi.id === 'RES' || kpi.id === 'QEXT') {
                 let sumaTotal = 0;
                 kpi.hist.series.forEach(serie => { 
                     sumaTotal += serie.data.reduce((a, b) => a + (isNaN(b) || b === null ? 0 : b), 0); 
                 });
-                kpi.val = sumaTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Kg";
+                kpi.val = kpi.id === 'RES' 
+                    ? sumaTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Kg"
+                    : sumaTotal.toString() + (sumaTotal === 1 ? " Caso" : " Casos");
             } else if (kpi.id === 'TR') {
                 let serie = kpi.hist.series[0].data;
                 let encontrado = false;
@@ -394,7 +410,7 @@
                         if (kpi.id === 'MONIT') {
                             suma += v; contador++;
                         } else {
-                            if (v > 0 || v === 0) { suma += v; contador++; } // Considera los 0 si existen
+                            if (v >= 0) { suma += v; contador++; } 
                         }
                     }
                 });
@@ -416,8 +432,8 @@
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
                 BD_HSEQ.forEach(k => {
-                    // LIMPIAR CACHÉ DE COMUNITARIO PARA CARGAR LOS NUEVOS DATOS DE 2025 Y LA META
-                    if(k.id === 'COM') {
+                    // LIMPIAR CACHÉ DE QEXT PARA MOSTRAR LOS DATOS DE LA TABLA Y EL NUEVO GRÁFICO
+                    if(k.id === 'COM' || k.id === 'QEXT') {
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     } else {
                         try {
@@ -449,7 +465,7 @@
 
                 renderKpiList();
                 renderTablaPlanificacion();
-                selectKpi("COM"); // Mostrar Comunitario por defecto para validar
+                selectKpi("QEXT"); // Se muestra KPI 10 por defecto para que lo veas al instante
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
             }
@@ -629,10 +645,12 @@
             const cont = document.querySelector("#chartContainer");
             if(!cont || typeof ApexCharts === 'undefined') return;
 
+            // Paleta de colores ajustada para Quejas (Verde, Amarillo, Azul) y para Residuos
             let palette = mainChartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'];
             if(kpi.id === 'RES' && mainChartType === 'bar') { palette = ['#54a034', '#1e5b9f', '#e57a14']; }
+            if(kpi.id === 'QEXT' && mainChartType === 'bar') { palette = ['#65a30d', '#ca8a04', '#0284c7']; } // Verde, Naranja, Azul
 
-            let isStacked = (kpi.id === 'RES' && mainChartType === 'bar');
+            let isStacked = ((kpi.id === 'RES' || kpi.id === 'QEXT') && mainChartType === 'bar');
 
             const opt = {
                 chart: { 
@@ -646,7 +664,7 @@
                 stroke: { curve: 'smooth', width: mainChartType === 'bar' ? 0 : [3, 2] }, 
                 series: kpi.hist.series,
                 xaxis: { categories: kpi.hist.labels, labels: { style: { colors: txtColor, fontSize: '9px' } } },
-                yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' } } },
+                yaxis: { labels: { style: { colors: txtColor, fontSize: '10px' }, forceNiceScale: true, min: 0 } },
                 grid: { borderColor: gridColor, strokeDashArray: 3 },
                 legend: { position: 'top', horizontalAlign: 'left', fontSize: '10px', labels: { colors: txtColor } }
             };
@@ -664,7 +682,8 @@
             const indiceMes = kpi.hist.labels.indexOf(mesValue);
             
             if (indiceMes !== -1) {
-                if (kpi.id === 'RES') {
+                // Si es un KPI de barras apiladas o entradas absolutas
+                if (kpi.id === 'RES' || kpi.id === 'QEXT') {
                     kpi.inputs.forEach((inp, idx) => {
                         let val = parseFloat(document.getElementById(inp.id).value);
                         if(kpi.hist.series[idx]) kpi.hist.series[idx].data[indiceMes] = isNaN(val) ? 0 : val;
@@ -688,7 +707,6 @@
                         
                         kpi.hist.series[0].data[indiceMes] = parseFloat(res.toFixed(2));
                         
-                        // Si es COM y estamos editando 2025, no reescribir con 100 si la meta ahí era 85
                         if (kpi.hist.series[1]) {
                             kpi.hist.series[1].data[indiceMes] = kpi.hist.series[1].data[indiceMes] || kpi.metaVal; 
                         }
