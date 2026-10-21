@@ -352,7 +352,6 @@
                 ]}
             },
             {
-                // KPI DE QUEJAS EXTERNAS ACTUALIZADO A BARRAS APILADAS POR TIPO (Igual a la Imagen 2)
                 id: "QEXT", name: "10. QUEJAS Y PETICIONES EXTERNAS", formula: "Registro Mensual de Casos por Tipo (Resolución: 100% Casos Cerrados)", smart: "Atención y resolución oportuna de peticiones externas garantizando el 100% de cumplimiento.", metaVal: 0, type: "bar", val: "0 Casos", links: { v: "", t: "" },
                 inputs: [ 
                     { id: "in_qex_obs", label: "Observaciones / Inquietudes" }, 
@@ -362,19 +361,21 @@
                 hist: { 
                     labels: [...lbl24], 
                     series: [ 
-                        // Verdes (Observaciones)
                         { name: "Observaciones / Inquietudes", data: [null,null,null,null,null,null,null,null,null,null, 1, 0, 0, 1, 1, 0, null, 1, 1, 1, 0, null,null,null] },
-                        // Amarillos (Requerimientos)
                         { name: "Requerimientos", data: [null,null,null,null,null,null,null,null,null,null, 1, 1, 1, 0, 0, 4, null, 3, 0, 0, 1, null,null,null] },
-                        // Azules (Quejas/Reclamos)
                         { name: "Quejas / Reclamos / Denuncias", data: [null,null,null,null,null,null,null,null,null,null, 1, 0, 0, 0, 0, 0, null, 0, 1, 0, 0, null,null,null] }
                     ]
                 }
             },
             {
+                // KPI DE QUEJAS INTERNAS ACTUALIZADO CON HISTÓRICO 2026 SEGÚN TABLA
                 id: "QINT", name: "11. QUEJAS INTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Optimizar la resolución de inconformidades internas del personal.", metaVal: 95.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_qinres", label: "Resueltas" }, { id: "in_qinrec", label: "Recibidas" } ],
-                hist: { labels: [...lbl24], series: [ { name: "Quejas Internas (%)", data: Array(24).fill(95.8) }, { name: "Meta (%)", data: Array(24).fill(95) } ]}
+                hist: { labels: [...lbl24], series: [ 
+                    // Ene-Abr 0%, May 100%, Jun 95.83%, Jul 85.45%, Ago 43.48%, Sep 60%
+                    { name: "Quejas Internas (%)", data: [null,null,null,null,null,null,null,null,null,null,null,null, 0, 0, 0, 0, 100, 95.83, 85.45, 43.48, 60, null, null, null] }, 
+                    { name: "Meta (%)", data: Array(24).fill(95) } 
+                ]}
             }
         ];
 
@@ -432,8 +433,8 @@
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
                 BD_HSEQ.forEach(k => {
-                    // LIMPIAR CACHÉ DE QEXT PARA MOSTRAR LOS DATOS DE LA TABLA Y EL NUEVO GRÁFICO
-                    if(k.id === 'COM' || k.id === 'QEXT') {
+                    // LIMPIAR CACHÉ DE QINT PARA CARGAR LOS NUEVOS DATOS HISTÓRICOS 2026
+                    if(k.id === 'COM' || k.id === 'QEXT' || k.id === 'QINT') {
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     } else {
                         try {
@@ -465,7 +466,7 @@
 
                 renderKpiList();
                 renderTablaPlanificacion();
-                selectKpi("QEXT"); // Se muestra KPI 10 por defecto para que lo veas al instante
+                selectKpi("QINT"); // Mostrar KPI 11 Quejas Internas por defecto
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
             }
@@ -645,10 +646,9 @@
             const cont = document.querySelector("#chartContainer");
             if(!cont || typeof ApexCharts === 'undefined') return;
 
-            // Paleta de colores ajustada para Quejas (Verde, Amarillo, Azul) y para Residuos
             let palette = mainChartType === 'bar' ? ['#7f8c8d', '#27ae60'] : ['#0284c7', '#ef4444'];
             if(kpi.id === 'RES' && mainChartType === 'bar') { palette = ['#54a034', '#1e5b9f', '#e57a14']; }
-            if(kpi.id === 'QEXT' && mainChartType === 'bar') { palette = ['#65a30d', '#ca8a04', '#0284c7']; } // Verde, Naranja, Azul
+            if(kpi.id === 'QEXT' && mainChartType === 'bar') { palette = ['#65a30d', '#ca8a04', '#0284c7']; }
 
             let isStacked = ((kpi.id === 'RES' || kpi.id === 'QEXT') && mainChartType === 'bar');
 
@@ -682,7 +682,6 @@
             const indiceMes = kpi.hist.labels.indexOf(mesValue);
             
             if (indiceMes !== -1) {
-                // Si es un KPI de barras apiladas o entradas absolutas
                 if (kpi.id === 'RES' || kpi.id === 'QEXT') {
                     kpi.inputs.forEach((inp, idx) => {
                         let val = parseFloat(document.getElementById(inp.id).value);
