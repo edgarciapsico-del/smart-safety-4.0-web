@@ -323,7 +323,6 @@
                 }
             },
             {
-                // KPI DE MONITOREO AMBIENTAL CORREGIDO: Usando 'null' en los meses sin reporte
                 id: "MONIT", name: "6. MONITOREO AMBIENTAL", formula: "(Parámetros CUMPLEN / Total Medidos) * 100", smart: "Asegurar que las emisiones y ruido no superen el Límite Máximo Permisible.", metaVal: 90.0, type: "bar", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_cumple", label: "Cumplen (SI)" }, { id: "in_total", label: "Total Medidos" } ],
                 hist: { labels: [...lbl24], series: [ 
@@ -345,9 +344,13 @@
                 ]}
             },
             {
+                // KPI DE RELACIONAMIENTO COMUNITARIO ACTUALIZADO (DATA 2025 COMPLETA Y 2026 CALCULADA)
                 id: "COM", name: "9. RELAC. COMUNITARIO", formula: "(Actividades / Programadas) * 100", smart: "Ejecución oportuna de los programas de relación con la comunidad.", metaVal: 100.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
                 inputs: [ { id: "in_comd", label: "Ejecutadas" }, { id: "in_comp", label: "Programadas" } ],
-                hist: { labels: [...lbl24], series: [ { name: "Comunitario (%)", data: Array(24).fill(100) }, { name: "Meta (%)", data: Array(24).fill(100) } ]}
+                hist: { labels: [...lbl24], series: [ 
+                    { name: "Comunitario (%)", data: [100, 100, 92, 129, 100, 100, 100, 100, 80, 80, 80, 100, 100, 100, 100, 92.3, 100, 112.5, 42.9, 0, 0, null, null, null] }, 
+                    { name: "Meta (%)", data: [85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100] } 
+                ]}
             },
             {
                 id: "QEXT", name: "10. QUEJAS EXTERNAS", formula: "(Resueltas / Recibidas) * 100", smart: "Atención y resolución oportuna de peticiones externas.", metaVal: 90.0, type: "line-meta", val: "0%", links: { v: "", t: "" },
@@ -362,10 +365,9 @@
         ];
 
         let currentKpiId = "PREV";
-        let mainChartType = "bar";
+        let mainChartType = "line";
         let mainChart = null;
 
-        // Función ajustada para soportar valores nulos (ignorándolos del promedio)
         function recalcularValorTarjeta(kpi) {
             if(kpi.id === 'INC') {
                 let sumaTotal = kpi.hist.series[0].data.reduce((a, b) => a + (isNaN(b) || b === null ? 0 : b), 0);
@@ -388,14 +390,11 @@
                 let suma = 0;
                 let contador = 0;
                 serie.forEach(v => {
-                    // Ignora todo lo que sea null o estrictamente vacío
                     if(v !== null && v !== undefined && v !== '') {
                         if (kpi.id === 'MONIT') {
-                            // En Monitoreo, si es 0 real, sí debe contar para el promedio
                             suma += v; contador++;
                         } else {
-                            // En los otros KPIs heredados, ignoramos los 0 porque eran usados como "vacío"
-                            if (v > 0) { suma += v; contador++; }
+                            if (v > 0 || v === 0) { suma += v; contador++; } // Considera los 0 si existen
                         }
                     }
                 });
@@ -417,8 +416,8 @@
                 if(inpCierre) inpCierre.valueAsDate = new Date();
                 
                 BD_HSEQ.forEach(k => {
-                    // LIMPIAR CACHÉ DE MONIT PARA QUE TOMEN EFECTO LOS VALORES NULOS
-                    if(k.id === 'MONIT') {
+                    // LIMPIAR CACHÉ DE COMUNITARIO PARA CARGAR LOS NUEVOS DATOS DE 2025 Y LA META
+                    if(k.id === 'COM') {
                         localStorage.removeItem(`kpi_data_${k.id}`);
                     } else {
                         try {
@@ -450,7 +449,7 @@
 
                 renderKpiList();
                 renderTablaPlanificacion();
-                selectKpi("MONIT"); // Se muestra el nuevo indicador como defecto
+                selectKpi("COM"); // Mostrar Comunitario por defecto para validar
             } catch (err) { 
                 console.error("Error crítico en inicio:", err); 
             }
@@ -613,7 +612,6 @@
                 </div>
             `).join('');
             
-            // Preferir barras por defecto si el KPI es Monitoreo o TR
             mainChartType = kpi.type === 'bar' ? 'bar' : 'line';
             
             renderLinks(kpi.links); 
@@ -656,7 +654,6 @@
             mainChart.render();
         }
 
-        // FUNCION MEJORADA: Calcula el dato correctamente en lugar de sobrescribir arrays a ciegas y respeta los valores nulos (vacíos)
         function guardarDatosMensuales() {
             const kpi = BD_HSEQ.find(k => k.id === currentKpiId);
             if(!kpi) return;
@@ -676,17 +673,14 @@
                     let val = parseFloat(document.getElementById(kpi.inputs[0].id).value);
                     kpi.hist.series[0].data[indiceMes] = isNaN(val) ? 0 : val;
                 } else {
-                    // Para indicadores calculados (porcentajes, tasas, monitoreo)
                     let vals = kpi.inputs.map(inp => parseFloat(document.getElementById(inp.id).value));
                     
-                    // Si el usuario deja los campos en blanco o pone 0 medidos, se considera un mes "Sin Datos" (Null)
                     if (vals.some(isNaN) || (vals.length > 1 && vals[1] === 0)) {
                         kpi.hist.series[0].data[indiceMes] = null;
                         if (kpi.id === 'MONIT' && kpi.hist.series[1]) {
-                            kpi.hist.series[1].data[indiceMes] = null; // Quitar también la barra de meta visualmente
+                            kpi.hist.series[1].data[indiceMes] = null;
                         }
                     } else {
-                        // Calcular el resultado
                         let res = 0;
                         if(kpi.id === 'PREV' || vals.length === 1) res = vals[0];
                         else if(kpi.id === 'TR') res = vals[0] / vals[1];
@@ -694,9 +688,9 @@
                         
                         kpi.hist.series[0].data[indiceMes] = parseFloat(res.toFixed(2));
                         
-                        // Restaurar la meta en el gráfico por si había sido eliminada antes
+                        // Si es COM y estamos editando 2025, no reescribir con 100 si la meta ahí era 85
                         if (kpi.hist.series[1]) {
-                            kpi.hist.series[1].data[indiceMes] = kpi.metaVal; 
+                            kpi.hist.series[1].data[indiceMes] = kpi.hist.series[1].data[indiceMes] || kpi.metaVal; 
                         }
                     }
                 }
